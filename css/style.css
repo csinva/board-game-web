@@ -185,6 +185,9 @@ table.ref tr + tr { border-top: 1px solid var(--soft); }
 }
 @media (max-width: 640px) {
   .wrap { padding: 16px; }
+  .game-nav { width: 100%; }
+  .game-nav select { flex: 1; max-width: none; min-width: 0; }
+  .game-nav button.btn { display: none; }
   .sheet-head { grid-template-columns: 1fr; padding: 16px; gap: 10px; }
   .sheet-head h1 { font-size: 36px; }
   .pitch { font-size: 17px; }
