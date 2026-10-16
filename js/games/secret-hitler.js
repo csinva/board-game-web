@@ -80,6 +80,50 @@ defineGame({
     'As Hitler, act like the most boring liberal at the table, then wait to be elected.',
   ],
 
+  walk(A) {
+    const C = A.C, lib = '#3e7ea8', fas = '#c45a32', backC = '#b9a77c';
+    const names = ['Eve', 'Ana', 'Cal', 'Ben', 'Dot', 'Fin', 'Gil'];
+    const px = (i) => 26 + i * 44.7, py = 168;
+    // Tracks: 1 liberal and 1 fascist policy already enacted.
+    let board = A.bg('#efe2c4');
+    board += A.rect(6, 4, 146, 40, '#a9cbe0', { rx: 5, sw: 1.3 }) + A.rect(158, 4, 156, 40, '#e9a98a', { rx: 5, sw: 1.3 });
+    for (let i = 0; i < 5; i++) board += A.rect(12 + i * 28, 9, 24, 31, 'rgba(255,255,255,.45)', { rx: 3, sw: 0.8, dash: '3 2' });
+    for (let i = 0; i < 6; i++) board += A.rect(162 + i * 25, 9, 23, 31, 'rgba(255,255,255,.45)', { rx: 3, sw: 0.8, dash: '3 2' });
+    board += A.circle(162 + 25 + 11, 22, 4, 'none', { stroke: '#9b4a2a', sw: 1.3 }) + A.line(201, 25, 204, 29, { stroke: '#9b4a2a', sw: 1.5 });
+    board += A.text(237, 51, 'Deck', { size: 7.5, fill: '#7a6248' }) + A.text(287, 51, 'Discard', { size: 7.5, fill: '#7a6248' });
+    board += A.rect(227, 60, 20, 28, 'none', { rx: 4, sw: 0.8, dash: '3 2' }) + A.rect(277, 60, 20, 28, 'none', { rx: 4, sw: 0.8, dash: '3 2' });
+    for (let i = 0; i < 3; i++) board += A.card(227 - i, 60 - i * 1.5, 20, 28, backC);
+    names.forEach((n, i) => { board += A.person(px(i), py, 30, ['#7a6a58', '#5d6b78', '#8a5a33', '#6c5a7a', '#4f6e5a', '#7a4f4f', '#5a5a5a'][i], { face: '#e8c9a8' }) + A.text(px(i), 194, n, { size: 8.5, weight: 700 }); });
+    const pol = (x, y, t) => A.card(x, y, 20, 28, t === 'L' ? lib : fas, { label: t === 'L' ? 'LIB' : 'FAS', size: 6 });
+    const back = (x, y) => A.card(x, y, 20, 28, backC);
+    const done = A.k('lib1', pol(14, 10.5, 'L')) + A.k('fas1', pol(163.5, 10.5, 'F'));
+    const placard = (x, y, t) => A.rect(x - 15, y, 30, 11, '#2b2b2b', { rx: 2, sw: 1 }) + A.text(x, y + 5.5, t, { size: 6, weight: 800, fill: '#e8c9a8' });
+    const pres = (i) => A.k('pres', placard(px(i), 141, 'PRES'));
+    const chanc = (x, y) => A.k('chanc', placard(x, y, 'CHANC'));
+    const vote = (i, ja) => A.k('v' + i, A.rect(px(i) - 11, 121, 22, 14, ja ? '#f4ecd6' : '#2b2b2b', { rx: 2, sw: 1 }) + A.text(px(i), 128, ja ? 'JA!' : 'NEIN', { size: 6, weight: 800, fill: ja ? C.ink : '#f4ecd6' }));
+    const votes = [1, 1, 0, 1, 1, 1, 0].map((v, i) => vote(i, v)).join('');
+    const secret = (x, who, y = 101) => A.tag(x, y, 'only ' + who + ' sees', { fill: '#5d6b78' });
+    // Ana's 3 policies: p1 fascist (discarded), p2 fascist (enacted), p3 liberal.
+    const ana = [44, 70, 96].map(x => [x, 62]);
+    const ben = [140, 166].map(x => [x, 62]);
+    return [
+      { step: 0, say: 'The President placard passes to **Ana**. She nominates **Ben** as Chancellor.', svg: board + done + pres(1) + chanc(px(3), 141) + A.bubble(64, 104, 96, 20, 'Ben, Chancellor?', { size: 9 }) + A.glow(px(3), 168, 15, 'g-ben') },
+      { step: 1, say: 'Everyone flips a vote at once: **5 Ja, 2 Nein**. A majority, so Ana and Ben form the government.', svg: board + done + pres(1) + chanc(px(3), 141) + votes },
+      { step: 2, say: 'Ana draws the top **3 policies**. Only she sees them: 2 fascist, 1 liberal.', svg: board + done + pres(1) + chanc(px(3), 141) + secret(70, 'Ana') +
+        A.k('p1', pol(...ana[0], 'F')) + A.k('p2', pol(...ana[1], 'F')) + A.k('p3', pol(...ana[2], 'L')) + A.glow(px(1), 168, 15, 'g-ana') },
+      { step: 2, say: 'Ana discards a fascist face down and passes the other two to Ben, who now sees **1 fascist, 1 liberal**.', svg: board + done + pres(1) + chanc(px(3), 141) + secret(153, 'Ben') +
+        A.k('p1', back(277, 60)) + A.k('p2', pol(...ben[0], 'F')) + A.k('p3', pol(...ben[1], 'L')) + A.glow(px(3), 168, 15, 'g-ben') },
+      { step: 2, say: 'Ben discards the liberal and **enacts the fascist**. He claims he got two fascists. Ana knows that is a lie.', svg: board + done + pres(1) + chanc(px(3), 141) +
+        A.k('p1', back(277, 60)) + A.k('p3', back(278.5, 57.5)) + A.k('p2', pol(188.5, 10.5, 'F')) + A.bubble(150, 104, 110, 20, 'I got 2 fascists!', { size: 9 }) },
+      { step: 3, say: 'The 2nd fascist slot (7 players) unlocks **Investigate**: Ana secretly looks at Ben’s party card.', svg: board + done + pres(1) + chanc(px(3), 141) +
+        A.k('p1', back(277, 60)) + A.k('p3', back(278.5, 57.5)) + A.k('p2', pol(188.5, 10.5, 'F')) + A.glow(198, 25, 15, 'g-pow') +
+        A.k('party', A.card(px(3) - 17, 108, 34, 22, '#7a4f4f', { label: 'PARTY', size: 6 })) },
+      { step: 3, say: 'Ben’s card says **Fascist**. Only Ana saw it; now she must convince the table without proof.', svg: board + done + pres(1) + chanc(px(3), 141) +
+        A.k('p1', back(277, 60)) + A.k('p3', back(278.5, 57.5)) + A.k('p2', pol(188.5, 10.5, 'F')) + secret(70, 'Ana', 92) +
+        A.k('party', A.card(53, 54, 34, 26, fas, { label: 'FASCIST', size: 6 })) + A.bubble(60, 106, 84, 18, 'Ben lied!', { size: 9 }) },
+    ];
+  },
+
   art(A) {
     const C = A.C, lib = '#3e7ea8', fas = '#c45a32';
     let o = A.bg('#efe2c4');

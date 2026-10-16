@@ -83,6 +83,41 @@ defineGame({
     'Don’t hand out free pieces: count attackers and defenders before you capture.',
   ],
 
+  walk(A) {
+    const C = A.C, s = 22, x0 = 8, y0 = 12;
+    const sq = (n) => [x0 + (n.charCodeAt(0) - 97) * s + s / 2, y0 + (8 - +n[1]) * s + s / 2];
+    const V = '︎', G = { K: '♚' + V, Q: '♛' + V, R: '♜' + V, B: '♝' + V, N: '♞' + V, P: '♟' + V };
+    const glyph = (x, y, p, white, size = s * 0.86) => `<text x="${x}" y="${y + 1}" font-size="${size}" text-anchor="middle" dominant-baseline="central" font-family="'Apple Symbols','Segoe UI Symbol','DejaVu Sans',serif" fill="${white ? '#ffffff' : '#262220'}" stroke="#262220" stroke-width="${white ? 1.1 : 0.6}" paint-order="stroke">${G[p]}</text>`;
+    const pc = (n, p, white) => glyph(...sq(n), p, white);
+    let base = A.bg('#e8dcc4') + A.rect(x0 - 4, y0 - 4, s * 8 + 8, s * 8 + 8, '#5b4632', { rx: 3, sw: 1.2 });
+    base += A.grid(x0, y0, 8, 8, s, (i, j) => (i + j) % 2 ? '#b58863' : '#f0d9b5', { sw: 0 });
+    for (let i = 0; i < 8; i++) base += A.text(x0 + i * s + s - 3, y0 + 8 * s - 4, 'abcdefgh'[i], { size: 5, weight: 700, fill: '#5b4632' });
+    const white = { e1: 'K', d1: 'Q', a1: 'R', h1: 'R', c1: 'B', c4: 'B', c3: 'N', a2: 'P', b2: 'P', c2: 'P', d3: 'P', e4: 'P', f2: 'P', g2: 'P', h2: 'P' };
+    const black = { e8: 'K', a8: 'R', h8: 'R', c8: 'B', c5: 'B', c6: 'N', f6: 'N', a7: 'P', b7: 'P', c7: 'P', d6: 'P', e5: 'P', g7: 'P', h7: 'P' };
+    for (const k in white) base += pc(k, white[k], true);
+    for (const k in black) base += pc(k, black[k], false);
+    base += A.tag(256, 20, 'Ben (Black)') + A.tag(256, 180, 'Ana (White)');
+    base += A.rect(204, 84, 104, 34, '#f7efe0', { rx: 6, sw: 1 }) + A.text(256, 92, 'captured', { size: 7, weight: 700, fill: C.gray });
+    const hl = (n, f = '#f3e27a') => { const [x, y] = sq(n); return A.rect(x - s / 2, y - s / 2, s, s, f, { sw: 0, opacity: 0.75, rx: 0 }); };
+    const ring = (n, f = C.red) => { const [x, y] = sq(n); return A.rect(x - s / 2 + 1.5, y - s / 2 + 1.5, s - 3, s - 3, 'none', { stroke: f, sw: 2.2, rx: 0 }); };
+    const knight = (n) => A.k('wN', pc(n, 'N', true));
+    const queen = (n) => A.k('bQ', pc(n, 'Q', false));
+    const pawn = A.k('bPf7', pc('f7', 'P', false));
+    const toMove = (who) => A.text(256, 56, who + ' to move', { size: 9, weight: 700 });
+    const ar = (a, b, f, dash) => { const [x1, y1] = sq(a), [x2, y2] = sq(b), d = Math.hypot(x2 - x1, y2 - y1), k = 8 / d; return A.arrow(x1 + (x2 - x1) * k, y1 + (y2 - y1) * k, x2 - (x2 - x1) * k, y2 - (y2 - y1) * k, { stroke: f, sw: 2, head: 6, dash }); };
+    return [
+      { step: 0, say: 'Ana (White) to move. Her knight on **f3** and bishop on c4 are both aimed at Black’s kingside.', svg: base + toMove('White') + knight('f3') + queen('d8') + pawn + A.glow(...sq('f3'), 14, 'g-n') },
+      { step: 0, say: 'Ana moves the knight in an **L** (2 up, 1 right) from f3 to g5. Knights jump; nothing blocks them.', svg: base + hl('f3') + hl('g5') + toMove('Black') + knight('g5') + queen('d8') + pawn },
+      { step: 1, say: 'Now f7 is attacked **twice** (knight and bishop) and defended only once, by Ben’s king.', svg: base + hl('f3') + hl('g5') + toMove('Black') + knight('g5') + queen('d8') + pawn + ring('f7') +
+        ar('g5', 'f7', C.blue) + ar('c4', 'f7', C.red, '4 2') },
+      { step: 1, say: 'If Ben ignored it, Nxf7 would **capture** the pawn (it leaves the board) and attack his queen and rook at once.', svg: base + toMove('Black') + knight('f7') + queen('d8') +
+        A.k('tray', glyph(222, 106, 'P', false, 17)) + ar('f7', 'd8', C.red) + ar('f7', 'h8', C.red) + A.text(256, 140, '(what if…)', { size: 10, weight: 700, fill: C.red, italic: true }) },
+      { step: 2, say: 'His king couldn’t take back: the bishop guards f7, and a king may **never** move into check.', svg: base + toMove('Black') + knight('f7') + queen('d8') +
+        A.k('tray', glyph(222, 106, 'P', false, 17)) + ring('f7') + ar('c4', 'f7', C.red, '4 2') + A.glow(...sq('e8'), 13, 'g-k') + A.text(256, 140, '(what if…)', { size: 10, weight: 700, fill: C.red, italic: true }) },
+      { step: 0, say: 'So in the real game Ben defends: queen **d8 → e7** guards f7 a second time.', svg: base + hl('d8') + hl('e7') + toMove('White') + knight('g5') + queen('e7') + pawn + ar('e7', 'f7', C.green) },
+    ];
+  },
+
   art(A) {
     const C = A.C, s = 23, x0 = 8, y0 = 8;
     const light = '#f0d9b5', dark = '#b58863';

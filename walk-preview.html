@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>Walkthrough preview (dev)</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body { padding: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .f { background: #fff; border: 1.5px solid #2a2420; border-radius: 8px; overflow: hidden; }
+  .f svg { width: 100%; display: block; border-bottom: 1.5px solid #2a2420; }
+  .f p { margin: 0; padding: 8px 10px; font-size: 13px; }
+  .f b.st { display: inline-block; background: #2a2420; color: #fff; border-radius: 4px; padding: 0 6px; margin-right: 6px; font-size: 11px; }
+</style>
+</head>
+<body>
+<h1 id="h"></h1>
+<div class="grid" id="grid"></div>
+<script src="js/core.js"></script>
+<script src="js/art.js"></script>
+<script>
+// Dev tool: renders every walkthrough slide of ?g=<id> side by side for review.
+loadGames().then(() => {
+  const g = GAME_BY_ID[new URLSearchParams(location.search).get('g')];
+  if (!g || !g.walk) { document.getElementById('h').textContent = 'No walk for this game'; return; }
+  document.getElementById('h').textContent = g.name + ' — walkthrough slides';
+  document.getElementById('grid').innerHTML = g.walk(A).map((f, i) =>
+    `<div class="f"><svg viewBox="0 0 320 200">${f.svg}</svg><p><b class="st">${i + 1} · step ${f.step + 1}: ${esc(g.turn.steps[f.step].verb)}</b>${md(f.say)}</p></div>`).join('');
+});
+</script>
+</body>
+</html>

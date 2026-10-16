@@ -79,6 +79,53 @@ defineGame({
     'Too many terminal actions (no +Action) collide in one hand. Pair them with Villages.',
   ],
 
+  walk(A) {
+    const C = A.C;
+    const T = {
+      copper: ['#c08245', 'Copper', '1', 0], silver: ['#b7bec7', 'Silver', '2', 3], gold: ['#e2b33c', 'Gold', '3', 6],
+      estate: ['#8fbf6a', 'Estate', '1VP', 2], province: ['#2f7a3d', 'Province', '6VP', 8],
+      village: ['#efe2c2', 'Village', '+2 Act', 3], smithy: ['#efe2c2', 'Smithy', '+3 Card', 4],
+    };
+    const face = (x, y, t) => {
+      const [f, n, v, cost] = T[t];
+      let s = A.card(x, y, 30, 42, f, {}) + A.rect(x + 4, y + 4, 22, 9, C.white, { rx: 2, sw: 0, opacity: 0.9 }) + A.text(x + 15, y + 8.5, n, { size: 5, weight: 800 });
+      if (v[0] === '+') s += A.text(x + 15, y + 24, v, { size: 5.5, weight: 800 });
+      else if (v.indexOf('VP') > 0) s += A.circle(x + 15, y + 24, 8, C.paper, { sw: 1 }) + A.text(x + 15, y + 24.5, v, { size: 5, weight: 800 });
+      else s += A.circle(x + 15, y + 24, 8, '#e8c547', { sw: 1 }) + A.text(x + 15, y + 24.5, v, { size: 9, weight: 800 });
+      return s + A.circle(x + 8, y + 35, 3.8, '#e8c547', { sw: 0.7 }) + A.text(x + 8, y + 35.3, cost, { size: 5, weight: 800 });
+    };
+    const back = (x, y) => A.card(x, y, 30, 42, '#7d5532', {}) + A.rect(x + 8, y + 8, 14, 26, 'none', { rx: 2, stroke: '#e8c547', sw: 1.2 });
+    const DECK = [8, 146], DISC = [282, 146], PROV = [8, 6];
+    const P = (i) => [44 + i * 33, 63], H = (i) => [48 + i * 32, 146];
+    let base = A.bg('#d8c69c') + A.rect(0, 0, 320, 52, '#cdb98b', { sw: 0, rx: 0 });
+    ['province', 'gold', 'silver', 'village', 'smithy', 'estate'].forEach((t, i) => { base += A.rect(11 + i * 38, 3, 30, 42, '#efe6cf', { rx: 4, sw: 1 }) + face(8 + i * 38, 6, t); });
+    base += A.rect(6, 58, 308, 52, 'rgba(255,255,255,.3)', { rx: 6, sw: 1, dash: '4 3' }) + A.text(24, 84, 'In play', { size: 8, weight: 700, rotate: -90 });
+    base += A.rect(11, 149, 30, 42, '#6f4a2c', { rx: 5, sw: 1 }) + back(...DECK) + A.text(23, 195, 'Deck', { size: 7, weight: 700 });
+    base += A.rect(282, 146, 30, 42, 'none', { rx: 5, sw: 1, dash: '3 2' }) + A.text(297, 195, 'Discard', { size: 7, weight: 700 });
+    base += A.tag(160, 128, 'Your hand');
+    const status = (a, b, c, hi) => A.rect(236, 5, 78, 42, C.paper, { rx: 4, sw: 1 }) + (hi ? A.rect(240, hi * 11 - 1.5, 70, 11, '#ffd76a', { rx: 3, sw: 0 }) : '') +
+      A.text(275, 15, 'Actions ' + a, { size: 8 }) + A.text(275, 26, 'Buys ' + b, { size: 8 }) + A.text(275, 37, 'Coins ' + c, { size: 8, weight: 800 });
+    const show = (list) => list.map(([k, [x, y], t]) => A.k(k, t ? face(x, y, t) : back(x, y))).join('');
+    const NEW = ['n1', 'n2', 'n3', 'n4', 'n5'], NEWT = ['copper', 'silver', 'copper', 'estate', 'copper'];
+    const deck = (keys) => keys.map(k => [k, DECK, null]);
+    const prov = ['prov', PROV, 'province'];
+    return [
+      { step: 0, say: 'Your hand: Village, Smithy, 2 Coppers and an Estate. **Action phase**: you have 1 Action.', svg: base + status(1, 1, 0) +
+        show([...deck(['silver', 'gold', 'c3', 'e2', ...NEW]), prov, ['village', H(0), 'village'], ['smithy', H(1), 'smithy'], ['c1', H(2), 'copper'], ['c2', H(3), 'copper'], ['e1', H(4), 'estate']]) + A.glow(63, 167, 24, 'g-hand') },
+      { step: 0, say: 'Play **Village**: +1 Card (you draw a Silver) and +2 Actions.', svg: base + status(2, 1, 0, 1) +
+        show([...deck(['gold', 'c3', 'e2', ...NEW]), prov, ['village', P(0), 'village'], ['smithy', H(0), 'smithy'], ['c1', H(1), 'copper'], ['c2', H(2), 'copper'], ['e1', H(3), 'estate'], ['silver', H(4), 'silver']]) },
+      { step: 0, say: 'Spend an Action on **Smithy**: +3 Cards. You draw Gold, Copper and another Estate.', svg: base + status(1, 1, 0) +
+        show([...deck(NEW), prov, ['village', P(0), 'village'], ['smithy', P(1), 'smithy'], ['c1', H(0), 'copper'], ['c2', H(1), 'copper'], ['e1', H(2), 'estate'], ['silver', H(3), 'silver'], ['gold', H(4), 'gold'], ['c3', H(5), 'copper'], ['e2', H(6), 'estate']]) },
+      { step: 1, say: '**Buy phase.** Play all your Treasures: 1 + 1 + 2 + 3 + 1 = **8 coins**. Estates do nothing in your hand.', svg: base + status(1, 1, 8, 3) +
+        show([...deck(NEW), prov, ['village', P(0), 'village'], ['smithy', P(1), 'smithy'], ['c1', P(2), 'copper'], ['c2', P(3), 'copper'], ['silver', P(4), 'silver'], ['gold', P(5), 'gold'], ['c3', P(6), 'copper'], ['e1', H(0), 'estate'], ['e2', H(1), 'estate']]) },
+      { step: 1, say: 'Spend 8 on a **Province** (6 VP). It goes to your **discard pile**, not your hand.', svg: base + status(1, 0, 0) +
+        show([...deck(NEW), ['village', P(0), 'village'], ['smithy', P(1), 'smithy'], ['c1', P(2), 'copper'], ['c2', P(3), 'copper'], ['silver', P(4), 'silver'], ['gold', P(5), 'gold'], ['c3', P(6), 'copper'], ['e1', H(0), 'estate'], ['e2', H(1), 'estate'], ['prov', DISC, 'province']]) + A.glow(297, 167, 21, 'g-disc') },
+      { step: 2, say: '**Clean-up.** Everything you played and still hold goes to the discard pile. Draw a fresh hand of **5**.', svg: base + status(1, 1, 0) +
+        show([['prov', DISC, 'province'], ...['village', 'smithy', 'c1', 'c2', 'silver', 'gold', 'c3', 'e1'].map((k, i) => [k, DISC, ['village', 'smithy', 'copper', 'copper', 'silver', 'gold', 'copper', 'estate'][i]]), ['e2', DISC, 'estate'],
+          ...NEW.map((k, i) => [k, H(i), NEWT[i]])]) },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     let o = A.bg('#d8c69c');

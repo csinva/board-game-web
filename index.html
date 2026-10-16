@@ -15,7 +15,7 @@
 
   <section class="intro" id="games">
     <h1>Learn any board game from one page.</h1>
-    <p>Pick a game. Not sure what to play? <a href="map.html">Find games like ones you already know →</a></p>
+    <p>Pick a game. Not sure what to play? <a href="map.html">Find games like ones you already know →</a> or <a href="deepdive.html">get your gamer profile →</a></p>
   </section>
   <div class="filters">
     <input type="search" id="q" placeholder="Search games or mechanics…" aria-label="Search">
@@ -52,7 +52,7 @@ loadGames().then(games => {
     const f = FAMILIES[g.family];
     return `<a class="gcard" href="game.html?g=${g.id}" style="--fam:${f.color}">
       <div class="thumb"><svg viewBox="0 0 320 200" role="img" aria-label="${esc(g.name)} illustration">${g.art(A)}</svg></div>
-      <div class="body"><div class="fam">${f.label}</div><h3>${esc(g.name)}</h3><p>${md(g.pitch)}</p>
+      <div class="body"><div class="fam">${f.label}${g.profile.complexity >= 4 ? '<span class="heavy-tag">Heavy</span>' : ''}</div><h3>${esc(g.name)}</h3><p>${md(g.pitch)}</p>
       <div class="stats"><span>${ICON_P}${rng(g.players)}</span><span>${ICON_T}${rng(g.time)} min</span><span class="dots" title="Rules weight">${[1,2,3,4,5].map(i => `<i class="${i <= Math.round(g.profile.complexity) ? 'on' : ''}"></i>`).join('')}</span></div></div></a>`;
   };
 

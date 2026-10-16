@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Board Game Deep-Dive</title>
+<meta name="description" content="Every board game in the Field Guide scored on rules, luck, meanness, table talk, depth and more. Plot any two, and get your gamer profile.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/deepdive.css">
+</head>
+<body>
+<div class="dd-top">
+  <nav><a href="index.html">⌂ All games</a><a href="map.html">Find similar games</a></nav>
+  <a href="https://x.com/csinva" target="_blank" rel="noopener">Made with love by @csinva</a>
+</div>
+<div class="wrap">
+  <header>
+    <h1>The Board Game Deep-Dive</h1>
+    <div class="sub" id="sub"></div>
+  </header>
+  <nav class="tabs">
+    <button class="tab active" data-page="chart">🌌 The Deep-Dive</button>
+    <button class="tab" data-page="profile">🎲 Your Gamer Profile</button>
+  </nav>
+
+  <div class="page" id="page-chart">
+    <div class="covers" id="covers"></div>
+    <div class="covers-hint">click a family to solo it · click again to bring everyone back</div>
+    <div class="picker-cap"><b>↑</b> vertical axis · <span>click a pill to change it</span></div>
+    <div class="pills" id="pillsY"></div>
+    <div class="chart-zone">
+      <div>
+        <div class="chart-card">
+          <div id="stage"></div>
+          <div class="axis-labels"><span class="lo" id="xLo"></span><span class="xblurb" id="xBlurb"></span><span class="hi" id="xHi"></span></div>
+        </div>
+        <div class="picker-cap"><b>→</b> horizontal axis · <span>click a pill to change it</span></div>
+        <div class="pills" id="pillsX"></div>
+      </div>
+      <div class="side-boards" id="boards"></div>
+    </div>
+  </div>
+
+  <div class="page hidden" id="page-profile">
+    <div class="aura-intro">Pick <b>three to five</b> games you love. We’ll read your table: your dominant player type, what your picks say about you, and what to play next.</div>
+    <div class="picker">
+      <input id="search" placeholder="Start typing a game… (or pick from the shelf below)" autocomplete="off">
+      <div id="suggest"></div>
+    </div>
+    <div id="chips"></div>
+    <button id="readBtn" disabled>Pick at least 3 games</button>
+    <div id="result"></div>
+    <div class="catalogue" id="catalogue"></div>
+  </div>
+
+  <footer>
+    Every dimension is Claude-annotated opinion (0–100), except play time (from the box) and teach time (minutes for a first explanation).<br>
+    Ringed dots are heavy games. Hover or tap a dot for its card; every game links to its one-page explainer.
+  </footer>
+</div>
+<div id="tip"></div>
+<script src="js/core.js"></script>
+<script src="js/art.js"></script>
+<script src="js/deepdive-data.js"></script>
+<script src="js/deepdive.js"></script>
+</body>
+</html>

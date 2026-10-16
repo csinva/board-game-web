@@ -81,6 +81,54 @@ defineGame({
     'Spymasters: keep a poker face. Your reaction is not allowed to be a clue.',
   ],
 
+  walk(A) {
+    const C = A.C, red = '#c8423b', blue = '#2f6db5', bys = '#d9c79c', tan = '#ead9b0';
+    const words = [['PIANO', 'SHARK', 'MOON', 'BANK'], ['ICE', 'BEACH', 'RING', 'FORK'], ['LEMON', 'PORT', 'NIGHT', 'CAST'], ['ROSE', 'EGG', 'SPACE', 'TRUNK']];
+    const key = ['brnr', 'bnrb', 'nrbk', 'rbnr'];
+    const w = 46, h = 30, x0 = 8, y0 = 44;
+    const cell = (i, j) => [x0 + i * (w + 5), y0 + j * (h + 5)];
+    const ctr = (i, j) => { const [x, y] = cell(i, j); return [x + w / 2, y + h / 2]; };
+    const cover = (x, y, t) => {
+      const f = t === 'r' ? red : t === 'b' ? blue : bys, pf = t === 'n' ? '#a8946a' : 'rgba(255,255,255,.4)';
+      return A.rect(x + 1.5, y + 2, w, h, 'rgba(0,0,0,.35)', { sw: 0, rx: 3 }) + A.rect(x, y, w, h, f, { rx: 3, sw: 1.2 }) + A.person(x + w / 2, y + h / 2 + 1, 15, pf, { face: pf });
+    };
+    let board = A.bg('#3c3a44');
+    words.forEach((row, j) => row.forEach((wd, i) => {
+      const [x, y] = cell(i, j);
+      board += A.rect(x + 1.5, y + 2, w, h, 'rgba(0,0,0,.35)', { sw: 0, rx: 3 }) + A.rect(x, y, w, h, tan, { rx: 3, sw: 1.2 });
+      board += A.rect(x + 3, y + h - 13, w - 6, 10, C.white, { rx: 2, sw: 0.6 }) + A.text(x + w / 2, y + h - 8, wd, { size: 6, weight: 800, spacing: 0.3 });
+    }));
+    // Covered on earlier turns.
+    board += cover(...cell(0, 1), 'b') + cover(...cell(0, 3), 'r');
+    board += A.tag(58, 18, 'Red operatives', { fill: red });
+    // Spymaster, key card, cover stacks.
+    board += A.person(236, 66, 28, red, { face: '#e6c7a8' }) + A.tag(282, 66, 'Zoe', { fill: red });
+    const kx = 236, ky = 92, ks = 10;
+    board += A.rect(kx - 5, ky - 5, ks * 4 + 10, ks * 4 + 10, red, { rx: 4, sw: 1.4 });
+    board += A.grid(kx, ky, 4, 4, ks, (i, j) => ({ r: red, b: blue, n: bys, k: '#141414' })[key[j][i]], { sw: 0.8 });
+    board += A.text(298, 112, 'Key', { size: 8, fill: C.white }) + A.text(298, 121, 'card', { size: 8, fill: C.white });
+    board += cover(222, 152, 'r') + cover(270, 152, 'n');
+    board += A.text(245, 192, 'Red agents', { size: 7, fill: C.white }) + A.text(293, 192, 'Bystanders', { size: 7, fill: C.white });
+    const clue = A.k('clue', A.bubble(222, 4, 92, 28, 'OCEAN: 2', { size: 12 }));
+    const [sx, sy] = cell(1, 0), [bx, by] = cell(1, 1);
+    const sharkCov = (on) => A.k('cov-shark', cover(...(on ? [sx, sy] : [222, 152]), 'r'));
+    const beachCov = (on) => A.k('cov-beach', cover(...(on ? [bx, by] : [270, 152]), 'n'));
+    return [
+      { step: 0, say: 'Zoe checks the key card: **SHARK** and **PORT** are red. She says one word and one number: “**Ocean: 2**”.',
+        svg: board + clue + A.glow(kx + 20, ky + 20, 30, 'g-key') },
+      { step: 1, say: 'Her team talks it over (“sharks live in the ocean…”) and touches **SHARK**.',
+        svg: board + clue + sharkCov(false) + A.glow(...ctr(1, 0), 30, 'g-shark') },
+      { step: 1, say: 'Zoe covers it with its true colour: a **red agent**. Correct!',
+        svg: board + clue + sharkCov(true) + beachCov(false) },
+      { step: 2, say: 'A correct guess lets them keep going (up to 2 + 1 = 3 guesses). Ships dock at a beach… they touch **BEACH**.',
+        svg: board + clue + sharkCov(true) + beachCov(false) + A.glow(...ctr(1, 1), 30, 'g-beach') },
+      { step: 2, say: 'BEACH is an **innocent bystander**, so the turn ends at once. **PORT** stays hidden for a later turn.',
+        svg: board + clue + sharkCov(true) + beachCov(true) + A.glow(...ctr(1, 2), 30, 'g-port') },
+      { step: 2, say: 'Now Blue’s spymaster gives a clue. Red can still pick up PORT later with a “+1” guess.',
+        svg: board + sharkCov(true) + beachCov(true) + A.k('turn', A.tag(160, 18, 'Blue’s turn', { fill: blue })) },
+    ];
+  },
+
   art(A) {
     const C = A.C, red = '#c8423b', blue = '#2f6db5', bys = '#d9c79c', tan = '#ead9b0';
     let o = A.bg('#3c3a44');

@@ -77,6 +77,42 @@ defineGame({
     'Offer trades that help you more than them, and stop trading with the leader.',
   ],
 
+  walk(A) {
+    const C = A.C, s = 24, ox = 104, oy = 108;
+    const hexes = [[0, 0, C.desert], [1, 0, C.forest, 6], [-1, 0, C.wheat, 9], [0, 1, C.sheep, 5], [0, -1, C.ore, 8], [1, -1, C.brick, 4], [-1, 1, C.forest, 10]];
+    const [oreX, oreY] = A.hexAt(0, -1, s, ox, oy);
+    let board = A.bg(C.sea) + A.rect(196, 0, 124, 200, '#f6efe0', { sw: 0, rx: 0 }) + A.line(196, 0, 196, 200, { sw: 2 });
+    for (const [q, r, f, n] of hexes) { const [x, y] = A.hexAt(q, r, s, ox, oy); board += A.hex(x, y, s, f, { label: n }); }
+    board += A.house(ox, oy - s + 5, 12, C.red) + A.city(oreX, oy - s / 2 + 5, 13, C.blue);
+    board += A.pawn(ox, oy + 2, 18, C.gray);
+    board += A.tag(258, 14, 'Maya (blue)', { fill: C.blue }) + A.tag(258, 112, 'You (red)', { fill: C.red });
+    const card = (x, y, fill, lab) => A.card(x, y, 21, 29, fill, { label: lab, size: 5.6, labelFill: C.ink });
+    const dice = (a, b, x = 214, y = 150) => A.k('dice', A.die(x, y, 22, a) + A.die(x + 26, y, 22, b));
+    // Hands: Maya top-right, you bottom-right.
+    const maya = (i) => [208 + i * 24, 30];
+    const you = (i) => [208 + i * 24, 124];
+    const atOre = [oreX - 10, oreY - 14];
+    const road = A.k('road', A.line(ox, oy - s, ox, oy - 2 * s, { stroke: C.red, sw: 6 }));
+    const start = A.k('you-sheep', card(...you(0), C.sheep, 'sheep')) + A.k('you-wood', card(...you(1), C.forest, 'wood')) +
+      A.k('maya-brick', card(...maya(0), C.brick, 'brick'));
+    return [
+      { step: 0, say: 'Your turn. Roll both dice: **3 + 5 = 8**.', svg: board + start + dice(3, 5, 150, 150) },
+      { step: 0, say: 'Every hex numbered **8** pays, to everyone. It’s the ore hex: your settlement touches it (1 ore) and so does Maya’s city (2 ore).', svg: board + start + dice(3, 5, 150, 150) + A.glow(oreX, oreY, 26, 'glow-ore') +
+        A.k('you-ore', card(...atOre, C.ore, 'ore')) + A.k('maya-ore1', card(atOre[0] - 6, atOre[1] + 4, C.ore, 'ore')) + A.k('maya-ore2', card(atOre[0] + 6, atOre[1] + 4, C.ore, 'ore')) },
+      { step: 0, say: 'The cards go into each hand. The dice give, but rarely exactly what you need.', svg: board + start + dice(3, 5, 150, 150) +
+        A.k('you-ore', card(...you(2), C.ore, 'ore')) + A.k('maya-ore1', card(...maya(1), C.ore, 'ore')) + A.k('maya-ore2', card(...maya(2), C.ore, 'ore')) },
+      { step: 1, say: '**Trade.** You need brick for a road. You offer Maya your sheep for her brick, and she agrees.', svg: board + dice(3, 5, 150, 150) +
+        A.k('you-wood', card(...you(1), C.forest, 'wood')) + A.k('you-ore', card(...you(2), C.ore, 'ore')) + A.k('maya-ore1', card(...maya(1), C.ore, 'ore')) + A.k('maya-ore2', card(...maya(2), C.ore, 'ore')) +
+        A.k('you-sheep', card(...maya(3), C.sheep, 'sheep')) + A.k('maya-brick', card(...you(0), C.brick, 'brick')) },
+      { step: 2, say: '**Build.** Pay wood + brick back to the bank and place a road on an edge next to your settlement.', svg: board + dice(3, 5, 150, 150) +
+        A.k('you-ore', card(...you(2), C.ore, 'ore')) + A.k('maya-ore1', card(...maya(1), C.ore, 'ore')) + A.k('maya-ore2', card(...maya(2), C.ore, 'ore')) +
+        A.k('you-sheep', card(...maya(3), C.sheep, 'sheep')) + road + A.glow(ox, oy - 1.5 * s, 14, 'glow-road') },
+      { step: 2, say: 'Done. The dice pass to Maya. Your road points toward a new corner for your next settlement.', svg: board + dice(3, 5, 214, 64) +
+        A.k('you-ore', card(...you(2), C.ore, 'ore')) + A.k('maya-ore1', card(...maya(1), C.ore, 'ore')) + A.k('maya-ore2', card(...maya(2), C.ore, 'ore')) +
+        A.k('you-sheep', card(...maya(3), C.sheep, 'sheep')) + road },
+    ];
+  },
+
   art(A) {
     const C = A.C, s = 27, ox = 120, oy = 108;
     const hexes = [[0, 0, C.desert], [1, 0, C.forest, 6], [-1, 0, C.wheat, 9], [0, 1, C.sheep, 5], [0, -1, C.ore, 8], [1, -1, C.brick, 4], [-1, 1, C.forest, 10]];

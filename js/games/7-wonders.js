@@ -83,6 +83,52 @@ defineGame({
     'Science scales fast if you commit, but someone at the table will try to hate-draft it.',
   ],
 
+  walk(A) {
+    const C = A.C;
+    const col = { brown: '#8a5a33', gray: '#8c877f', green: '#3c8d4f', blue: '#2f6db5', yellow: '#e2b33c', red: '#c8423b' };
+    const gear = (x, y, f) => A.circle(x, y, 3.4, 'none', { stroke: f, sw: 2, dash: '1.5 1.1' }) + A.circle(x, y, 1.2, f, { sw: 0 });
+    const big = (x, y, c, name, g) => {
+      let s = A.card(x, y, 36, 50, col[c], {}) + A.rect(x + 3, y + 3, 30, 10, C.white, { rx: 2, sw: 0, opacity: 0.9 }) +
+        A.text(x + 18, y + 8, name, { size: Math.min(5.5, 46 / name.length), weight: 800 });
+      if (g) s += A.circle(x + 18, y + 31, 7, C.paper, { sw: 1 }) + gear(x + 18, y + 31, C.ink);
+      return s;
+    };
+    const back = (x, y) => A.card(x, y, 30, 42, '#b99766', {}) + A.text(x + 15, y + 21, 'II', { size: 6, weight: 800, fill: C.white });
+    const strip = (x, y, c, name, g, w = 34) => A.rect(x, y, w, 15, col[c], { rx: 2, sw: 1 }) +
+      (name ? A.text(x + w / 2, y + 7.5, name, { size: Math.min(4.8, 50 / name.length), weight: 700, fill: C.white }) : '');
+    const gears = (n) => A.circle(170, 146, 6, C.paper, { sw: 1 }) + gear(170, 146, C.ink) + A.text(185, 146, '×' + n, { size: 8, weight: 800 });
+    const H = (i) => [82 + i * 40, 12], PICK = [142, 66];
+    const LH = (i) => [8 + i * 7, 24], RH = (i) => [258 + i * 7, 24], LP = [20, 74], RP = [270, 74];
+    let base = A.bg('#e4d3a8');
+    base += A.rect(78, 132, 164, 64, '#b99766', { rx: 4, sw: 1.2 }) + A.rect(4, 132, 68, 64, '#b99766', { rx: 4, sw: 1.2 }) + A.rect(248, 132, 68, 64, '#b99766', { rx: 4, sw: 1.2 });
+    base += A.tag(38, 10, 'Left') + A.tag(282, 10, 'Right') + A.tag(104, 124, 'You');
+    base += A.rect(PICK[0] - 3, PICK[1] - 3, 42, 56, 'none', { rx: 5, sw: 1, dash: '3 2' });
+    base += strip(84, 175, 'brown', 'Lumber Yard') + strip(84, 158, 'brown', 'Clay Pool') + strip(122, 175, 'gray', 'Press') + strip(160, 175, 'green', 'Workshop', 1) + strip(198, 175, 'blue', 'Baths');
+    base += strip(8, 175, 'brown', '', 0, 28) + strip(38, 175, 'gray', '', 0, 28) + strip(8, 158, 'blue', '', 0, 28);
+    base += strip(252, 175, 'brown', '', 0, 28) + strip(282, 175, 'yellow', '', 0, 28) + strip(252, 158, 'green', '', 0, 28);
+    const mine = [['aq', 'blue', 'Aqueduct'], ['car', 'yellow', 'Caravansery'], ['sta', 'red', 'Stables']];
+    const left3 = (pos) => [0, 1, 2].map(i => A.k('l' + i, back(...pos(i)))).join('');
+    const right3 = (pos) => [0, 1, 2].map(i => A.k('r' + i, back(...pos(i)))).join('');
+    const myRest = mine.map(([k, c, n], i) => A.k(k, big(...H(i + 1), c, n))).join('');
+    const lab = (svg) => A.k('lab', svg);
+    return [
+      { step: 0, say: 'Age II. Everyone looks at their hand at the same time. Yours has 4 cards left.', svg: base + left3(LH) + right3(RH) +
+        A.k('lp', back(...LH(3))) + A.k('rp', back(...RH(3))) + lab(big(...H(0), 'green', 'Laboratory', 1)) + myRest + gears(1) },
+      { step: 0, say: 'Everyone picks **one** card and lays it face-down. You choose the **Laboratory**.', svg: base + left3(LH) + right3(RH) +
+        A.k('lp', back(...LP)) + A.k('rp', back(...RP)) + lab(back(PICK[0] + 3, PICK[1] + 4)) + myRest + gears(1) },
+      { step: 1, say: 'Reveal. Laboratory costs 2 clay + papyrus, but your **Workshop** chains to it, so you build it **free**.', svg: base + left3(LH) + right3(RH) +
+        A.k('lp', big(LP[0] - 3, LP[1] - 4, 'red', 'Walls')) + A.k('rp', big(RP[0] - 3, RP[1] - 4, 'green', 'School', 1)) + lab(big(...PICK, 'green', 'Laboratory', 1)) + myRest +
+        A.curve(196, 180, 222, 140, 182, 110, { sw: 1.6 }) + A.text(222, 124, 'chain', { size: 8, weight: 800 }) + A.glow(177, 182, 16, 'g-ws') + gears(1) },
+      { step: 1, say: 'Each card joins its owner’s city. Your green column now shows **2 gears** for science.', svg: base + left3(LH) + right3(RH) +
+        A.k('lp', strip(38, 141, 'red', '', 0, 28)) + A.k('rp', strip(282, 141, 'green', '', 0, 28)) + lab(strip(160, 158, 'green', 'Laboratory', 1)) + myRest + gears(2) + A.glow(176, 146, 14, 'g-gear') },
+      { step: 2, say: 'Age II passes **right**: your 3 cards go to your right neighbour, and your left neighbour’s 3 come to you.', svg: base +
+        A.k('lp', strip(38, 141, 'red', '', 0, 28)) + A.k('rp', strip(282, 141, 'green', '', 0, 28)) + lab(strip(160, 158, 'green', 'Laboratory', 1)) +
+        mine.map(([k], i) => A.k(k, back(...RH(i)))).join('') +
+        [['yellow', 'Forum'], ['green', 'Library'], ['blue', 'Temple']].map(([c, n], i) => A.k('l' + i, big(...H(i), c, n))).join('') +
+        gears(2) + A.arrow(200, 70, 246, 70, { sw: 2 }) + A.arrow(74, 50, 92, 66, { sw: 2 }) },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     let o = A.bg('#e4d3a8');

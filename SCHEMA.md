@@ -6,21 +6,23 @@ Run `tools/validate.sh <id>` to check a file.
 
 ## Why the sheet is ordered this way
 
-The panels follow the order an experienced teacher explains a game.
-The usual mistake is to start with components and edge cases. This order starts with purpose instead:
+The panels follow the order an experienced teacher explains a game: purpose first, edge cases last.
 
-| # | Panel | Question it answers | Layer |
-|---|-------|---------------------|-------|
-| 1 | What it is (art + theme) | What are we pretending to be? What does the table look like? | 30 sec |
-| 2 | How you win | What am I trying to do? | 30 sec |
-| 3 | How it ends | How long is this, and what's the clock? | 30 sec |
-| 4 | Your turn | What can I actually do? | 30 sec |
-| 5 | How it flows + key decision | How do I get stronger, and what's the interesting choice? | 5 min |
-| 6 | One turn, played out | Show me a concrete example. | 5 min |
-| – | Quick reference, key terms | The lookup table you keep on the table. | 5 min |
-| 7 | Rules people miss | The exceptions, saved until now. | Everything |
-| 8 | First-game tips | How not to flounder. | Everything |
-| – | Profile, setup, similar games | Is this for me? How do I start? | Everything |
+| # | Panel | Question it answers |
+|---|-------|---------------------|
+| 1 | What it is (art + theme) | What are we pretending to be? What does the table look like? |
+| 2 | How you win | What am I trying to do? |
+| 3 | How it ends | How long is this, and what's the clock? |
+| 4 | Your turn (+ animated walkthrough) | What can I actually do? Show me. |
+| 5 | How it flows | How do I get stronger? |
+| 6 | The key decision | What's the interesting choice? |
+| – | Setup, quick reference, key terms | What do I need on the table? |
+| 7 | Rules people miss | The exceptions, saved until now. |
+| 8 | First-game tips | How not to flounder. |
+| – | Feel profile, similar games | Is this for me? What's it like? |
+
+Extras: "I already know X" bridges (`js/bridges/*.js`, for curated pairs in `js/kin.js`), and
+collapsible "Extended details" for heavy games only.
 
 ## Fields
 
@@ -85,3 +87,45 @@ defineGame({
   Labels should be short (≤ 26 chars). Callouts are clamped to the canvas, but avoid overlaps.
 - Use the game's real colour language (e.g. Catan resources, Ticket to Ride route colours).
 - No text-heavy art and no logos or trademarks. Stylized only.
+
+## Turn walkthrough (`walk`)
+
+Every game should have an animated walkthrough that plays next to "Your turn".
+
+```js
+walk(A) {
+  const board = A.bg() + ...;              // shared scene parts
+  return [
+    { step: 0, say: 'Roll both dice: **3 + 5 = 8**.', svg: board + A.k('dice', ...) },
+    { step: 0, say: 'Every 8 hex pays ...',           svg: board + A.k('ore', cardOnHex) + A.glow(x, y, r) },
+    { step: 1, say: '...',                             svg: board + A.k('ore', cardInHand) },
+  ];
+}
+```
+
+- 4–7 slides that play one concrete turn (ideally the same story as `example`). For `round` games, walk one round; for `simultaneous`, show everyone acting then the reveal.
+- `step` = index into `turn.steps` that the slide illustrates (the step list highlights it).
+- `say` = one or two short sentences; `**bold**` allowed.
+- `svg` = the whole 320×200 scene for that slide.
+- Wrap moving pieces in `A.k('key', svg)`: a piece with the same key in consecutive slides **slides**
+  from its old spot to its new one; a new key **pops in**; a key that disappears **fades out**.
+  This is how the board visibly changes (cards flying into a hand, a pawn moving, a tile being placed).
+  Keys must be unique within a slide.
+- `A.glow(cx, cy, r, key)` draws a pulsing ring to point at what matters on this slide.
+- `A.tag(x, y, 'You')` labels player areas.
+- Keep the scene simple and legible at ~600px wide: fewer, bigger pieces beat a faithful board.
+  Text inside the scene must fit its shape (small cards need font size ≤ 6).
+
+## Extended details (`extended`, heavy games only)
+
+Only for games with complexity 4–5 (e.g. Magic, Twilight Imperium, Bridge). Rendered as a collapsed
+"Extended details" section under the sheet. Everything a first game needs stays on the main sheet;
+this is for game two onward.
+
+```js
+extended: [
+  { title: 'The stack', text: 'One paragraph…' },
+  { title: 'Common keywords', items: ['**Flying**: …', '**Trample**: …'] },
+]
+```
+4–8 sections.

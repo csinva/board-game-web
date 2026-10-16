@@ -7,6 +7,7 @@ load('js/core.js');
 load('js/art.js');
 var errors = 0;
 function err(id, msg) { print('✗ ' + id + ': ' + msg); errors++; }
+function warn(id, msg) { print('· ' + id + ': ' + msg); }
 var only = typeof arguments !== 'undefined' && arguments.length ? arguments : null;
 var ids = only ? Array.prototype.slice.call(only) : GAME_IDS;
 ids.forEach(function (id) {
@@ -35,6 +36,22 @@ ids.forEach(function (id) {
   ['setup', 'gotchas', 'tips'].forEach(function (k) { if (!Array.isArray(g[k]) || g[k].length !== 3) err(id, k + ' must have exactly 3 items'); });
   if (!Array.isArray(g.terms) || g.terms.length < 3 || g.terms.length > 5) err(id, 'terms needs 3–5 [term, def] pairs');
   if (g.pitch && g.pitch.length > 150) err(id, 'pitch too long (' + g.pitch.length + ' > 150)');
+  if (typeof g.walk !== 'function') warn(id, 'walk(A) missing (animated turn walkthrough)');
+  else {
+    try {
+      var fr = g.walk(A);
+      if (!Array.isArray(fr) || fr.length < 3 || fr.length > 8) err(id, 'walk must return 3–8 slides');
+      (fr || []).forEach(function (f, i) {
+        if (typeof f.step !== 'number' || f.step < 0 || f.step >= g.turn.steps.length) err(id, 'walk slide ' + i + ': step must index turn.steps');
+        if (!f.say || !f.svg) err(id, 'walk slide ' + i + ': needs say + svg');
+        if (f.svg && f.svg.indexOf('NaN') >= 0) err(id, 'walk slide ' + i + ' produced NaN');
+        var keys = (f.svg || '').match(/data-k="[^"]+"/g) || [], seen = {};
+        keys.forEach(function (k) { if (seen[k]) err(id, 'walk slide ' + i + ': duplicate key ' + k); seen[k] = 1; });
+      });
+    } catch (e) { err(id, 'walk threw: ' + e); }
+  }
+  if (g.profile && g.profile.complexity >= 4 && !g.extended) warn(id, 'heavy game: add extended details');
+  if (g.extended) g.extended.forEach(function (x) { if (!x.title || !(x.text || x.items)) err(id, 'extended section needs title + text/items'); });
   if (typeof g.art !== 'function') err(id, 'art(A) missing');
   else { try { var svg = g.art(A); if (svg.indexOf('NaN') >= 0) err(id, 'art produced NaN'); if (svg.length < 400) err(id, 'art suspiciously small'); } catch (e) { err(id, 'art threw: ' + e); } }
 });

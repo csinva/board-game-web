@@ -80,6 +80,43 @@ defineGame({
     'Spend nature tokens when they fix a big play, but each unspent one is still 1 point.',
   ],
 
+  walk(A) {
+    const C = A.C, s = 26, ox = 110, oy = 80;
+    const H = { m: '#9aa1a8', f: '#2f6b34', p: '#d9c45a', w: '#7fc0a0', r: '#4a8fcb' };
+    const W = { bear: ['#6b4a2f', 'B'], elk: ['#c08a4e', 'E'], salmon: ['#d65a5a', 'S'], hawk: ['#6fb1d9', 'H'], fox: ['#e07b2e', 'F'] };
+    const verts = (x, y, r) => { const p = []; for (let i = 0; i < 6; i++) { const a = Math.PI / 180 * (60 * i - 30); p.push([+(x + r * Math.cos(a)).toFixed(1), +(y + r * Math.sin(a)).toFixed(1)]); } return p; };
+    const hexTile = (x, y, r, a, b) => {
+      const v = verts(x, y, r);
+      if (!b) return A.poly(v, H[a], { sw: 1.2 });
+      return A.poly([v[0], v[1], v[2], v[3]], H[a], { sw: 0 }) + A.poly([v[3], v[4], v[5], v[0]], H[b], { sw: 0 }) + A.poly(v, 'none', { sw: 1.2 });
+    };
+    const token = (x, y, an, r = 9) => A.circle(x + 1, y + 1.5, r, C.shadow, { sw: 0 }) + A.circle(x, y, r, '#f5ecd6', { sw: 1 }) + A.circle(x, y, r * 0.72, W[an][0], { sw: 0 }) + A.text(x, y + 0.5, W[an][1], { size: r * 0.95, weight: 800, fill: C.white });
+    const hx = (q, r) => A.hexAt(q, r, s, ox, oy);
+    const area = [[0, 0, 'f', null, 'bear'], [-1, 0, 'f', null, null], [-1, 1, 'm', 'f', 'hawk'], [0, 1, 'w', 'f', null], [1, -1, 'f', null, null],
+      [0, -1, 'm', null, null], [1, 1, 'r', null, 'salmon'], [2, -1, 'p', null, 'elk'], [-2, 1, 'w', null, null], [-1, 2, 'r', 'w', 'salmon']];
+    let board = A.bg('#e7eadb');
+    for (const [q, r, a, b, an] of area) { const [x, y] = hx(q, r); board += hexTile(x, y, s, a, b); if (an) board += token(x, y, an); }
+    const [nx, ny] = hx(1, 0);
+    board += A.poly(verts(nx, ny, s - 1.5), 'none', { dash: '3 2', sw: 1.4 });
+    board += A.rect(236, 6, 80, 188, '#f6f1e3', { rx: 8 }) + A.text(276, 18, 'Display', { size: 8, fill: '#6d5a3a' });
+    const row = (i) => 52 + i * 40;
+    const disp = [['p', null, 'fox'], ['w', 'm', 'hawk'], ['f', 'p', 'salmon']];
+    disp.forEach(([a, b, an], i) => { board += hexTile(258, row(i + 1), 15, a, b) + token(294, row(i + 1), an); });
+    const newTile = (x, y, r) => A.k('tile', hexTile(x, y, r, 'r', 'f'));
+    const bear = (x, y) => A.k('bear', token(x, y, 'bear'));
+    const inDisp = newTile(258, row(0), 15), bearDisp = bear(294, row(0));
+    const [bx, by] = hx(0, 0);
+    // Outline of the forest area once the new tile joins it.
+    const forest = [[0, 0], [-1, 0], [-1, 1], [0, 1], [1, -1], [1, 0]].map(([q, r]) => A.poly(verts(...hx(q, r), s - 3), 'none', { stroke: '#ffcf3f', sw: 2.5 })).join('');
+    return [
+      { step: 0, say: 'Pick one of the 4 pairs. You take the **forest/river tile** with the **bear** token.', svg: board + inDisp + bearDisp + A.glow(276, row(0), 30, 'g-pick') },
+      { step: 1, say: 'Place the tile touching your area, turned so its **forest** side joins your forest.', svg: board + newTile(nx, ny, s) + bearDisp },
+      { step: 1, say: 'Your forest is now one area of **6 tiles**. Largest areas score at the end.', svg: board + newTile(nx, ny, s) + bearDisp + A.k('forest', forest) + A.k('lab', A.tag(56, 186, 'Forest: 6 tiles', { fill: '#2f6b34' })) },
+      { step: 2, say: 'Put the bear on the new tile, next to your lone bear: **a pair** for the Bear scoring card.', svg: board + newTile(nx, ny, s) + bear(nx, ny) + A.glow((bx + nx) / 2, by, 38, 'g-bears') },
+      { step: 3, say: 'Refill the empty slot with a new tile and token from the bag. Next player.', svg: board + newTile(nx, ny, s) + bear(nx, ny) + A.k('t2', hexTile(258, row(0), 15, 'm', 'w')) + A.k('k2', token(294, row(0), 'elk')) },
+    ];
+  },
+
   art(A) {
     const C = A.C, s = 21, ox = 112, oy = 98;
     const H = { m: '#9aa1a8', f: '#2f6b34', p: '#d9c45a', w: '#7fc0a0', r: '#4a8fcb' };

@@ -12,12 +12,6 @@
 <body data-page="game">
 <main class="wrap">
   <div class="sheet-controls">
-    <div class="layers">
-      <span class="lbl">Detail</span>
-      <div class="seg" id="layers">
-        <button data-lv="1">30 seconds</button><button data-lv="2">5 minutes</button><button data-lv="3" class="on">Everything</button>
-      </div>
-    </div>
     <div class="game-nav">
       <a class="btn" id="prev" title="Previous game">←</a>
       <select id="pick" aria-label="Choose a game"></select>
@@ -25,11 +19,12 @@
       <button class="btn" onclick="window.print()" title="Print this sheet on one landscape page">Print</button>
     </div>
   </div>
-  <div id="out" class="lv3"></div>
+  <div id="out"></div>
 </main>
 <script src="js/site.js"></script>
 <script src="js/core.js"></script>
 <script src="js/art.js"></script>
+<script src="js/walk.js"></script>
 <script src="js/sheet.js"></script>
 <script>
 loadGames().then(games => {
@@ -47,19 +42,11 @@ loadGames().then(games => {
   document.getElementById('prev').href = '?g=' + games[(i - 1 + games.length) % games.length].id;
   document.getElementById('next').href = '?g=' + games[(i + 1) % games.length].id;
 
-  const setLv = lv => {
-    out.className = 'lv' + lv;
-    document.querySelectorAll('#layers button').forEach(b => b.classList.toggle('on', b.dataset.lv == lv));
-    try { localStorage.setItem('bgfg-layer', lv); } catch (e) {}
-  };
-  document.querySelectorAll('#layers button').forEach(b => b.onclick = () => setLv(b.dataset.lv));
-  let saved = null; try { saved = localStorage.getItem('bgfg-layer'); } catch (e) {}
-  setLv(params.get('layer') || saved || 3);
+  activateSheet(g, out);
   document.addEventListener('keydown', e => {
     if (e.target.tagName === 'SELECT') return;
     if (e.key === 'ArrowLeft') location.href = document.getElementById('prev').href;
     if (e.key === 'ArrowRight') location.href = document.getElementById('next').href;
-    if ('123'.includes(e.key)) setLv(e.key);
   });
 });
 </script>

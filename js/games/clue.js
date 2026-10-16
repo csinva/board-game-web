@@ -80,6 +80,50 @@ defineGame({
     'Don’t accuse until all three are certain: a wrong guess ends your chance to win.',
   ],
 
+  walk(A) {
+    const C = A.C, PLUM = '#7d55b5', MUST = '#e2b33c';
+    let base = A.bg('#efe4cc') + A.rect(4, 4, 174, 192, '#e3c46a', { rx: 4, sw: 1.6 });
+    base += A.grid(6, 6, 17, 19, 10, () => '#e9cf7a', { sw: 0.35, stroke: '#c7a64c' });
+    const rooms = [
+      ['Study', 6, 6, 52, 46, '#c99b78'], ['Hall', 66, 6, 48, 38, '#b9c6a3'], ['Lounge', 122, 6, 54, 46, '#a9cbbf'],
+      ['Library', 6, 62, 52, 54, '#d7b089'], ['Dining', 122, 62, 54, 54, '#9fb47f'],
+      ['Conservatory', 6, 128, 52, 66, '#c5a5b9'], ['Ballroom', 66, 150, 48, 44, '#d2bf95'], ['Kitchen', 122, 128, 54, 66, '#b49a7a'],
+    ];
+    for (const [n, x, y, w, h, f] of rooms) base += A.rect(x, y, w, h, f, { rx: 1, sw: 1.4 }) + A.text(x + w / 2, y + 7, n, { size: 6, weight: 700 });
+    for (const [x, y, w, h] of [[56, 86, 4, 10], [30, 50, 10, 4], [86, 42, 10, 4], [120, 86, 4, 10], [30, 126, 10, 4], [86, 148, 10, 4], [146, 126, 10, 4], [146, 50, 10, 4]]) base += A.rect(x, y, w, h, '#7a2e3a', { sw: 0, rx: 1 });
+    base += A.rect(68, 56, 44, 78, '#8a6c4f', { rx: 2, sw: 1.4 }) + A.rect(74, 82, 32, 22, '#f3ead6', { rx: 2, sw: 1.1 }) + A.path('M74 82 L90 95 L106 82', { sw: 1.1 }) + A.text(90, 114, 'case file', { size: 6, weight: 700, fill: C.white });
+    // Right panel: other players and Priya's notes.
+    const BK = (x, y) => A.card(x, y, 14, 20, '#7a2e3a', {});
+    base += A.tag(210, 50, 'Tom') + BK(230, 40) + BK(244, 40) + BK(258, 40);
+    base += A.tag(210, 82, 'Lena') + BK(230, 72) + BK(244, 72);
+    base += A.tag(210, 104, 'Priya', { fill: PLUM });
+    base += A.rect(238, 96, 76, 98, C.white, { rx: 3, sw: 1.2 }) + A.text(276, 104, 'Priya’s notes', { size: 6.5, weight: 800 });
+    const notes = ['Mustard', 'Plum', 'Rope', 'Wrench', 'Library', 'Hall'], done = { Plum: 1, Wrench: 1, Hall: 1 };
+    notes.forEach((n, i) => {
+      const y = 118 + i * 12.5;
+      base += A.rect(244, y - 3.5, 7, 7, 'none', { sw: 0.8, rx: 1 }) + A.text(256, y, n, { size: 7, weight: 600, anchor: 'start' });
+      if (done[n]) base += A.text(247.5, y, 'x', { size: 8, weight: 800 });
+    });
+    const rope = (x, y) => A.path(`M${x - 9} ${y} q4 -7 8 0 q4 7 8 0`, { stroke: '#a77b22', sw: 2.6 }) + A.circle(x + 9, y - 1, 2.6, 'none', { stroke: '#a77b22', sw: 1.8 });
+    const priya = (x, y) => A.k('priya', A.pawn(x, y, 15, PLUM));
+    const must = (x, y) => A.k('must', A.pawn(x, y, 15, MUST));
+    const ropeT = (x, y) => A.k('rope', rope(x, y));
+    const die = A.k('die', A.die(192, 116, 20, 5));
+    const lenaRope = A.k('rope-card', BK(258, 72));
+    const inLib = priya(20, 94) + must(42, 94) + ropeT(30, 108);
+    const bub = A.k('bub', A.bubble(186, 4, 128, 22, 'Mustard + rope + Library?', { size: 7 }));
+    return [
+      { step: 0, say: 'Priya rolls a **5** and heads for the Library door.', svg: base + priya(62, 140) + must(150, 30) + ropeT(30, 170) + lenaRope + die + A.glow(58, 91, 12, 'g-door') },
+      { step: 0, say: 'She enters the **Library**. A room ends her move.', svg: base + priya(26, 94) + must(150, 30) + ropeT(30, 170) + lenaRope + die },
+      { step: 1, say: 'She suggests “**Colonel Mustard** with the **rope** in the Library.” His pawn and the rope are moved into the room.', svg: base + inLib + lenaRope + bub },
+      { step: 2, say: 'Going left, **Tom** checks first: he has none of the three, so he says so.', svg: base + inLib + lenaRope + bub + A.k('tom-no', A.tag(296, 50, 'none', { fill: C.gray })) },
+      { step: 2, say: '**Lena** holds the rope, so she shows it to Priya alone, face down to everyone else.', svg: base + inLib + bub + A.k('tom-no', A.tag(296, 50, 'none', { fill: C.gray })) +
+        A.k('rope-card', A.card(196, 142, 32, 44, '#d9c49a', { label: 'Rope', size: 6, labelFill: C.ink })) },
+      { step: 3, say: 'Priya crosses off the rope and notes Tom has none of the three. Not sure yet, so **no accusation**.', svg: base + inLib + A.k('tom-no', A.tag(296, 50, 'none', { fill: C.gray })) +
+        A.k('rope-card', A.card(196, 142, 32, 44, '#d9c49a', { label: 'Rope', size: 6, labelFill: C.ink })) + A.k('x', A.text(247.5, 143, 'x', { size: 9, weight: 800, fill: C.red })) + A.glow(248, 143, 9, 'g-x') },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     let o = A.bg('#efe4cc');

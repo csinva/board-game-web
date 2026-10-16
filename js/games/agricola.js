@@ -86,6 +86,76 @@ defineGame({
     'Aim for a little of **everything**: the first animal or vegetable in a category is worth the most.',
   ],
 
+  extended: [
+    { title: 'The harvest, step by step', items: [
+      '**Field phase**: take 1 grain or vegetable from every sown field into your supply.',
+      '**Feeding phase**: pay 2 food per family member; a child born this round eats only 1. You may convert goods to food at any time to pay.',
+      '**Breeding phase**: each animal type you have 2+ of gives 1 newborn, but only if you have room for it. A newborn can’t be cooked the moment it is born.',
+    ] },
+    { title: 'Turning goods into food', items: [
+      'Raw, without any improvement: 1 grain or 1 vegetable = 1 food. Animals can’t be eaten raw.',
+      '**Fireplace** (2–3 clay): sheep 2, boar 2, cattle 3, vegetable 2; bake bread at 2 food per grain.',
+      '**Cooking hearth** (4–5 clay, or return a fireplace): sheep 2, boar 3, cattle 4, vegetable 3; bread 3 per grain.',
+      '**Clay oven** bakes 1 grain into 5 food; **stone oven** bakes up to 2 grain at 4 each. Baking needs a Bake bread action (or Sow and bake).',
+    ] },
+    { title: 'Begging', text: 'If you can’t pay all the food at a harvest, take one **begging card** per missing food. Each is −3 points at the end and can’t be paid off later. One begging card is often cheaper than wrecking two turns for food, but more adds up fast.' },
+    { title: 'Family growth', text: 'Basic **Family growth** needs a room with no one living in it: the newborn moves in and works from next round. It eats 1 food at a harvest in the round it was born, 2 after that. Later round cards add “Family growth even without room”. You can have at most 5 family members.' },
+    { title: 'Fields, pastures and animals', items: [
+      'New fields must be plowed next to your existing fields. Sowing turns 1 grain into 3 on the field (1 vegetable into 2).',
+      'A pasture is any area fully enclosed by fences (1 wood each, at most 15). It holds 2 animals per space, of one type only; each stable inside doubles that.',
+      'An unfenced stable holds 1 animal, and your house holds 1 pet. Animals with nowhere to go must be cooked or released.',
+    ] },
+    { title: 'House and rooms', text: 'All rooms are the same material. A room costs 5 of that material + 2 reed. **Renovate** wood → clay (1 clay per room + 1 reed) and later clay → stone (1 stone per room + 1 reed); you can’t skip clay. Clay rooms score 1 each, stone rooms 2, wood rooms 0.' },
+    { title: 'Cards', text: '**Occupations** are played on a Lessons space and cost food (typically 1–2; the first is often cheaper). **Minor improvements** come from your hand and some pass to the next player once used. The 10 **major improvements** are shared: first come, first served.' },
+    { title: 'Final scoring', items: [
+      'Each of fields, pastures, grain, vegetables, sheep, boar and cattle scores −1 for none, up to +4 for plenty (e.g. 8 grain, 4 vegetables, 6 cattle).',
+      '+1 per fenced stable, +1 per clay room, +2 per stone room, +3 per family member, plus card points.',
+      '−1 per unused farmyard space and −3 per begging card. Ties go to the most building resources left.',
+    ] },
+  ],
+
+  walk(A) {
+    const C = A.C, cs = 30, fx = 12, fy = 32;
+    const grass = '#9cc56a', woodC = '#8a5a33', reedC = '#d9cf9a';
+    let base = A.bg('#e9dfc4');
+    base += A.rect(fx - 4, fy - 4, cs * 5 + 8, cs * 3 + 8, '#6f8f45', { rx: 6 });
+    for (let j = 0; j < 3; j++) for (let i = 0; i < 5; i++) base += A.rect(fx + i * cs + 1.5, fy + j * cs + 1.5, cs - 3, cs - 3, grass, { rx: 3, sw: 0.8, stroke: '#5f7c3a' });
+    const room = (j) => {
+      const x = fx + 3, y = fy + j * cs + 3;
+      let s = A.rect(x, y, cs - 6, cs - 6, '#c99a62', { rx: 2, sw: 1 });
+      for (let k = 1; k < 3; k++) s += A.line(x + 2, y + k * 8, x + cs - 8, y + k * 8, { stroke: '#8a5a33', sw: 0.8 });
+      return s;
+    };
+    base += room(1) + room(2);
+    base += A.tag(88, 14, 'Your farm');
+    // Supply
+    base += A.rect(8, 136, 166, 56, '#f7f0dc', { rx: 6, sw: 1.2 }) + A.text(16, 146, 'Your supply', { size: 8, anchor: 'start' });
+    // Action spaces
+    const ax = 186, aw = 126, sp = ['Forest', 'Build rooms', 'Family growth'];
+    sp.forEach((t, k) => { const y = 8 + k * 64; base += A.rect(ax, y, aw, 56, '#f7f0dc', { rx: 5, sw: 1.2 }) + A.text(ax + 8, y + 10, t, { size: 9, anchor: 'start', weight: 700 }); });
+    base += A.text(ax + 8, 94, 'pay 5 wood + 2 reed', { size: 7, anchor: 'start', weight: 600, fill: C.gray });
+    base += A.text(ax + 8, 158, 'needs an empty room', { size: 7, anchor: 'start', weight: 600, fill: C.gray });
+    const wood = (i, x, y) => A.k('w' + i, A.rect(x, y, 10, 10, woodC, { rx: 1.5, sw: 0.9 }));
+    const reed = (i, x, y) => A.k('r' + i, A.rect(x, y, 6, 14, reedC, { rx: 2, sw: 0.9 }));
+    const person = (key, x, y, fill = C.blue) => A.k(key, A.circle(x, y, 7, fill, { sw: 1.4 }));
+    const home1 = [fx + cs / 2, fy + cs * 1.5], home2 = [fx + cs / 2, fy + cs * 2.5];
+    const onSpace = (k) => [ax + aw - 18, 8 + k * 64 + 38];
+    const woodOnForest = () => [0, 1, 2, 3, 4, 5].map(i => wood(i, ax + 10 + i * 14, 38 + (i % 2) * 4)).join('');
+    const woodInSupply = (n = 6) => [...Array(n).keys()].map(i => wood(i, 16 + i * 14, 160)).join('');
+    const reeds = [0, 1].map(i => reed(i, 110 + i * 10, 158)).join('');
+    const newRoom = A.k('room3', room(0));
+    const start = base + woodOnForest() + reeds;
+    return [
+      { step: 0, say: 'Round 5. **6 wood** has piled up on Forest, and you need wood for a room.', svg: start + person('p1', ...home1) + person('p2', ...home2) + A.glow(ax + 44, 46, 20, 'g-forest') },
+      { step: 0, say: 'Place your first person on **Forest**.', svg: start + person('p1', ...onSpace(0)) + person('p2', ...home2) },
+      { step: 0, say: 'Take **all** of it: 6 wood into your supply.', svg: base + woodInSupply() + reeds + person('p1', ...onSpace(0)) + person('p2', ...home2) },
+      { step: 2, say: 'Your second person goes to **Build rooms**.', svg: base + woodInSupply() + reeds + person('p1', ...onSpace(0)) + person('p2', ...onSpace(1)) + A.glow(...onSpace(1), 14, 'g-build') },
+      { step: 2, say: 'Pay **5 wood + 2 reed**: a third room appears next to your house. 1 wood is left over.', svg: base + wood(5, 16, 160) + newRoom + person('p1', ...onSpace(0)) + person('p2', ...onSpace(1)) + A.glow(fx + cs / 2, fy + cs / 2, 18, 'g-room') },
+      { step: 3, say: 'Next round your family is home and the new room is **empty**, so you can take Family growth.', svg: base + wood(5, 16, 160) + newRoom + person('p1', ...home1) + person('p2', ...home2) + A.glow(...onSpace(2), 14, 'g-fam') },
+      { step: 3, say: 'A **child** moves into the new room: three workers from now on (it eats too).', svg: base + wood(5, 16, 160) + newRoom + person('p1', ...onSpace(2)) + person('p2', ...home2) + A.k('baby', A.circle(fx + cs / 2, fy + cs / 2 + 2, 5, C.blue, { sw: 1.2 })) + A.glow(fx + cs / 2, fy + cs / 2, 14, 'g-baby') },
+    ];
+  },
+
   art(A) {
     const C = A.C, cs = 38, fx = 8, fy = 44;
     const grass = '#9cc56a', soil = '#7a5233', wood = '#b07a45';

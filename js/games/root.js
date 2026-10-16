@@ -72,11 +72,89 @@ defineGame({
     'You score **1 VP** for each enemy building or token you remove, but nothing for killing warriors.',
   ],
 
+  extended: [
+    { title: 'Marquise de Cat: the industry engine', items: [
+      '**Birdsong**: 1 wood on every sawmill. Wood moves only through clearings you rule, so a broken supply line strands it.',
+      '**Daylight**: 3 actions (+1 per bird card spent): battle, march (two moves), recruit (1 warrior per recruiter, once per turn), build, or overwork (spend a matching card for 1 extra wood at a sawmill).',
+      'Each building track gets more expensive (0-1-2-3-3-4 wood) and scores more VP; uncovered spaces also raise your card draw (recruiters) or crafting power (workshops).',
+      'The **Keep** protects its clearing from other factions’ placement; Field Hospitals let you spend a card to return warriors removed in a matching clearing to the Keep.',
+    ] },
+    { title: 'Eyrie Dynasties: the Decree', items: [
+      'Birdsong: add 1–2 cards to the Decree’s four columns (**Recruit, Move, Battle, Build**); bird cards are wild.',
+      'Daylight: resolve every card left to right, each in a clearing matching its suit. If you can’t, you fall into **Turmoil**: lose 1 VP per bird card in the Decree, discard it (except the leader’s loyal viziers), pick a new leader.',
+      'Evening: score VP from the roost track; more roosts = more points each turn. Roosts are your only buildings, so losing them hurts doubly.',
+      'Lords of the Forest: the Eyrie rule a clearing on ties.',
+    ] },
+    { title: 'Woodland Alliance: sympathy & revolt', items: [
+      'Spread **sympathy** tokens by paying supporters (cards) matching the clearing; each token scores VP by the track. More cost where enemy warriors gather (martial law).',
+      '**Outrage**: anyone who removes sympathy or moves into a sympathetic clearing must give you a matching card (or you draw one).',
+      'Birdsong: **revolt** by spending 2 matching supporters in a sympathetic clearing: wipe out enemy pieces there, build a base, get warriors.',
+      '**Guerrilla war**: when defending, the Alliance use the higher die. Officers set how many Evening operations (move, battle, recruit, organize) you get.',
+    ] },
+    { title: 'Vagabond: items & relationships', items: [
+      'Every action exhausts an item: boots to move, sword to battle, torch to explore ruins (find items), crossbow, hammer to repair, tea to refresh. Damaged items can’t be used.',
+      '**Aid** a faction by giving it a card: relationships climb from indifferent to allied, scoring VP; once allied you can move with and use their warriors.',
+      'Attacking a faction makes it **hostile**: you score +1 VP for each of their pieces you remove (Infamy), but moving into a clearing with their warriors costs an extra boot.',
+      '**Quests** need two specific items; complete them for 2 cards or VP.',
+    ] },
+    { title: 'Crafting & items', items: [
+      'Craft by activating crafting pieces (Cat workshops, Eyrie roosts, Alliance sympathy, Vagabond hammers) matching the card’s suits.',
+      'Item cards score the printed VP and put an item on the map’s shared track (the Vagabond loves them); if the item is gone, you can’t craft that card.',
+      'Persistent effect cards (e.g. Royal Claim, Sappers, Better Burrow Bank) stay in front of you; Eyrie only score 1 VP per item crafted.',
+    ] },
+    { title: 'Battle in full', items: [
+      'Attacker rolls 2 dice, takes the higher; defender takes the lower. Hits are capped by your warriors in the clearing.',
+      '**Defenseless** defender (no warriors) takes +1 extra hit. Ambush cards (matching suit) deal 2 hits before the roll, and can be cancelled by another ambush.',
+      'Defender chooses which of their own pieces to remove: warriors first, then buildings/tokens of their choice.',
+    ] },
+    { title: 'Dominance cards', text: 'Four suited Dominance cards are in the deck. A player with **10+ VP** can play one in Daylight, removing their score marker: they now win only by ruling 3 clearings of that suit (or 2 opposite corners with bird dominance) at the **start** of their Birdsong. Played dominance cards can be taken by others for a matching card. The Vagabond can instead form a coalition with the lowest-scoring player and win with them.' },
+  ],
+
   tips: [
     'Read every faction board before starting: you need to know how each rival scores.',
     'Hit whoever is running away with points; the Alliance and Vagabond are easy to underestimate.',
     'Craft early: the shared cards’ items and effects add up quickly.',
   ],
+
+  walk(A) {
+    const C = A.C, CAT = '#e07b2e', EY = '#2f6db5';
+    const L = [70, 76], M = [160, 148], R = [252, 76];
+    const suitC = { f: '#d9472f', r: '#e9c43a', m: '#e88a3a' };
+    const clearing = ([x, y], s, name) => A.circle(x, y, 30, '#f3ead2', { stroke: '#5a4630', sw: 1.8 }) +
+      A.circle(x - 22, y - 22, 6, suitC[s], { sw: 1 }) + A.text(x, y + 38, name, { size: 8, fill: '#3e4a2a' });
+    let board = A.bg('#cfe0a8') + `<ellipse cx="160" cy="70" rx="44" ry="24" fill="#8fb36a"/><ellipse cx="40" cy="165" rx="30" ry="18" fill="#8fb36a"/>`;
+    board += A.line(...L, ...R, { stroke: '#f3ead2', sw: 6 }) + A.line(...L, ...M, { stroke: '#f3ead2', sw: 6 }) + A.line(...M, ...R, { stroke: '#f3ead2', sw: 6 });
+    board += clearing(L, 'f', 'fox') + clearing(M, 'r', 'rabbit') + clearing(R, 'm', 'mouse');
+    const bld = (x, y, f, l) => A.rect(x - 7, y - 7, 14, 14, f, { rx: 2, sw: 1.2 }) + A.text(x, y + 0.5, l, { size: 6, weight: 800, fill: '#fff' });
+    const war = (x, y, f) => A.meeple(x, y, 15, f);
+    const wood = (x, y) => A.rect(x - 4, y - 4, 8, 8, '#8a5a33', { rx: 1, sw: 1 });
+    board += bld(L[0] - 10, L[1] - 12, CAT, 'SAW') + bld(M[0] - 10, M[1] - 10, CAT, 'SAW');
+    board += A.rect(M[0] + 3, M[1] - 17, 14, 14, 'none', { rx: 2, sw: 1, dash: '2 2' });
+    const vp = (n) => A.k('vp', A.tag(46, 14, 'Cats ' + n + ' VP', { fill: CAT }));
+    const eyTag = A.tag(276, 14, 'Eyrie', { fill: EY });
+    const catW = (i, at) => A.k('cw' + i, war(at === L ? L[0] - 17 + i * 11 : R[0] - 20 + i * 11, at === L ? L[1] + 12 : R[1] + 14, CAT));
+    const cats = (at, n = 4) => [0, 1, 2, 3].slice(4 - n).map(i => catW(i, at)).join('');
+    const eyrie = A.k('ew0', war(R[0] - 6, R[1] - 10, EY)) + A.k('ew1', war(R[0] + 6, R[1] - 10, EY)) + A.k('roost', A.rect(R[0] + 11, R[1] - 13, 14, 14, EY, { rx: 2, sw: 1.2 }) + A.bird(R[0] + 18, R[1] - 5, 11, '#fff'));
+    const woodL = A.k('wood1', wood(L[0] + 10, L[1] - 12)), woodM = A.k('wood2', wood(M[0] - 10, M[1] + 6));
+    const ws = A.k('ws', bld(M[0] + 10, M[1] - 10, CAT, 'WS'));
+    const hand = (n) => [0, 1, 2, 3].slice(0, n).map(i => A.k('c' + i, A.card(234 + i * 14, 156, 22, 32, ['#e7a08f', '#f0d98a', '#f0b98a', '#a9c7e8'][i]))).join('');
+    const dice = (a, b) => A.k('dice', A.die(110, 8, 20, a, '#fff6e6') + A.die(136, 8, 20, b, '#fff6e6'));
+    const base = board + eyTag;
+    return [
+      { step: 0, say: '**Birdsong.** The Cats place **1 wood** at each sawmill.',
+        svg: base + vp(10) + cats(L) + eyrie + woodL + woodM + hand(3) + A.glow(L[0] + 10, L[1] - 12, 10, 'g1') + A.glow(M[0] - 10, M[1] + 6, 10, 'g2') },
+      { step: 1, say: '**Daylight**, action 1: spend 1 wood to build a 2nd **workshop**. It scores **+2 VP**.',
+        svg: base + vp(12) + cats(L) + eyrie + woodL + ws + hand(3) + A.glow(M[0] + 10, M[1] - 10, 13, 'g-ws') },
+      { step: 1, say: 'Action 2: **march** 4 warriors from the fox clearing (they rule it) into the Eyrie’s mouse clearing.',
+        svg: base + vp(12) + cats(R) + eyrie + woodL + ws + hand(3) + A.arrow(104, 70, 214, 70, { stroke: CAT, sw: 2, dash: '4 3' }) },
+      { step: 1, say: 'Action 3: **battle**. Roll 2 dice: **3** and **1**. The attacker takes the higher, so Cats deal 3 hits and the Eyrie deal 1.',
+        svg: base + vp(12) + cats(R) + eyrie + woodL + ws + hand(3) + dice(3, 1) + A.text(120, 36, 'Cats', { size: 7, fill: CAT }) + A.text(146, 36, 'Eyrie', { size: 7, fill: EY }) + A.glow(R[0], R[1], 34, 'g-r') },
+      { step: 1, say: 'The Eyrie lose both warriors, then the **roost** (+1 VP). The Cats lose 1 warrior.',
+        svg: base + vp(13) + cats(R, 3) + woodL + ws + hand(3) + dice(3, 1) },
+      { step: 2, say: '**Evening.** Draw 1 card (more if the recruiter track shows a bonus), then discard down to 5.',
+        svg: base + vp(13) + cats(R, 3) + woodL + ws + hand(4) + A.glow(276, 170, 24, 'g-hand') + A.tag(262, 140, 'Cats’ hand', { fill: CAT }) },
+    ];
+  },
 
   art(A) {
     const C = A.C;

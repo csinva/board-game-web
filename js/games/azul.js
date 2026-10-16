@@ -82,6 +82,45 @@ defineGame({
     'Count the centre late in the round so you are not the one forced to swallow a big pile.',
   ],
 
+  walk(A) {
+    const C = A.C, cs = 20, g = 2.5, step = cs + g;
+    const T = ['#2f6fbf', '#f2c12e', '#d7473b', '#2b2b2b', '#7fcfdc'];
+    const tile = (x, y, k, s = cs) => A.tile(x, y, s, T[k], { sw: 1 }) + (k === 3 ? A.circle(x + s / 2, y + s / 2, s * 0.22, 'none', { stroke: '#7fcfdc', sw: 1.2 }) : '') + (k === 4 ? A.rect(x + s * 0.3, y + s * 0.3, s * 0.4, s * 0.4, 'none', { stroke: '#2f6fbf', sw: 1, rotate: 45 }) : '');
+    const bx = 6, by = 6, prx = 122, wx = 130;
+    const pl = (r, k) => [prx - (k + 1) * step + g, by + 10 + r * step];
+    const wl = (r, c) => [wx + c * step, by + 10 + r * step];
+    let board = A.bg('#efe4cc') + A.rect(bx, by, 240, 126, '#d9c9a6', { rx: 8 });
+    for (let r = 0; r < 5; r++) for (let k = 0; k <= r; k++) board += A.rect(...pl(r, k), cs, cs, '#c4b08a', { rx: 3, sw: 0.8 });
+    const placed = new Set(['0,0', '0,1', '1,4', '2,2', '2,3', '3,0']);
+    for (let r = 0; r < 5; r++) for (let c = 0; c < 5; c++) { const k = (c - r + 5) % 5; board += placed.has(r + ',' + c) ? tile(...wl(r, c), k) : A.rect(...wl(r, c), cs, cs, T[k], { rx: 3, sw: 0.6, opacity: 0.35 }); }
+    board += tile(...pl(3, 0), 4) + tile(...pl(3, 1), 4);
+    board += A.tag(52, 148, 'Ben’s board', { fill: '#6d5a3a' });
+    // Factories and centre.
+    const F1 = [284, 36], F2 = [284, 98];
+    for (const [fx, fy] of [F1, F2]) board += A.circle(fx + 1.5, fy + 2, 25, C.shadow, { sw: 0 }) + A.circle(fx, fy, 25, '#f6f0e2', { sw: 1.4 });
+    board += A.text(284, 136, 'centre', { size: 8, fill: '#6d5a3a' });
+    const fpos = ([fx, fy], i) => [fx - 15 + (i % 2) * 16, fy - 15 + Math.floor(i / 2) * 16];
+    const ft = (key, xy, k) => A.k(key, tile(...xy, k, 14));
+    const f2 = [1, 1, 3, 0].map((k, i) => ft('f2-' + i, fpos(F2, i), k)).join('') + ft('c-1', [277, 146], 4);
+    const fp = A.k('fp', A.tile(296, 146, 14, C.white, { sw: 1 }) + A.text(303, 153, '1', { size: 9, weight: 800 }));
+    const lifted = (n) => [126 + n * 24, 152], inLine = (n) => pl(2, n);
+    const yel = (xy) => A.k('yel', tile(...xy, 1, 14));
+    const score = (n) => A.k('s' + n, A.tag(262, 186, 'Ben: ' + n + ' points', { fill: '#2f6fbf' }));
+    const redsF = [0, 1, 3].map(i => A.k('red' + i, tile(...fpos(F1, i), 2, 14))).join('');
+    const redsAt = (fn) => [0, 1, 3].map((i, n) => A.k('red' + i, tile(...fn(n), 2))).join('');
+    const [rx, ry] = wl(2, 4);
+    const refill = [[0, 2, 2, 4], [3, 3, 1, 0]].map((ks, f) => ks.map((k, i) => ft('n' + f + i, fpos(f ? F2 : F1, i), k)).join('')).join('');
+    return [
+      { step: 0, say: 'Ben’s turn. He wants red, and this factory holds **3 red** and 1 yellow.', svg: board + redsF + yel(fpos(F1, 2)) + f2 + fp + score(12) + A.glow(...F1, 30, 'g-f1') },
+      { step: 0, say: 'He must take **all 3 reds**. The leftover yellow slides into the centre.', svg: board + redsAt(lifted) + yel([258, 146]) + f2 + fp + score(12) },
+      { step: 1, say: 'All 3 go in **one** pattern line: the 3-space line, which they fill exactly. Nothing spills to the floor.', svg: board + redsAt(inLine) + yel([258, 146]) + f2 + fp + score(12) + A.glow(pl(2, 1)[0] + cs / 2, pl(2, 1)[1] + cs / 2, 30, 'g-line') },
+      { step: 2, say: 'When every tile is gone, the full line moves **one red** to its spot on the wall. The other two are discarded.', svg: board + A.k('red0', tile(rx, ry, 2)) + score(12) },
+      { step: 2, say: 'It links to **3** tiles in its row (itself included) and **2** in its column: **3 + 2 = 5 points**.', svg: board + A.k('red0', tile(rx, ry, 2)) + score(17) +
+        A.k('hl-row', A.rect(wl(2, 2)[0] - 2, ry - 2, 3 * step + 1, cs + 4, 'none', { rx: 4, stroke: '#ffcf3f', sw: 3 })) + A.k('hl-col', A.rect(rx - 2, wl(1, 4)[1] - 2, cs + 4, 2 * step + 1, 'none', { rx: 4, stroke: '#ffcf3f', sw: 3 })) },
+      { step: 3, say: 'Then each factory is refilled with 4 tiles from the bag, and the next round begins.', svg: board + A.k('red0', tile(rx, ry, 2)) + score(17) + refill },
+    ];
+  },
+
   art(A) {
     const C = A.C, cs = 16, g = 2.5, step = cs + g;
     const T = ['#2f6fbf', '#f2c12e', '#d7473b', '#2b2b2b', '#7fcfdc'];

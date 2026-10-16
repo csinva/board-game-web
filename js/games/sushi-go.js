@@ -81,6 +81,52 @@ defineGame({
     'Look at what your left neighbour has collected before you pass.',
   ],
 
+  walk(A) {
+    const C = A.C, W = 34, H = 46;
+    const D = {
+      tempura: ['#9b74c9', 'Tempura'], dumpling: ['#4aa3d8', 'Dumpling'], maki: ['#e0524a', 'Maki'], squid: ['#f2c14e', 'Squid Nigiri'],
+      salmon: ['#f2c14e', 'Salmon Nigiri'], wasabi: ['#86b84a', 'Wasabi'], pudding: ['#f19bb4', 'Pudding'], sashimi: ['#93c45e', 'Sashimi'], chop: ['#4fbfae', 'Chopsticks'],
+    };
+    const dish = (x, y, k) => {
+      const [f, t] = D[k];
+      let s = A.card(x, y, W, H, f, {}) + A.rect(x + 3, y + 3, W - 6, 10, C.white, { rx: 2, sw: 0, opacity: 0.9 }) + A.text(x + W / 2, y + 8, t, { size: Math.min(5.5, 46 / t.length), weight: 800 });
+      const cx = x + W / 2, cy = y + H / 2 + 6;
+      if (k === 'squid' || k === 'salmon') s += A.rect(cx - 9, cy, 18, 7, '#fbf6ec', { rx: 3, sw: 1 }) + A.rect(cx - 10, cy - 5, 20, 6, k === 'squid' ? '#f4efe6' : '#e85d3a', { rx: 3, sw: 1 });
+      else if (k === 'maki') s += A.circle(cx, cy, 8, '#2b2b2b', { sw: 1 }) + A.circle(cx, cy, 5, '#fbf6ec', { sw: 0 }) + A.circle(cx, cy, 2, '#e85d3a', { sw: 0 });
+      else if (k === 'dumpling') s += A.path(`M${cx - 9} ${cy + 4} q9 -15 18 0 z`, { fill: '#fbf6ec', sw: 1 });
+      else if (k === 'tempura') s += A.path(`M${cx - 8} ${cy + 5} q4 -13 8 -9 q4 -4 8 9 z`, { fill: '#e8b04a', sw: 1 });
+      else if (k === 'sashimi') s += A.rect(cx - 9, cy - 4, 18, 8, '#f08a6a', { rx: 3, sw: 1 });
+      else if (k === 'pudding') s += A.path(`M${cx - 7} ${cy + 6} l3 -11 h8 l3 11 z`, { fill: '#f6d27a', sw: 1 }) + A.rect(cx - 4, cy - 7, 8, 4, '#8a5a33', { rx: 2, sw: 0.8 });
+      else if (k === 'wasabi') s += A.path(`M${cx - 7} ${cy + 5} q7 -14 14 0 z`, { fill: '#b7dc6a', sw: 1 });
+      else s += A.line(cx - 7, cy + 6, cx + 5, cy - 7, { sw: 2, stroke: '#8a5a33' }) + A.line(cx - 3, cy + 7, cx + 8, cy - 5, { sw: 2, stroke: '#8a5a33' });
+      return s;
+    };
+    const back = (x, y) => A.card(x, y, W, H, '#d9503f', {}) + A.circle(x + W / 2, y + H / 2, 8, '#fbf6ec', { sw: 1 }) + A.text(x + W / 2, y + H / 2, '?', { size: 6, weight: 800 });
+    const KH = (i) => [146 + i * 12, 8], YH = (i) => [10 + i * 40, 144], MH = (i) => [236 + i * 12, 144];
+    let base = A.bg('#f7e3cf') + A.rect(0, 0, 320, 62, '#efd3b6', { sw: 0, rx: 0 }) + A.line(0, 62, 320, 62, { stroke: '#c9a988', sw: 1 });
+    base += A.tag(296, 50, 'Kai') + A.tag(296, 92, 'You') + A.tag(296, 132, 'Mo');
+    base += dish(10, 8, 'tempura') + dish(48, 8, 'maki') + dish(10, 70, 'wasabi') + dish(48, 70, 'dumpling');
+    const kaiHand = [0, 1, 2].map(i => A.k('k' + i, back(...KH(i)))).join('');
+    const moHand = [0, 1, 2].map(i => A.k('m' + i, back(...MH(i)))).join('');
+    const rest = (pos) => A.k('tem', dish(...pos(0), 'tempura')) + A.k('mak', dish(...pos(1), 'maki')) + A.k('pud', dish(...pos(2), 'pudding'));
+    const YR = (i) => YH(i + 1), KR = (i) => [96 + i * 40, 8];
+    const squidOn = A.k('squid', dish(14, 86, 'squid'));
+    return [
+      { step: 0, say: 'You hold Squid Nigiri, Tempura, Maki and Pudding. An empty **Wasabi** waits in front of you.', svg: base + kaiHand + moHand +
+        A.k('kp', back(...KH(3))) + A.k('squid', dish(...YH(0), 'squid')) + rest(YR) + A.glow(27, 167, 26, 'g1') + A.glow(27, 93, 26, 'g2') },
+      { step: 0, say: 'Everyone picks one card at the same time and lays it face-down. You take the **Squid**.', svg: base + kaiHand + moHand +
+        A.k('kp', back(96, 8)) + A.k('squid', back(96, 70)) + rest(YR) },
+      { step: 1, say: 'Reveal together. Your Squid goes on the Wasabi: 3 × 3 = **9 points**. Kai revealed a Dumpling.', svg: base + kaiHand + moHand +
+        A.k('kp', dish(96, 8, 'dumpling')) + squidOn + rest(YR) + A.k('pts', A.bubble(60, 104, 66, 24, '3 × 3 = 9', { size: 9 })) },
+      { step: 2, say: 'Pass the rest **left** to Kai (top), including a Tempura that completes Kai’s pair. You couldn’t take both.', svg: base + moHand +
+        A.k('kp', dish(96, 8, 'dumpling')) + squidOn + A.k('tem', dish(146, 8, 'tempura')) + A.k('mak', dish(184, 8, 'maki')) + A.k('pud', dish(222, 8, 'pudding')) +
+        A.glow(27, 31, 24, 'g3') + A.glow(163, 31, 24, 'g4') },
+      { step: 2, say: 'At the same time Mo, on your right, passes you 3 cards. Pick again: Salmon now scores just 2, as your Wasabi is used.', svg: base +
+        A.k('kp', dish(96, 8, 'dumpling')) + squidOn + A.k('tem', dish(146, 8, 'tempura')) + A.k('mak', dish(184, 8, 'maki')) + A.k('pud', dish(222, 8, 'pudding')) +
+        A.k('m0', dish(...YH(0), 'salmon')) + A.k('m1', dish(...YH(1), 'sashimi')) + A.k('m2', dish(...YH(2), 'chop')) },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     let o = A.bg('#f7e3cf');

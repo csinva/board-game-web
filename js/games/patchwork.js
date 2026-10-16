@@ -79,6 +79,47 @@ defineGame({
     'Leave yourself room for the awkward shapes, and grab leather patches to plug single holes.',
   ],
 
+  walk(A) {
+    const C = A.C;
+    const fab = ['#c94f6d', '#3f8fc0', '#e8b84a', '#5aa36b', '#8a63b8', '#e07b42', '#47a8a4'];
+    const patch = (ox, oy, k, cells, col) => cells.map(([i, j]) => A.rect(ox + i * k, oy + j * k, k, k, col, { rx: 1, sw: 0.9 })).join('');
+    const btn = (x, y, r = 4.5) => A.circle(x, y, r, '#2f6db5', { sw: 0.8, stroke: '#cfe0f3' });
+    let board = A.bg('#efe5d0');
+    // Patch circle (a slice) with the neutral pawn.
+    board += A.text(160, 10, 'Patches: buy one of the 3 after the pawn', { size: 7.5, fill: '#6d5a3a' });
+    board += patch(10, 22, 10, [[0, 0], [1, 0]], fab[2]);
+    const L = [[0, 0], [0, 1], [0, 2], [1, 2]];
+    const T = [[0, 0], [1, 0], [2, 0], [1, 1]], I = [[0, 0], [1, 0], [2, 0], [3, 0]], Z = [[0, 0], [1, 0], [1, 1], [2, 1]];
+    board += patch(92, 22, 10, T, fab[3]) + patch(140, 22, 10, I, fab[4]) + patch(200, 22, 10, Z, fab[1]);
+    const cap = (x, b, t) => A.text(x, 64, b + ' btn · ' + t + ' time', { size: 5.5, fill: '#6d5a3a' });
+    board += cap(107, 2, 2) + cap(160, 3, 3) + cap(215, 5, 4);
+    // Quilt 9×9.
+    const k = 12, qx = 12, qy = 78;
+    board += A.rect(qx - 3, qy - 3, k * 9 + 6, k * 9 + 6, '#b98d5a', { rx: 4, sw: 1.2 }) + A.grid(qx, qy, 9, 9, k, () => '#f3ead6', { stroke: '#d8c7a4', sw: 0.6 });
+    board += patch(qx, qy, k, [[0, 0], [1, 0], [0, 1], [1, 1], [2, 1]], fab[6]) + patch(qx + 3 * k, qy, k, [[0, 0], [1, 0], [2, 0], [2, 1]], fab[5]) + btn(qx + 0.5 * k, qy + 0.5 * k, 3.5);
+    board += A.text(qx + 4.5 * k, qy + k * 9 + 9, 'Your quilt', { size: 7.5, fill: '#6d5a3a' });
+    // Time track: a straight stretch.
+    const sp = (i) => [146 + i * 17, 112];
+    board += A.text(228, 76, 'Time track', { size: 7.5, fill: '#6d5a3a' });
+    for (let i = 0; i < 10; i++) board += A.rect(sp(i)[0] - 8, sp(i)[1] - 8, 16, 16, '#f3ead6', { rx: 2, sw: 0.9 });
+    const tok = (key, i, col, up = 0) => A.k(key, A.circle(sp(i)[0], sp(i)[1] - up, 6, col, { sw: 1.3 }) + (key === 'you' ? A.tag(sp(i)[0], 92, 'You', { fill: '#3c8d4f' }) : ''));
+    board += tok('maya', 5, C.yellow) + A.tag(sp(5)[0], 134, 'Maya', { fill: '#b8932a' });
+    board += A.tag(232, 154, 'Your buttons', { fill: '#2f6db5' });
+    const coins = (n) => { let s = ''; for (let i = 0; i < n; i++) s += A.k('b' + i, btn(198 + i * 14, 176, 5)); return s; };
+    const lPatch = (x, y, kk) => A.k('L', patch(x, y, kk, L, fab[0]) + btn(x + kk / 2, y + 2.5 * kk, kk * 0.28));
+    const pawn = (x) => A.k('pawn', A.pawn(x, 34, 16, C.black));
+    const lMarket = lPatch(54, 22, 10) + A.k('capL', A.text(64, 64, '3 btn · 4 time', { size: 5.5, fill: '#6d5a3a' }));
+    const lQuilt = lPatch(qx, qy + 6 * k, k);
+    return [
+      { step: 0, say: 'You’re **4 spaces behind** Maya on the time track. Whoever is behind takes the turn, so it’s you.', svg: board + pawn(38) + lMarket + coins(5) + tok('you', 1, '#4fae5a') + A.k('gap', A.rect(sp(1)[0] - 10, sp(1)[1] - 10, 4 * 17 + 20, 20, 'none', { rx: 4, stroke: '#ffcf3f', sw: 3 })) },
+      { step: 0, say: 'Buy the **L-shaped patch** just after the pawn. It costs **3 buttons** and **4 time**, and has a button on it.', svg: board + pawn(38) + lMarket + coins(5) + tok('you', 1, '#4fae5a') + A.glow(64, 37, 20, 'g-L') },
+      { step: 0, say: 'Pay 3 buttons and sew it into a corner of your quilt. The pawn moves to where that patch was.', svg: board + pawn(64) + lQuilt + coins(2) + tok('you', 1, '#4fae5a') },
+      { step: 0, say: 'Move your time token **4 spaces**. It lands on Maya’s space and goes **on top**.', svg: board + pawn(64) + lQuilt + coins(2) + tok('you', 5, '#4fae5a', 6) },
+      { step: 1, say: 'On top means you go again. This time **advance** to just ahead of Maya: 1 space, so **1 button**.', svg: board + pawn(64) + lQuilt + coins(3) + tok('you', 6, '#4fae5a') + A.glow(...sp(6), 12, 'g-6') },
+      { step: 1, say: 'Now Maya is behind, so it’s her turn next.', svg: board + pawn(64) + lQuilt + coins(3) + tok('you', 6, '#4fae5a') + A.glow(...sp(5), 12, 'g-5') },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     const fab = ['#c94f6d', '#3f8fc0', '#e8b84a', '#5aa36b', '#8a63b8', '#e07b42', '#47a8a4'];

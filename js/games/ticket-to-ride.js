@@ -78,6 +78,47 @@ defineGame({
     'Long routes are worth far more per train: a 6-route scores 15, six 1-routes only 6.',
   ],
 
+  walk(A) {
+    const C = A.C, gray = '#9a958c';
+    const P = { den: [70, 40], sf: [118, 108], ep: [96, 172], phx: [26, 130], okc: [176, 92] };
+    const NM = { den: 'Denver', sf: 'Santa Fe', ep: 'El Paso', phx: 'Phoenix', okc: 'Okla. City' };
+    const ends = (a, b) => { const [x1, y1] = P[a], [x2, y2] = P[b], d = Math.hypot(x2 - x1, y2 - y1), ux = (x2 - x1) / d, uy = (y2 - y1) / d; return [x1 + ux * 9, y1 + uy * 9, x2 - ux * 9, y2 - uy * 9]; };
+    const R = [['den', 'sf', 2, gray], ['sf', 'ep', 2, gray], ['den', 'okc', 4, C.yellow], ['sf', 'okc', 3, C.blue], ['phx', 'sf', 3, gray], ['phx', 'ep', 3, C.green]];
+    let board = A.bg('#e8dab4') + A.rect(200, 0, 120, 200, '#f6efe0', { sw: 0, rx: 0 }) + A.line(200, 0, 200, 200, { sw: 2 });
+    for (const [a, b, n, f] of R) board += A.route(...ends(a, b), n, f, { w: 9 });
+    for (const k in P) board += A.circle(P[k][0], P[k][1], 6.5, C.red, { sw: 1.5 }) + A.circle(P[k][0], P[k][1], 2.5, C.cream, { sw: 0 });
+    board += A.text(70, 26, NM.den, { size: 8 }) + A.text(146, 116, NM.sf, { size: 8 }) + A.text(130, 178, NM.ep, { size: 8 }) + A.text(26, 116, NM.phx, { size: 8 }) + A.text(178, 108, NM.okc, { size: 8 });
+    board += A.text(260, 10, 'Face-up cards', { size: 8, fill: '#6d5a3a' });
+    board += A.text(218, 92, 'Deck', { size: 7, fill: '#6d5a3a' }) + A.card(208, 52, 20, 28, '#4a4a6a', { label: '?', size: 10 });
+    // Ticket
+    board += A.card(240, 50, 72, 40, '#efe4c6', { face: '#efe4c6' }) + A.text(274, 62, 'Denver – El Paso', { size: 6.5, weight: 700 }) + A.text(274, 76, '4', { size: 12, weight: 800 });
+    board += A.tag(260, 118, 'Your hand', { fill: C.red });
+    const tc = (x, y, f) => {
+      if (f !== 'loco') return A.card(x, y, 20, 28, f, {}) + A.rect(x + 5, y + 11, 10, 6, 'rgba(255,255,255,.75)', { rx: 1.5, sw: 0.6 });
+      let s = A.card(x, y, 20, 28, C.white, {});
+      ['#c8423b', '#e07b2e', '#e2b33c', '#3c8d4f', '#2f6db5', '#7d55b5'].forEach((c, i) => { s += A.rect(x + 3, y + 3 + i * 3.67, 14, 3.67, c, { sw: 0, rx: 0 }); });
+      return s;
+    };
+    const disp = (i) => [206 + i * 22, 18], hand = (i) => [206 + i * 22, 132];
+    const show = ['blue', 'or', 'loco', 'green', 'pink'], F = { blue: C.blue, or: C.orange, loco: 'loco', green: C.green, pink: C.pink };
+    const display = (skip, extra = '') => show.map((c, i) => i === skip ? '' : A.k('d-' + c, tc(...disp(i), F[c]))).join('') + extra;
+    const h0 = A.k('h-or', tc(...hand(0), C.orange)) + A.k('h-pink', tc(...hand(1), C.pink)) + A.k('h-blue', tc(...hand(2), C.blue));
+    const score = (n) => A.k('score' + n, A.rect(206, 170, 56, 18, C.white, { rx: 9, sw: 1 }) + A.text(234, 179, 'Score ' + n, { size: 8.5, weight: 800 }));
+    const [a1, b1, a2, b2] = ends('den', 'sf'), mid = [(a1 + a2) / 2, (b1 + b2) / 2];
+    const refill = A.k('d-new', tc(...disp(1), C.yellow)), top = A.k('deck', A.card(208, 52, 20, 28, '#4a4a6a', { label: '?', size: 10 }));
+    return [
+      { step: 0, say: 'Your secret ticket is **Denver – El Paso** (4 points). You need a line of your trains between them.', svg: board + display() + top + h0 + score(0) + A.glow(...P.den, 12, 'g-den') + A.glow(...P.ep, 12, 'g-ep') },
+      { step: 0, say: '**Draw cards.** Take the face-up **orange** card. A new card is turned up to replace it.', svg: board + display(1, refill) + top + h0 + A.k('d-or', tc(...hand(3), C.orange)) + score(0) },
+      { step: 0, say: 'Your second card comes blind from the deck: green. That was your whole turn.', svg: board + display(1, refill) + h0 + A.k('d-or', tc(...hand(3), C.orange)) + A.k('deck', tc(...hand(4), C.green)) + score(0) },
+      { step: 1, say: '**Next turn, claim a route.** The gray Denver – Santa Fe route takes 2 cards of any one colour: play your 2 oranges.', svg: board + display(1, refill) + A.k('h-pink', tc(...hand(0), C.pink)) + A.k('h-blue', tc(...hand(1), C.blue)) + A.k('deck', tc(...hand(2), C.green)) +
+        A.k('h-or', tc(mid[0] - 22, mid[1] - 14, C.orange)) + A.k('d-or', tc(mid[0] + 2, mid[1] - 14, C.orange)) + score(0) },
+      { step: 1, say: 'The cards are discarded and 2 of your trains go on the route. A 2-train route scores **2 points**.', svg: board + display(1, refill) + A.k('h-pink', tc(...hand(0), C.pink)) + A.k('h-blue', tc(...hand(1), C.blue)) + A.k('deck', tc(...hand(2), C.green)) +
+        A.k('trains', A.route(a1, b1, a2, b2, 2, gray, { w: 9, trains: C.red })) + score(2) + A.glow(mid[0], mid[1], 22, 'g-route') },
+      { step: 1, say: 'One more 2-train route, **Santa Fe – El Paso**, completes the ticket for +4 at the end.', svg: board + display(1, refill) + A.k('h-pink', tc(...hand(0), C.pink)) + A.k('h-blue', tc(...hand(1), C.blue)) + A.k('deck', tc(...hand(2), C.green)) +
+        A.k('trains', A.route(a1, b1, a2, b2, 2, gray, { w: 9, trains: C.red })) + score(2) + A.glow(107, 140, 22, 'g-next') },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     let o = A.bg('#e8dab4');

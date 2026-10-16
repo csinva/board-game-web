@@ -189,6 +189,16 @@
     city(x, y, s, fill) { return A.poly([[x - s * 0.7, y], [x - s * 0.7, y - s * 0.55], [x - s * 0.2, y - s * 0.55], [x - s * 0.2, y - s * 0.75], [x + s * 0.15, y - s * 1.05], [x + s * 0.5, y - s * 0.75], [x + s * 0.5, y]], fill, { sw: 1.2 }); },
     crown(x, y, s, fill) { return A.poly([[x - s / 2, y], [x - s / 2, y - s * 0.6], [x - s / 4, y - s * 0.3], [x, y - s * 0.7], [x + s / 4, y - s * 0.3], [x + s / 2, y - s * 0.6], [x + s / 2, y]], fill, { sw: 1.2 }); },
 
+    // Walkthrough helpers: A.k gives a piece a stable key so it animates between slides;
+    // A.glow draws a pulsing highlight ring (pass a key to keep it across slides).
+    k(key, svg) { return `<g data-k="${key}">${svg}</g>`; },
+    glow(cx, cy, r, key) { return `<g data-k="${key || 'glow-' + Math.round(cx) + '-' + Math.round(cy)}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#ffcf3f" stroke-width="3.5" class="walk-glow"/></g>`; },
+    // Small label used for player areas in walkthroughs.
+    tag(x, y, str, o = {}) {
+      const w = o.w || str.length * 6 + 14;
+      return A.rect(x - w / 2, y - 8, w, 16, o.fill || C.ink, { rx: 8, sw: 0 }) + A.text(x, y, str, { size: 9.5, weight: 700, fill: o.color || C.white });
+    },
+
     // Labelled callout used to annotate illustrations: dot at target, text box at (tx, ty).
     note(px, py, tx, ty, str, o = {}) {
       const w = o.w || str.length * 5.6 + 12;

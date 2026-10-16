@@ -79,6 +79,55 @@ defineGame({
     'Discard your oldest unclued card, and keep newly clued cards in place so the table can track them.',
   ],
 
+  walk(A) {
+    const C = A.C;
+    const F = { r: '#e0473c', y: '#f2c230', g: '#3fae5a', b: '#3d7fe0', w: '#f4f1ea' };
+    const ink = (c) => (c === 'y' || c === 'w') ? C.ink : C.white;
+    const W = 28, H = 40;
+    const face = (x, y, c, n) => A.card(x, y, W, H, F[c], { label: n, labelFill: ink(c), size: 16 });
+    const back = (x, y) => A.card(x, y, W, H, '#3b3f6e', { label: '?', size: 14, labelFill: '#b8bce8' });
+    const hx = (i) => 78 + i * 33;
+    const MY = 8, BY = 152;
+    // Fixed table: tags, piles, deck, discard, token area.
+    let board = A.bg('#1a1d3a');
+    board += A.tag(36, 28, 'Mia') + A.tag(36, 172, 'Ben') + A.tag(30, 100, 'Lee', { fill: C.purple });
+    const px = (i) => 66 + i * 35, PY = 78;
+    const piles = [['r', 2], ['y', 1], ['g', 2], ['b', 1], ['w', 0]];
+    piles.forEach(([c, n], i) => {
+      board += n ? face(px(i), PY, c, n) : A.rect(px(i), PY, W, H, 'none', { stroke: F.w, dash: '3 3', sw: 1.2, rx: 4 });
+    });
+    board += A.text(px(2) + W / 2, PY + H + 10, 'Played piles', { size: 7.5, fill: '#cfd8ff' });
+    board += back(250, 146) + A.text(264, 194, 'Deck', { size: 7.5, fill: '#cfd8ff' });
+    board += A.rect(286, 146, W, H, 'none', { stroke: '#cfd8ff', dash: '3 3', sw: 1.2, rx: 4 }) + A.text(300, 194, 'Discard', { size: 7.5, fill: '#cfd8ff' });
+    board += A.text(282, 48, 'Clue tokens', { size: 7.5, fill: '#cfd8ff' });
+    // Clue tokens: 8 slots; tokens 0..6 always available, token 7 moves between "available" and "spent".
+    const slot = (i) => [258 + (i % 4) * 16, 62 + Math.floor(i / 4) * 16];
+    let toks = '';
+    for (let i = 0; i < 7; i++) { const [x, y] = slot(i); toks += A.circle(x, y, 6.5, '#4f8ff0', { stroke: '#cfd8ff', sw: 1 }); }
+    board += toks + A.text(282, 104, 'Spent', { size: 7.5, fill: '#cfd8ff' });
+    const tok = (spent) => { const [x, y] = spent ? [282, 118] : slot(7); return A.k('tok', A.circle(x, y, 6.5, spent ? '#2a2f55' : '#4f8ff0', { stroke: '#cfd8ff', sw: 1 })); };
+    // Hands.
+    const mia = [['r', 3], ['b', 1], ['y', 3], ['g', 4]];
+    const ben = [['r', 5], ['b', 4], ['w', 3], ['g', 4]];
+    const miaHand = (skip) => mia.map(([c, n], i) => i === skip ? '' : A.k('m' + i, face(hx(i), MY, c, n))).join('');
+    const benHand = (skip) => ben.map(([c, n], i) => i === skip ? '' : A.k('b' + i, face(hx(i), BY, c, n))).join('');
+    const chip = (i) => A.k('chip' + i, A.circle(hx(i) + W / 2, MY + H + 9, 6, '#fff7d6', { stroke: C.ink, sw: 1 }) + A.text(hx(i) + W / 2, MY + H + 9, '3', { size: 8, weight: 800 }));
+    const bubble = A.k('clue', A.bubble(2, 50, 62, 26, '“These are 3s”', { size: 7.5 }));
+    const newMia = A.k('mnew', face(hx(0), MY, 'b', 2));
+    return [
+      { step: 0, say: 'Red is on **2**. Lee spends a clue token and tells Mia: “These two cards are **3s**.”',
+        svg: board + miaHand() + benHand() + tok(true) + bubble + chip(0) + chip(2) + A.glow(hx(0) + W / 2, MY + H / 2, 22, 'g1') + A.glow(hx(2) + W / 2, MY + H / 2, 22, 'g2') },
+      { step: 2, say: 'Mia can’t see her cards, but she knows red 3 is wanted and guesses Lee clued now for a reason. She **plays** her left 3.',
+        svg: board + miaHand(0) + benHand() + tok(true) + chip(2) + A.k('m0', face(px(0), PY - 4, 'r', 3)) + A.glow(px(0) + W / 2, PY + H / 2 - 4, 26, 'gp') },
+      { step: 2, say: 'It is the **red 3**: the red pile grows. Mia draws a new card to refill her hand.',
+        svg: board + miaHand(0) + benHand() + tok(true) + chip(2) + A.k('m0', face(px(0), PY - 4, 'r', 3)) + newMia },
+      { step: 1, say: 'Ben has no clued cards, so nothing is known to be safe. He **discards** his oldest card: a green 4.',
+        svg: board + miaHand(0) + newMia + benHand(3) + tok(true) + chip(2) + A.k('m0', face(px(0), PY - 4, 'r', 3)) + A.k('b3', face(286, 146, 'g', 4)) + A.glow(300, 166, 18, 'gd') },
+      { step: 1, say: 'Discarding wins back **1 clue token**, and Ben draws a replacement. Now Lee has a clue to spend again.',
+        svg: board + miaHand(0) + newMia + benHand(3) + tok(false) + chip(2) + A.k('m0', face(px(0), PY - 4, 'r', 3)) + A.k('b3', face(286, 146, 'g', 4)) + A.k('bnew', face(hx(3), BY, 'y', 2)) + A.glow(slot(7)[0], slot(7)[1], 11, 'gt') },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     const F = { r: '#e0473c', y: '#f2c230', g: '#3fae5a', b: '#3d7fe0', w: '#f4f1ea' };

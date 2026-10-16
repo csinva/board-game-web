@@ -79,6 +79,59 @@ defineGame({
     'Discard extra treasure cards of a colour you’ve already captured.',
   ],
 
+  walk(A) {
+    const C = A.C, s = 34, ox = 14, oy = 24;
+    const names = [['Watchtower', 'Bronze Gate', 'Twilight', 'Observatory'], ['Lost Lagoon', 'Moon Temple', 'Coral Palace', 'Cliffs'],
+      ['Iron Gate', 'Phantom Rock', 'Misty Marsh', 'Dunes'], ['Fools’ Land.', 'Copper Gate', 'Silver Gate', 'Gold Gate']];
+    const at = (i, j) => [ox + i * (s + 4), oy + j * (s + 4)];
+    const earth = '#8a6a45', ocean = '#3db0b0';
+    let board = A.bg('#2f86b5');
+    for (let j = 0; j < 3; j++) for (let i = 0; i < 3; i++) board += A.path(`M${214 + (j % 2) * 12 + i * 20} ${70 + j * 14} q4 -4 8 0 q4 4 8 0`, { stroke: '#8fd0ee', sw: 1.1, opacity: 0.5 });
+    // Sunk outlines show through wherever a tile is gone.
+    for (let j = 0; j < 4; j++) for (let i = 0; i < 4; i++) { const [x, y] = at(i, j); board += A.rect(x, y, s, s, 'none', { stroke: '#bfe6f7', dash: '3 3', sw: 1 }); }
+    const tile = (i, j) => {
+      const [x, y] = at(i, j); let t = A.rect(x, y, s, s, '#e3cf9a', { stroke: '#7a5a2e' }) + A.rect(x + 3, y + 3, s - 6, s - 13, '#a7c87a', { rx: 2, sw: 0, opacity: 0.55 });
+      if (i === 1 && j === 1) t += A.rect(x + 6, y + 7, 10, 10, earth, { sw: 1, rx: 2 });
+      if (i === 2 && j === 1) t += A.circle(x + 11, y + 12, 5.5, ocean, { sw: 1 });
+      if (i === 0 && j === 3) t += A.circle(x + 17, y + 12, 6, C.white, { sw: 1 }) + A.text(x + 17, y + 12.5, 'H', { size: 7.5, weight: 800 });
+      return t + A.text(x + s / 2, y + s - 6, names[j][i], { size: 5, weight: 700 });
+    };
+    const flood = (i, j) => {
+      const [x, y] = at(i, j);
+      return A.k(`fl-${i}-${j}`, A.rect(x, y, s, s, '#4f9fd0', { stroke: '#1d4e6e', opacity: 0.92 }) + A.path(`M${x + 9} ${y + 12} q4 -4 8 0 q4 4 8 0`, { stroke: '#fff', sw: 1.3 }) +
+        A.text(x + s / 2, y + s - 6, names[j][i], { size: 5, weight: 700, fill: C.white }));
+    };
+    for (let j = 0; j < 4; j++) for (let i = 0; i < 4; i++) if (!(i === 2 && j === 1)) board += tile(i, j);
+    // Right panel: treasure deck, Sam's hand, water meter.
+    board += A.card(180, 16, 26, 36, '#8b2f3a', { label: '✦', size: 12 });
+    board += A.tag(222, 124, 'Sam · Engineer', { fill: C.red });
+    board += A.rect(286, 16, 24, 160, '#e9f5fb', { rx: 6 }) + A.text(298, 10, 'Water', { size: 6.5, fill: C.white });
+    const lv = [2, 2, 3, 3, 3, 4, 4, 5, 5, '☠'], ly = (i) => 164 - i * 15.5;
+    lv.forEach((v, i) => { board += A.text(298, ly(i), v, { size: i === 9 ? 9 : 7, weight: 800, fill: v >= 4 || i === 9 ? C.red : '#1d4e6e' }); });
+    const level = (i) => A.k('lvl', A.poly([[272, ly(i) - 5], [283, ly(i)], [272, ly(i) + 5]], C.red, { sw: 1 }));
+    const hc = (i, f, lab, key) => A.k(key, A.card(180 + i * 26, 136, 24, 34, f, { label: lab, size: 5, labelFill: C.white }));
+    const hand = hc(0, ocean, 'Ocean', 'h1') + hc(1, earth, 'Earth', 'h2');
+    const coral = A.k('tile-cp', tile(2, 1));
+    const sam = (i, j) => { const [x, y] = at(i, j); return A.k('sam', A.pawn(x + s - 9, y + 13, 15, C.red)); };
+    const pre = board + coral + flood(2, 1) + hand;
+    return [
+      { step: 0, say: 'Water level shows **3**. Sam, the **Engineer**, stands on Phantom Rock with 3 actions to spend.',
+        svg: pre + flood(0, 1) + flood(1, 0) + sam(1, 2) + level(4) },
+      { step: 0, say: '**Action 1: move** one tile up, onto the Moon Temple (one of the Earth Stone’s two temples).',
+        svg: pre + flood(0, 1) + flood(1, 0) + sam(1, 1) + level(4) + A.glow(at(1, 1)[0] + s / 2, at(1, 1)[1] + s / 2, 24) },
+      { step: 0, say: '**Action 2: shore up.** An Engineer dries **two** tiles for one action: Lost Lagoon and Bronze Gate flip back to dry.',
+        svg: pre + sam(1, 1) + level(4) + A.glow(at(0, 1)[0] + s / 2, at(0, 1)[1] + s / 2, 22, 'g1') + A.glow(at(1, 0)[0] + s / 2, at(1, 0)[1] + s / 2, 22, 'g2') },
+      { step: 0, say: '**Action 3: move** again, up to Bronze Gate. Coral Palace is still flooded, and he has no actions left for it.',
+        svg: pre + sam(1, 0) + level(4) + A.glow(at(2, 1)[0] + s / 2, at(2, 1)[1] + s / 2, 24, 'gc') },
+      { step: 1, say: '**Draw 2:** an Earth Stone card joins his hand, then **Waters Rise!** The level climbs to **4**.',
+        svg: pre + sam(1, 0) + hc(2, earth, 'Earth', 'h3') + A.k('wr', A.card(212, 16, 30, 40, '#1d4e6e', { label: 'Rise!', size: 6 })) + level(5) + A.glow(277, ly(5), 12) },
+      { step: 2, say: '**Flood:** draw 4 flood cards. Watchtower, Dunes and Silver Gate flip to their **flooded** side…',
+        svg: pre + sam(1, 0) + hc(2, earth, 'Earth', 'h3') + level(5) + flood(0, 0) + flood(3, 2) + flood(2, 3) },
+      { step: 2, say: '…and the 4th card is **Coral Palace**. It was already flooded, so it **sinks** for good.',
+        svg: board + hand + sam(1, 0) + hc(2, earth, 'Earth', 'h3') + level(5) + flood(0, 0) + flood(3, 2) + flood(2, 3) + A.glow(at(2, 1)[0] + s / 2, at(2, 1)[1] + s / 2, 24, 'gc') },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     let o = A.bg('#2f86b5');

@@ -77,6 +77,49 @@ defineGame({
     'Watch what rivals need and take it if it also helps you.',
   ],
 
+  walk(A) {
+    const C = A.C;
+    const TER = { w: '#e8c547', f: '#2f6b34', l: '#3d8fd1', g: '#8cc63f', s: '#8f8f5c', m: '#5b4d43' };
+    const cs = 26, gx = 12, gy = 34;
+    const crownAt = (x, y, n) => { let s = ''; for (let i = 0; i < n; i++) s += A.crown(x - (n - 1) * 4 + i * 8, y, 8, '#f4d23c'); return s; };
+    const sq = (x, y, t, n = 0) => {
+      let s = A.rect(x + 1, y + 1, cs - 2, cs - 2, TER[t], { rx: 3, sw: 1 });
+      if (t === 'f') s += A.poly([[x + 8, y + 21], [x + 13, y + 9], [x + 18, y + 21]], '#1f4f26', { sw: 0 });
+      if (t === 'w') for (let k = 0; k < 3; k++) s += A.line(x + 8 + k * 5, y + 22, x + 8 + k * 5, y + 15, { stroke: '#b8932a', sw: 1.3 });
+      if (t === 'l') s += A.path(`M${x + 6} ${y + 18} q3.5 -3 7 0 q3.5 3 7 0`, { stroke: '#cfe6f7', sw: 1.3 });
+      if (t === 'm') s += A.poly([[x + 6, y + 23], [x + 13, y + 11], [x + 20, y + 23]], '#3c322b', { sw: 0 });
+      if (n) s += crownAt(x + cs / 2, y + 9, n);
+      return s;
+    };
+    const dom = (x, y, [a, ca, b, cb]) => A.rect(x + 1.5, y + 2, 2 * cs, cs, C.shadow, { sw: 0, rx: 3 }) + sq(x, y, a, ca) + sq(x + cs, y, b, cb);
+    const cell = (c, r) => [gx + c * cs, gy + r * cs];
+    let board = A.bg('#efe6d2') + A.rect(gx - 4, gy - 4, cs * 5 + 8, cs * 5 + 8, '#d9ccad', { rx: 6, sw: 1 });
+    board += A.text(gx + 2.5 * cs, 16, 'Your kingdom (5×5)', { size: 8, fill: '#6d5a3a' });
+    const [kx, ky] = cell(2, 2);
+    board += A.rect(kx + 2, ky + 2, cs - 4, cs - 4, '#cfc5b8', { rx: 3 }) + A.city(kx + cs / 2 + 1, ky + cs - 5, 16, '#e9e2d6');
+    for (const [c, r, t, n] of [[0, 2, 'f', 1], [1, 2, 'f', 0], [2, 0, 'l', 1], [2, 1, 'l', 0], [3, 2, 'w', 1], [4, 2, 'w', 0], [1, 3, 'g', 0], [2, 3, 'g', 0]]) board += sq(...cell(c, r), t, n);
+    // The two lines of dominoes: this round (left) and next round (right).
+    const L1 = 176, L2 = 256, row = (i) => 34 + i * 38;
+    board += A.text(L1 + cs, 16, 'This round', { size: 8, fill: '#6d5a3a' }) + A.text(L2 + cs, 16, 'Next round', { size: 8, fill: '#6d5a3a' });
+    const cur = [[5, null], [14, ['w', 0, 'w', 0]], [27, ['l', 0, 'f', 1]], [38, ['m', 2, 's', 0]]];
+    const nxt = [[3, ['f', 0, 'f', 0]], [19, ['w', 1, 'g', 0]], [33, ['l', 1, 'l', 1]], [46, ['s', 2, 'm', 0]]];
+    cur.forEach(([n, d], i) => { board += A.text(L1 - 7, row(i) + cs / 2, n, { size: 7.5, weight: 800, fill: '#6d5a3a' }); if (!d) board += A.rect(L1, row(i), 2 * cs, cs, 'none', { rx: 3, dash: '3 2', sw: 1 }); else if (n !== 14) board += dom(L1, row(i), d); });
+    nxt.forEach(([n, d], i) => { board += A.text(L2 - 7, row(i) + cs / 2, n, { size: 7.5, weight: 800, fill: '#6d5a3a' }) + dom(L2, row(i), d); });
+    const king = (x, y, c) => A.pawn(x, y, 16, c) + A.crown(x, y - 7, 7, '#f4d23c');
+    board += king(L2 + cs, row(0) + 13, C.blue) + king(L1 + cs, row(2) + 13, C.green) + king(L1 + cs, row(3) + 13, C.yellow);
+    const d14 = (x, y) => A.k('d14', dom(x, y, ['w', 0, 'w', 0]));
+    const mine = (x, y) => A.k('king', king(x, y, C.pink));
+    const onLine = [L1 + cs, row(1) + 13], on46 = [L2 + cs, row(3) + 13], placed = cell(3, 3);
+    const [ax, ay] = cell(3, 2);
+    return [
+      { step: 0, say: 'Your king (pink) sits on domino **14**: two wheat squares. Place it in your kingdom.', svg: board + d14(L1, row(1)) + mine(...onLine) + A.glow(L1 + cs, row(1) + 13, 30, 'g14') },
+      { step: 0, say: 'One side must **match** a touching terrain: set it below your wheat. It stays inside the 5×5 square.', svg: board + d14(...placed) + mine(...onLine) },
+      { step: 0, say: 'Your wheat area is now **4 squares** with **1 crown**: 4 × 1 = 4 points.', svg: board + d14(...placed) + mine(...onLine) + A.k('area', A.rect(ax - 1, ay - 1, 2 * cs + 2, 2 * cs + 2, 'none', { rx: 4, stroke: '#ffcf3f', sw: 3.5 })) + A.k('pts', A.tag(ax + cs, ay + 2 * cs + 14, '4 × 1 = 4', { fill: '#b8932a' })) },
+      { step: 1, say: 'Now **pick** for next round: jump your king onto **46**, a swamp with 2 crowns.', svg: board + d14(...placed) + mine(...on46) + A.glow(L2 + cs, row(3) + 13, 30, 'g46') },
+      { step: 1, say: 'Big numbers sit low in the line, so next round you place **last**. Strong tiles cost you turn order.', svg: board + d14(...placed) + mine(...on46) + A.k('order', A.arrow(L2 + 2 * cs + 8, row(0) + 4, L2 + 2 * cs + 8, row(3) + 22, { sw: 1.6, head: 5 })) },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     const TER = { w: '#e8c547', f: '#2f6b34', l: '#3d8fd1', g: '#8cc63f', s: '#8f8f5c', m: '#5b4d43' };

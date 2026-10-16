@@ -55,7 +55,7 @@ defineGame({
     ],
   },
 
-  example: 'Ivy holds a Baron (3) and draws a Guard (1). Sam has played two Princes, so she guesses Sam’s hand: she plays the Guard and names **Countess**. Sam has the Countess, so he is out of the round.',
+  example: 'Ivy holds a Baron (3) and draws a Guard (1). Last turn her Priest showed her Sam’s hand, so she plays the Guard on Sam and names **Countess**. Sam has the Countess, so he is out of the round.',
 
   setup: [
     'Shuffle the 21 cards and remove the top card **face down** unseen (with 2 players also set aside 3 face up).',
@@ -81,6 +81,39 @@ defineGame({
     'Guard guesses are best aimed at someone who just kept a card after a Priest or King revealed it.',
     'Keep high cards late in the round when the deck is nearly empty.',
   ],
+
+  walk(A) {
+    const C = A.C, red = '#a3324a', cream = '#f6ead2', gold = '#d4a63a';
+    let board = A.bg('#4a2230') + A.rect(6, 6, 308, 188, '#6b2d3e', { rx: 14, sw: 1.4 });
+    board += A.person(34, 34, 26, '#7d55b5', { face: '#e6c7a8' }) + A.text(34, 56, 'Sam', { size: 8.5, weight: 700, fill: C.white });
+    board += A.person(286, 34, 26, '#2f6db5', { face: '#e6c7a8' }) + A.text(286, 56, 'Max', { size: 8.5, weight: 700, fill: C.white });
+    board += A.person(34, 164, 28, '#c8423b', { face: '#e6c7a8' }) + A.text(34, 186, 'Ivy', { size: 8.5, weight: 700, fill: C.white });
+    const face = (x, y, n, name, w = 36, h = 50) => A.card(x, y, w, h, cream, { face: red }) + A.circle(x + 9, y + 10, 6, red, { sw: 0 }) + A.text(x + 9, y + 10.5, n, { size: 6, weight: 800, fill: C.white }) +
+      A.circle(x + w / 2, y + h / 2 + 1, 6, '#e6c7a8', { sw: 1 }) + A.text(x + w / 2, y + h - 8, name, { size: w > 32 ? 5.5 : 4, weight: 800, fill: red });
+    const back = (x, y, w = 32, h = 44) => A.card(x, y, w, h, red) + A.heart(x + w / 2, y + h / 2 + 2, 10, gold, { sw: 0 });
+    const disc = (x, y, n, name) => face(x, y, n, name, 30, 40);
+    // Static: deck, set-aside card, discard rows.
+    board += back(140, 76) + back(142, 73) + A.text(157, 64, 'deck', { size: 7, fill: '#f0c9d3' });
+    board += A.group(back(188, 78), 'rotate(12 203 99)') + A.text(210, 68, 'set aside', { size: 7, fill: '#f0c9d3' });
+    board += disc(12, 64, '1', 'GUARD') + disc(46, 64, '4', 'HANDMAID') + disc(276, 64, '1', 'GUARD');
+    board += A.text(60, 112, 'Sam’s discards', { size: 6.5, fill: '#f0c9d3' }) + A.text(290, 112, 'Max', { size: 6.5, fill: '#f0c9d3' });
+    board += disc(192, 142, '2', 'PRIEST') + A.text(244, 189, 'Ivy’s discards', { size: 6.5, fill: '#f0c9d3' });
+    const maxHand = back(240, 14);
+    const seen = A.tag(214, 130, 'only Ivy sees', { fill: '#5d3b6a' });
+    const baron = A.k('baron', face(76, 142, '3', 'BARON'));
+    const samHand = (up) => A.k('sam', up ? face(64, 14, '8', 'COUNTESS') : back(64, 14));
+    return [
+      { step: 0, say: 'Ivy holds a **Baron (3)**. Last turn her Priest showed her Sam’s hand: the **Countess**.', svg: board + maxHand + samHand() + baron + seen + A.k('guard', back(142, 73)) +
+        A.bubble(22, 117, 92, 18, 'Sam has Countess…', { size: 7.5 }) },
+      { step: 0, say: 'Her turn: she **draws** the top card, a Guard. Now she holds two cards.', svg: board + maxHand + samHand() + baron + seen + A.k('guard', face(116, 142, '1', 'GUARD')) },
+      { step: 1, say: 'She **plays the Guard** face up, targets Sam and names **Countess**.', svg: board + maxHand + samHand() + baron + A.k('guard', disc(226, 142, '1', 'GUARD')) +
+        A.bubble(22, 117, 92, 18, 'Sam: Countess?', { size: 8.5 }) + A.glow(80, 36, 26, 'g-sam') },
+      { step: 1, say: 'Right guess. Sam shows his Countess and is **out of the round**.', svg: board + maxHand + samHand(true) + baron + A.k('guard', disc(226, 142, '1', 'GUARD')) +
+        A.k('out', A.tag(34, 12, 'OUT', { fill: '#2b1a20' })) },
+      { step: 2, say: 'Ivy **keeps the Baron** secret until her next turn. Play passes to Max.', svg: board + maxHand + A.k('sam', disc(80, 64, '8', 'COUNTESS')) + A.k('baron', back(78, 144)) + A.k('guard', disc(226, 142, '1', 'GUARD')) +
+        A.k('out', A.tag(34, 12, 'OUT', { fill: '#2b1a20' })) + A.glow(286, 30, 20, 'g-max') },
+    ];
+  },
 
   art(A) {
     const C = A.C, red = '#a3324a', cream = '#f6ead2', gold = '#d4a63a';

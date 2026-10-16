@@ -5,7 +5,7 @@
   const link = (href, label, key) => `<a href="${href}" class="${page === key ? 'on' : ''}">${label}</a>`;
   document.body.insertAdjacentHTML('afterbegin', `<header class="topbar">
     <a class="brand" href="index.html">${logo}Board Game Field Guide</a>
-    <nav>${link('index.html', 'All games', 'home')}${link('map.html', 'Find similar games', 'map')}</nav>
+    <nav>${link('index.html', 'All games', 'home')}${link('map.html', 'Find similar games', 'map')}${link('deepdive.html', 'Deep-Dive', 'deepdive')}</nav>
   </header>`);
   if (page !== 'map') document.body.insertAdjacentHTML('beforeend', `<footer class="site-foot">
     Rules are summarized; check the rulebook for edge cases. ·

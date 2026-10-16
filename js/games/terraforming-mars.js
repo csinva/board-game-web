@@ -85,6 +85,91 @@ defineGame({
     'Claim a milestone the moment you qualify: only **3** can be claimed in the whole game.',
   ],
 
+  extended: [
+    { title: 'The generation, in full', items: [
+      '**Player order**: the first-player marker moves one seat left each generation (skip it in generation 1, when you buy from your starting 10 cards instead of 4).',
+      '**Action phase**: on your turn take 1 or 2 actions, or pass. Once you pass you are out until the next generation; everyone else keeps going.',
+      '**Production phase**: all energy becomes heat, then collect MC (TR + MC production, which can be negative down to −5), steel, titanium, plants, energy and heat.',
+    ] },
+    { title: 'Global parameters', items: [
+      '**Temperature** −30°C to +8°C in 2° steps (19 steps). Bonus: +1 heat production at −24 and −20, and a free ocean at 0°C.',
+      '**Oxygen** 0% to 14% (14 steps). At 8% oxygen, also raise temperature one step.',
+      '**Oceans**: 9 tiles, only on blue-reserved spaces. Placing any tile next to an ocean gives you **2 MC** per adjacent ocean.',
+      'Every step you raise gives you **+1 TR**. Once a parameter is maxed, effects that would raise it do nothing (and give no TR), but you may still play the card.',
+    ] },
+    { title: 'Tiles and placement', items: [
+      '**Greenery**: must go next to one of your own tiles if possible; raises oxygen 1 step; 1 VP at the end.',
+      '**City**: may not be next to another city; at the end scores 1 VP per adjacent greenery, **whoever owns** the greenery.',
+      'Printed bonuses on a space (steel, titanium, plants, cards) go to whoever places a tile there.',
+      'Plants: 8 plants → greenery. Heat: 8 heat → +1 temperature step. Both are actions you can take any number of times.',
+    ] },
+    { title: 'Cards, tags and requirements', items: [
+      '**Green** cards (automated) give production or one-off effects; **blue** cards stay active with ongoing effects or actions you can use once per generation; **red** events are played face-down and their tags no longer count.',
+      '**Steel** pays 2 MC each toward building-tag cards; **titanium** pays 3 MC each toward space-tag cards.',
+      'Requirements (min or max oxygen, temperature, oceans, or tags) only need to be true **when you play** the card.',
+      'Attacks (“remove up to 3 plants from any player”) may target nobody if you choose; you can always resolve as much as possible.',
+    ] },
+    { title: 'Standard projects and selling', text: 'Standard projects are always available as one action each: sell patents (discard any number of cards for 1 MC each), power plant 11 MC, asteroid 14 MC, aquifer 18 MC, greenery 23 MC, city 25 MC. They are expensive but guarantee progress when your hand is weak, and they are how you finish off the last steps of a parameter late in the game.' },
+    { title: 'Milestones and awards', items: [
+      '**Milestones** (8 MC, worth 5 VP): claim one the moment you meet it, e.g. Terraformer (35 TR), Mayor (3 cities), Gardener (3 greeneries), Builder (8 building tags), Planner (16 cards in hand). Only **3** can be claimed per game.',
+      '**Awards** cost 8, 14 and then 20 MC to fund; only 3 can be funded. At game end, 1st place gets 5 VP and 2nd gets 2 VP, even if someone else paid. Ties share the higher placing.',
+    ] },
+    { title: 'Final scoring', text: 'After the last production phase, everyone may convert plants into greenery one last time (oxygen is already maxed, so these give VP and city adjacency but no TR). Score TR, milestones and awards, 1 VP per greenery, city adjacency points, and VP printed on cards (including animals, microbes and other resources on cards). Most VP wins; ties go to the player with the most MC.' },
+  ],
+
+  walk(A) {
+    const C = A.C, s = 20, ox = 105, oy = 108;
+    const hx = (q, r) => A.hexAt(q, r, s, ox, oy);
+    const sand = ['#c8643a', '#d27645', '#bd5833', '#d9834f'];
+    let base = A.bg('#1d1830');
+    for (let i = 0; i < 24; i++) base += A.circle((i * 83) % 180 + 30, (i * 47) % 200, 0.7, '#fff', { sw: 0, opacity: 0.5 });
+    [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1], [1, -1], [-1, 1]].forEach(([q, r], i) => {
+      const [x, y] = hx(q, r);
+      const fill = q === -1 && r === 0 ? '#3c86c9' : sand[i % 4];
+      base += A.hex(x, y, s, fill, { sw: 1, stroke: '#5a2a18' });
+      if (fill === '#3c86c9') base += A.path(`M${x - 8} ${y} q4 -4 8 0 q4 4 8 0`, { stroke: '#cfe6f7', sw: 1.4 });
+    });
+    const [cx, cy] = hx(0, 0), [gx, gy] = hx(1, 0);
+    base += A.city(cx + 2, cy + 8, 18, '#d8dbe2') + A.rect(cx - 4, cy - 14, 8, 8, C.red, { rx: 1, sw: 1 });
+    // TR track
+    base += A.text(36, 14, 'TR', { size: 10, weight: 800, fill: '#fff' });
+    for (let i = 0; i < 5; i++) base += A.text(60 + i * 26, 14, 23 + i, { size: 10, fill: '#cfc8e0' });
+    // Oxygen and temperature bars
+    base += A.rect(10, 34, 16, 152, '#2c2a40', { rx: 6, stroke: '#8c8aa0', sw: 1 }) + A.text(18, 26, 'O₂', { size: 9, fill: '#cfe6f7', weight: 800 });
+    base += A.rect(186, 34, 16, 152, '#2c2a40', { rx: 6, stroke: '#8c8aa0', sw: 1 }) + A.text(194, 26, '°C', { size: 9, fill: '#f3a08f', weight: 800 });
+    // Player panel
+    base += A.rect(214, 30, 102, 166, '#2c2a40', { rx: 6, stroke: '#8c8aa0', sw: 1 }) + A.tag(265, 16, 'You (red)', { fill: C.red });
+    const row = (y, lab, col) => A.text(222, y, lab, { size: 8, fill: col, anchor: 'start', weight: 800 });
+    base += row(46, 'MC', '#e2b33c') + row(72, 'Plant', '#7fd06b') + row(100, 'Energy', '#c58df0') + row(124, 'Heat', '#f08a5d');
+    base += A.text(222, 146, 'Hand', { size: 8, fill: '#cfc8e0', anchor: 'start', weight: 800 });
+
+    const tr = v => A.k('tr', A.circle(60 + (v - 23) * 26, 14, 9, 'none', { stroke: '#ffcf3f', sw: 2 }));
+    const o2 = v => A.rect(13, 176 - v * 10, 10, 8, '#7fd0f0', { rx: 2, sw: 0 });
+    const oxy = v => { let r = ''; for (let i = 0; i < v; i++) r += o2(i); return r + A.k('o2', A.rect(11, 174 - v * 10, 14, 12, '#fff', { rx: 3, sw: 1 }) + A.text(18, 180 - v * 10, v, { size: 7, weight: 800 })); };
+    const temp = c => { const v = (c + 30) / 2; let r = ''; for (let i = 0; i < v; i++) r += A.rect(189, 177 - i * 7.5, 10, 6, '#e0442f', { rx: 1.5, sw: 0 });
+      return r + A.k('temp', A.rect(184, 175 - v * 7.5, 20, 11, '#fff', { rx: 3, sw: 1 }) + A.text(194, 180.5 - v * 7.5, c, { size: 7, weight: 800 })); };
+    const mc = v => A.k('mc' + v, A.circle(256, 46, 8, '#e2b33c', { sw: 1 }) + A.text(276, 46, v, { size: 11, fill: '#fff', weight: 800 }));
+    const cube = (x, y, f) => A.rect(x, y, 8, 8, f, { rx: 1.5, sw: 0.8 });
+    const plants = (n, at) => { let r = ''; for (let i = 0; i < n; i++) r += A.k('p' + i, at ? cube(at[0] - 18 + (i % 4) * 9, at[1] - 9 + Math.floor(i / 4) * 9, '#4f9a3c') : cube(260 + (i % 4) * 11, 63 + Math.floor(i / 4) * 10, '#4f9a3c')); return r; };
+    const energy = n => { let r = ''; for (let i = 0; i < n; i++) r += A.k('e' + i, cube(260 + i * 11, 96, '#a36be0')); return r; };
+    const heat = (n, extra) => { let r = ''; for (let i = 0; i < n; i++) r += A.k('h' + i, cube(260 + (i % 5) * 11, 120, '#e0612f')); for (let i = 0; i < (extra || 0); i++) r += A.k('e' + i, cube(260 + ((n + i) % 5) * 11, 120 + 0, '#e0612f')); return r; };
+    const card = (x, y, f, lab) => A.card(x, y, 26, 32, f, { title: lab, label: '' });
+    const drawn = [['c1', '#4f9a3c', 'Trees'], ['c2', '#2f6db5', 'Mine'], ['c3', '#c8423b', 'Comet'], ['c4', '#4f9a3c', 'Lichen']];
+    const hand = drawn.filter(d => d[0] === 'c1' || d[0] === 'c3').map((d, i) => A.k(d[0], card(226 + i * 30, 154, d[1], d[2]))).join('');
+    const greenery = A.k('green', A.hex(gx, gy, s - 1, '#4f9a3c', { sw: 1.2, stroke: '#2a5a20' }) + A.rect(gx - 4, gy - 4, 8, 8, C.red, { rx: 1, sw: 1 }));
+    const asteroid = A.k('ast', A.circle(170, 46, 9, '#8f939a', { sw: 1.2 }) + A.circle(167, 43, 2, '#6b6f75', { sw: 0 }) + A.line(158, 36, 146, 26, { stroke: '#f3a08f', sw: 2 }));
+
+    return [
+      { step: 0, say: '**Research.** You draw 4 project cards. Each one you keep costs **3 MC**.', svg: base + tr(24) + oxy(5) + temp(-12) + mc(40) + plants(8) + energy(2) + heat(3) +
+        drawn.map((d, i) => A.k(d[0], card(48 + i * 30, 162, d[1], d[2]))).join('') },
+      { step: 0, say: 'You keep **Trees** and **Comet** for 6 MC (40 → 34). The other two are discarded.', svg: base + tr(24) + oxy(5) + temp(-12) + mc(34) + plants(8) + energy(2) + heat(3) + hand + A.glow(272, 46, 17, 'g-mc') },
+      { step: 1, say: '**Action 1:** spend your **8 plants** to place a greenery next to your city.', svg: base + tr(24) + oxy(5) + temp(-12) + mc(34) + plants(8, [gx, gy]) + energy(2) + heat(3) + hand + A.glow(gx, gy, 22, 'g-hex') },
+      { step: 1, say: 'The greenery raises **oxygen 1%**, and every global step gives **+1 TR**: 24 → 25.', svg: base + tr(25) + oxy(6) + temp(-12) + mc(34) + greenery + energy(2) + heat(3) + hand + A.glow(18, 120, 12, 'g-o2') },
+      { step: 1, say: '**Action 2:** pay 14 MC for the **Asteroid** standard project: temperature +2°C, TR 26.', svg: base + tr(26) + oxy(6) + temp(-10) + mc(20) + greenery + energy(2) + heat(3) + hand + asteroid + A.glow(194, 98, 13, 'g-temp') },
+      { step: 2, say: '**Production.** Leftover energy turns into **heat**, then you collect income: TR 26 + MC production 2 = **28 MC**.', svg: base + tr(26) + oxy(6) + temp(-10) + mc(48) + greenery + heat(3, 2) + hand + A.glow(272, 46, 17, 'g-mc') },
+    ];
+  },
+
   art(A) {
     const C = A.C, s = 10.6, ox = 160, oy = 101;
     const sand = ['#c8643a', '#d27645', '#bd5833', '#d9834f'];

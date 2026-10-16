@@ -80,6 +80,46 @@ defineGame({
     'Don’t spread out: a big stack on a choke point beats armies sprinkled everywhere.',
   ],
 
+  walk(A) {
+    const C = A.C, ANA = C.red, BEN = C.green;
+    const ukrP = [[70, 28], [168, 22], [176, 70], [160, 124], [96, 132], [62, 90]];
+    const uraP = [[168, 22], [262, 14], [282, 66], [250, 92], [176, 70]];
+    const afgP = [[176, 70], [250, 92], [276, 122], [214, 136], [160, 124]];
+    const scaP = [[10, 20], [70, 28], [62, 90], [16, 84]];
+    const land = (ural) => A.bg('#9ccbe0') +
+      A.poly(scaP, '#e9a49c', { stroke: '#4a4030', sw: 1.4 }) + A.poly(ukrP, '#e9a49c', { stroke: '#4a4030', sw: 1.4 }) +
+      A.poly(uraP, ural, { stroke: '#4a4030', sw: 1.4 }) + A.poly(afgP, '#a8d39a', { stroke: '#4a4030', sw: 1.4 }) +
+      A.text(110, 40, 'Ukraine', { size: 9, fill: '#5a2a24' }) + A.text(228, 30, 'Ural', { size: 9, fill: '#3a2a20' }) +
+      A.text(220, 124, 'Afghanistan', { size: 8, fill: '#2a4a24' }) + A.text(38, 32, 'Scand.', { size: 8, fill: '#5a2a24' }) +
+      A.rect(0, 150, 320, 50, '#f6efe0', { sw: 0, rx: 0 }) + A.line(0, 150, 320, 150, { sw: 1.5 }) +
+      A.tag(40, 14, 'Ana (red)', { fill: ANA }) + A.tag(276, 140, 'Ben (green)', { fill: BEN });
+    const army = (x, y, n, c, r = 11) => A.circle(x, y, r, c, { stroke: '#fff', sw: 2 }) + A.text(x, y + 0.5, n, { size: r * 1.05, weight: 800, fill: '#fff' });
+    const U = [118, 82], R = [226, 52];
+    const fixed = army(36, 60, 2, ANA, 9) + army(214, 106, 4, BEN, 9);
+    const rd = (x, v) => A.die(x, 160, 20, v, '#d8403a', { pip: '#fff' });
+    const wd = (x, v) => A.die(x, 160, 20, v);
+    const dice = (r, w) => A.k('rdice', rd(70, r[0]) + rd(94, r[1]) + rd(118, r[2])) + A.text(155, 170, 'vs', { size: 10, weight: 800 }) + A.k('wdice', wd(172, w[0]) + wd(196, w[1]));
+    const res = (i, x, y) => A.k('res' + i, army(x, y, '+1', ANA, 7));
+    const arrow = A.curve(150, 60, 180, 36, 206, 46, { stroke: ANA, sw: 3, head: 8 });
+    const card = A.k('card', A.card(262, 156, 24, 34, C.cream, { label: '★', labelFill: C.ink, size: 13 }));
+    return [
+      { step: 0, say: 'Ana owns 11 territories: 11 ÷ 3 = **3 new armies**. She places them all on Ukraine, next to Ben’s Ural.',
+        svg: land('#a8d39a') + fixed + A.k('ukr', army(...U, 7, ANA)) + A.k('ural', army(...R, 3, BEN)) +
+          A.text(10, 175, 'Reinforcements:', { size: 9, anchor: 'start' }) + res(1, 102, 175) + res(2, 120, 175) + res(3, 138, 175) },
+      { step: 0, say: 'Ukraine now holds **10 armies**, ready to strike Ural (3).',
+        svg: land('#a8d39a') + fixed + res(1, U[0] - 3, U[1]) + res(2, U[0], U[1]) + res(3, U[0] + 3, U[1]) + A.k('ukr', army(...U, 10, ANA, 13)) + A.k('ural', army(...R, 3, BEN)) + A.glow(...U, 20, 'g-ukr') },
+      { step: 1, say: 'Attack! Ana rolls **6-4-2**, Ben rolls **5-4**. 6 beats 5, but the 4s tie and **ties go to the defender**: each loses 1.',
+        svg: land('#a8d39a') + fixed + arrow + A.k('ukr', army(...U, 9, ANA, 13)) + A.k('ural', army(...R, 2, BEN)) + dice([6, 4, 2], [5, 4]) +
+          A.text(80, 191, 'win', { size: 7, fill: ANA }) + A.text(104, 191, 'lose', { size: 7, fill: C.gray }) + A.text(182, 191, 'lose', { size: 7, fill: C.gray }) + A.text(206, 191, 'win', { size: 7, fill: BEN }) },
+      { step: 1, say: 'She rolls again: **5-3-1** vs **2-1**. Ben loses both armies and Ural is empty; it becomes Ana’s.',
+        svg: land('#e9a49c') + fixed + arrow + A.k('ukr', army(...U, 9, ANA, 13)) + dice([5, 3, 1], [2, 1]) + A.glow(R[0], R[1] + 6, 20, 'g-ural') },
+      { step: 1, say: 'She must move in at least as many armies as dice rolled (3); she moves **4**.',
+        svg: land('#e9a49c') + fixed + A.k('ukr', army(...R, 4, ANA)) + A.k('ukr2', army(...U, 5, ANA)) + A.k('ural-arrow', A.arrow(140, 72, 204, 56, { stroke: ANA, sw: 2, dash: '4 3' })) },
+      { step: 2, say: '**Fortify**: one move, 3 more armies from Ukraine into Ural. She conquered a territory, so she **draws a card**.',
+        svg: land('#e9a49c') + fixed + A.k('ukr2', army(...R, 7, ANA, 13)) + A.k('ukr3', army(...U, 2, ANA)) + card + A.glow(274, 173, 22, 'g-card') },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     let o = A.bg('#9ccbe0');

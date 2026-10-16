@@ -78,6 +78,57 @@ defineGame({
     'Count the turns: at 10+ points, buy the biggest card you can, not more bonuses.',
   ],
 
+  walk(A) {
+    const C = A.C;
+    const G = { white: '#f4f2ee', blue: '#2f6db5', green: '#2f8a4f', red: '#c8423b', black: '#2b2b2b', gold: '#e2b33c' };
+    const ink = (c) => (c === 'white' || c === 'gold' ? C.ink : C.white);
+    const gemIcon = (x, y, r, f) => A.poly([[x, y - r], [x + r, y - r * 0.2], [x + r * 0.6, y + r], [x - r * 0.6, y + r], [x - r, y - r * 0.2]], f, { sw: 0.8 });
+    // Development card: bonus colour, points, cost [[colour, n], ...].
+    const card = (x, y, bonus, pts, cost) => {
+      let s = A.card(x, y, 36, 48, '#efe6d0', { face: '#fffdf7' }) + A.rect(x + 3, y + 3, 30, 11, G[bonus], { rx: 2, sw: 0 });
+      if (pts) s += A.text(x + 9, y + 8.5, pts, { size: 9, weight: 800, fill: ink(bonus) });
+      s += gemIcon(x + 27, y + 8.5, 4, 'rgba(255,255,255,.7)');
+      cost.forEach(([c, n], k) => { s += A.circle(x + 9, y + 39 - k * 11, 4.5, G[c], { sw: 0.8 }) + A.text(x + 9, y + 39.5 - k * 11, n, { size: 6, weight: 800, fill: ink(c) }); });
+      return s;
+    };
+    const token = (x, y, c) => A.circle(x, y, 9, G[c], { sw: 1.2 }) + gemIcon(x, y, 4, 'rgba(255,255,255,.55)');
+    const noble = (x, y, req) => {
+      let s = A.rect(x, y, 40, 36, '#e9dcc0', { rx: 3, sw: 1.2 }) + A.text(x + 8, y + 8, '3', { size: 9, weight: 800 }) + A.person(x + 28, y + 19, 18, '#8a5a33', { face: '#e8c9a8' });
+      req.forEach(([c, n], k) => { s += A.rect(x + 3, y + 15 + k * 7, 11, 6, G[c], { rx: 1, sw: 0.6 }) + A.text(x + 8.5, y + 18 + k * 7, n, { size: 5, weight: 800, fill: ink(c) }); });
+      return s;
+    };
+    // Bank: piles on the right.
+    const bankOrder = ['white', 'blue', 'green', 'red', 'black', 'gold'];
+    const bankAt = (c) => { const i = bankOrder.indexOf(c); return [262 + (i % 2) * 32, 20 + Math.floor(i / 2) * 30]; };
+    let board = A.bg('#2f3b4a') + A.rect(4, 4, 226, 104, '#3b4a5c', { rx: 8, sw: 0 }) + A.rect(240, 4, 76, 104, '#3b4a5c', { rx: 8, sw: 0 });
+    board += A.rect(4, 114, 312, 82, '#46566a', { rx: 8, sw: 0 });
+    bankOrder.forEach((c) => { const [x, y] = bankAt(c); for (let k = 3; k >= 1; k--) board += A.circle(x, y + k * 2.5, 9, G[c], { sw: 1.2 }); board += c === 'gold' ? A.star(x, y, 4.5, '#fff3c4', { sw: 0.6 }) : ''; });
+    board += A.text(278, 100, 'bank', { size: 8, weight: 700, fill: '#dfe6ee' });
+    board += A.k('noble-b', noble(10, 8, [['green', 4], ['black', 4]]));
+    board += A.card(10, 54, 30, 48, '#e2b33c', { label: '••', size: 9 });
+    board += A.k('c0', card(46, 54, 'blue', 1, [['white', 3], ['black', 2]])) + A.k('c2', card(130, 54, 'white', 2, [['blue', 5]])) + A.k('c3', card(172, 54, 'black', 1, [['green', 3], ['red', 2]]));
+    board += A.tag(30, 126, 'You', { w: 40 });
+    // Your tableau: stacks of bonus cards by colour.
+    const stack = (col, color, n) => { let s = ''; for (let k = 0; k < n; k++) s += card(64 + col * 42, 120 + k * 9, color, 0, []); return s; };
+    board += stack(0, 'white', 3) + stack(1, 'blue', 3) + stack(2, 'green', 1) + stack(3, 'red', 2);
+    const pts = (n) => A.k('pts' + n, A.text(30, 145, n + ' pts', { size: 11, weight: 800, fill: '#fff3c4' }));
+    const target = (x, y) => A.k('target', card(x, y, 'red', 2, [['red', 3], ['green', 2]]));
+    const nobleA = (x, y) => A.k('noble-a', noble(x, y, [['red', 3], ['white', 3], ['blue', 3]]));
+    const tokBank = (c) => A.k('t-' + c, token(...bankAt(c), c));
+    const tokYou = (c, i) => A.k('t-' + c, token(254 + i * 22, 168, c));
+    const youTok = tokYou('red', 0) + tokYou('green', 1) + tokYou('blue', 2);
+    return [
+      { step: 0, say: 'You eye a level 2 card: **3 red + 2 green**, worth 2 points. First turn: **take 3** gems of different colours.', svg: board + target(88, 54) + nobleA(56, 8) + pts(4) +
+        tokBank('red') + tokBank('green') + tokBank('blue') + A.glow(106, 78, 28) },
+      { step: 0, say: 'Red, green and blue chips slide from the bank to you. Next player.', svg: board + target(88, 54) + nobleA(56, 8) + pts(4) + youTok },
+      { step: 3, say: 'Next turn, **buy**. Your 2 red and 1 green bonus cards are permanent discounts, so you owe just **1 red + 1 green**.', svg: board + target(88, 54) + nobleA(56, 8) + pts(4) + youTok + A.glow(166, 144, 22) + A.glow(208, 142, 26) },
+      { step: 3, say: 'The chips go back to the bank, the card joins your red stack (**+2 points**) and a new card refills the display.', svg: board + nobleA(56, 8) + pts(6) + tokBank('red') + tokBank('green') + tokYou('blue', 2) +
+        target(190, 138) + A.k('c1new', card(88, 54, 'green', 0, [['white', 2], ['blue', 2]])) },
+      { step: 3, say: 'Your bonuses now show 3 red, 3 white and 3 blue: the noble **visits** for **+3**. Total 9.', svg: board + pts(9) + tokBank('red') + tokBank('green') + tokYou('blue', 2) +
+        target(190, 138) + A.k('c1new', card(88, 54, 'green', 0, [['white', 2], ['blue', 2]])) + nobleA(12, 158) + A.glow(32, 176, 24) },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     const G = { white: '#f4f2ee', blue: '#2f6db5', green: '#2f8a4f', red: '#c8423b', black: '#2b2b2b', gold: '#e2b33c' };

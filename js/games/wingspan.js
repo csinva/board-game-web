@@ -81,6 +81,59 @@ defineGame({
     'In round 4, stop building and convert actions straight into points (eggs are an easy source).',
   ],
 
+  walk(A) {
+    const C = A.C;
+    const rows = [['#7fae6a', '#5f9150', ['food 1', 'food 1', 'food 2', 'food 2', 'food 3']],
+      ['#e6cf7a', '#cdb15a', ['lay 2', 'lay 2', 'lay 3', 'lay 3', 'lay 4']],
+      ['#86bcd6', '#5f9fc0', ['draw 1', 'draw 1', 'draw 2', 'draw 2', 'draw 3']]];
+    const rowY = (r) => 4 + r * 50, slotX = (c) => 34 + c * 36;
+    let board = A.bg('#e9e0cc') + A.rect(2, 2, 214, 152, '#cfc0a0', { rx: 6, sw: 1.2 });
+    rows.forEach(([f, d, lab], r) => {
+      const y = rowY(r);
+      board += A.rect(4, y, 210, 48, f, { rx: 4, sw: 0.8 }) + A.rect(6, y + 2, 24, 44, d, { rx: 3, sw: 0 });
+      for (let c = 0; c < 5; c++) board += A.rect(slotX(c), y + 3, 32, 42, 'rgba(255,255,255,.3)', { rx: 3, sw: 0.6, dash: '2 2' }) + A.text(slotX(c) + 16, y + 15, lab[c], { size: 6, weight: 700, fill: '#2a2420' });
+    });
+    board += A.circle(18, rowY(0) + 24, 6, '#e2b33c', { sw: 1 });
+    board += A.path(`M18 ${rowY(1) + 15} q-6 0 -6 9 q0 8 6 8 q6 0 6 -8 q0 -9 -6 -9 z`, { fill: '#f4ecd6', sw: 1.1 });
+    board += A.rect(11, rowY(2) + 14, 14, 20, '#f4ecd6', { rx: 2, sw: 1.1 });
+    board += A.text(268, 10, 'Bird tray', { size: 8, weight: 800 });
+    board += A.card(254, 70, 28, 40, '#5d7f8f', {}) + A.text(268, 117, 'deck', { size: 7, weight: 700 });
+    board += A.text(268, 132, 'Your cubes', { size: 7, weight: 700 });
+    board += A.cube(282, 138, 11, C.blue);
+    board += A.tag(22, 177, 'Hand', { w: 34 });
+    const bird = (x, y, fill, power, w = 30, h = 42) => {
+      let s = A.card(x, y, w, h, '#f6efdc', { face: '#f6efdc' }) + A.bird(x + w / 2, y + h * 0.42, 20, fill);
+      if (power) s += A.rect(x + 3, y + h - 11, w - 6, 8, '#a7774a', { sw: 0, rx: 1 }) + A.text(x + w / 2, y + h - 7, power, { size: 5, fill: C.white });
+      return s;
+    };
+    const back = (x, y) => A.card(x, y, 28, 40, '#5d7f8f', {});
+    const slot = (r, c) => [slotX(c) + 1, rowY(r) + 3];
+    const hand = (i) => [50 + i * 32, 157];
+    const tray = (i) => [223 + i * 31, 18];
+    const egg = (x, y, f = '#f4ecd6') => A.path(`M${x} ${y - 4} q-3.5 0 -3.5 4.5 q0 3.5 3.5 3.5 q3.5 0 3.5 -3.5 q0 -4.5 -3.5 -4.5 z`, { fill: f, sw: 0.9 });
+    const fixed = A.k('b-f0', bird(...slot(0, 0), '#c8423b')) + A.k('b-f1', bird(...slot(0, 1), '#6d6a62')) +
+      A.k('b-g0', bird(...slot(1, 0), '#8a5a33')) + A.k('egg1', egg(slotX(0) + 10, rowY(1) + 37)) +
+      A.k('b-w0', bird(...slot(2, 0), '#2f6db5')) + A.k('h-0', bird(...hand(0), '#e07b2e', '', 28, 40)) + A.k('fish', A.circle(286, 177, 6, '#2f6db5', { sw: 1 }));
+    const trayB = (n) => [A.k('t0', bird(...tray(0), '#3c8d4f', '', 28, 40)), A.k('t1', bird(...tray(1), '#d6578a', '', 28, 40)), A.k('t2', bird(...tray(2), '#7d55b5', '', 28, 40))].slice(n).join('');
+    const duckHand = A.k('duck', bird(...hand(1), '#2a9a96', 'draw 1', 28, 40));
+    const duckBoard = A.k('duck', bird(...slot(2, 1), '#2a9a96', 'draw 1'));
+    const food = A.k('seed', A.circle(250, 177, 6, '#e2b33c', { sw: 1 })) + A.k('worm', A.circle(268, 177, 6, '#d6578a', { sw: 1 })) + A.k('egg2', egg(slotX(0) + 20, rowY(1) + 37, '#bcd7e6'));
+    const cubeHome = A.k('cube', A.cube(268, 138, 11, C.blue));
+    const cubeRow = A.k('cube', A.cube(slotX(2) + 10.5, rowY(2) + 24, 11, C.blue));
+    const deckTop = A.k('d3', back(254, 70));
+    return [
+      { step: 0, say: 'Your action: **play a bird**. The duck in your hand can only live in the wetland.', svg: board + fixed + trayB(0) + deckTop + food + cubeHome + duckHand + A.glow(96, 177, 24) },
+      { step: 0, say: 'It goes in the leftmost empty wetland slot, **column 2**, so you pay its food **plus 1 egg**.', svg: board + fixed + trayB(0) + deckTop + cubeHome + duckBoard + A.glow(slotX(1) + 16, rowY(2) + 24, 26) },
+      { step: 3, say: 'Next turn: **draw cards**. Your cube goes on the first open wetland space, which now says **draw 2**.', svg: board + fixed + trayB(0) + deckTop + cubeRow + duckBoard + A.glow(slotX(2) + 16, rowY(2) + 24, 22) },
+      { step: 3, say: 'You take 2 birds from the face-up tray.', svg: board + fixed + trayB(2) + deckTop + cubeRow + duckBoard +
+        A.k('t0', bird(...hand(1), '#3c8d4f', '', 28, 40)) + A.k('t1', bird(...hand(2), '#d6578a', '', 28, 40)) },
+      { step: 3, say: 'Then wetland birds activate **right to left**: the duck’s brown power draws 1 more card.', svg: board + fixed + trayB(2) + cubeRow + duckBoard +
+        A.k('t0', bird(...hand(1), '#3c8d4f', '', 28, 40)) + A.k('t1', bird(...hand(2), '#d6578a', '', 28, 40)) + A.k('d3', back(...hand(3))) + A.glow(slotX(1) + 16, rowY(2) + 24, 26) },
+      { step: 3, say: '**3 cards** from one action. Every bird you add makes its row stronger next time.', svg: board + fixed + trayB(2) + cubeRow + duckBoard +
+        A.k('t0', bird(...hand(1), '#3c8d4f', '', 28, 40)) + A.k('t1', bird(...hand(2), '#d6578a', '', 28, 40)) + A.k('d3', back(...hand(3))) },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     let o = A.bg('#e9e0cc');

@@ -50,7 +50,7 @@ defineGame({
     ],
   },
 
-  example: 'You roll **4 + 4** and land on an orange street nobody owns. You decline to pay $180, so it goes to auction and you win it for $120. Because you rolled doubles you roll again: 5, onto Maya’s railroad, and you pay her **$50** since she owns two.',
+  example: 'You roll **4 + 4** and land on an orange street nobody owns. You decline to pay $180, so it goes to auction and you win it for $120. Because you rolled doubles you roll again: 7, onto Maya’s B&O Railroad, and you pay her **$50** since she owns two.',
 
   setup: [
     'Give each player $1,500; one player is the Banker and keeps the rest.',
@@ -76,6 +76,46 @@ defineGame({
     'Orange and red sets are landed on most (jail sends people there). Three houses per street is the big jump in rent.',
     'Late in the game, staying in jail is good: you skip landing on rivals’ hotels while still collecting rent.',
   ],
+
+  walk(A) {
+    const C = A.C, col = { pk: '#d4408f', or: '#f29a1e', rd: '#e0312c', ye: '#f4df2f' }, maya = C.purple, you = C.blue;
+    // The real stretch of board: Jail (p0) up the left side (St. Charles … New York) to Free Parking (p10), then along the top to B&O Railroad (p15).
+    const cell = (i) => i === 0 ? [6, 176, 34, 20] : i <= 9 ? [6, 176 - i * 15, 34, 15] : i === 10 ? [6, 6, 34, 35] : [40 + (i - 11) * 32, 6, 32, 35];
+    const mid = (i) => { const [x, y, w, h] = cell(i); return i === 0 ? [15, 186] : [x + w / 2, y + h / 2]; };
+    const kinds = ['jail', 'pk', 'util', 'pk', 'pk', 'rr', 'or', '?', 'or', 'or', 'free', 'rd', '?', 'rd', 'rd', 'rr'];
+    let board = A.bg('#e8e0cc') + A.rect(40, 40, 160, 156, '#c8e4cb', { rx: 0, sw: 1 });
+    kinds.forEach((k, i) => {
+      const [x, y, w, h] = cell(i);
+      board += A.rect(x, y, w, h, '#d5ead6', { rx: 0, sw: 0.8 });
+      if (col[k]) board += i <= 9 ? A.rect(x + w - 6, y, 6, h, col[k], { rx: 0, sw: 0.8 }) : A.rect(x, y + h - 7, w, 7, col[k], { rx: 0, sw: 0.8 });
+      if (k === 'rr') board += A.rect(x + w / 2 - 4, y + h / 2 - 3, 8, 6, C.black, { rx: 1, sw: 0 });
+      if (k === '?') board += A.text(x + w / 2 - (i <= 9 ? 3 : 0), y + h / 2, '?', { size: 9, weight: 800, fill: C.orange });
+      if (k === 'util') board += A.text(x + w / 2 - 3, y + h / 2, '⚡', { size: 8 });
+      if (k === 'jail') board += A.text(x + 25, y + h / 2, 'JAIL', { size: 6, weight: 800 });
+      if (k === 'free') board += A.text(x + w / 2, y + 13, 'FREE', { size: 6.5, weight: 800 }) + A.text(x + w / 2, y + 22, 'PARKING', { size: 5, weight: 800 });
+    });
+    // Maya owns both railroads shown.
+    for (const i of [5, 15]) { const [x, y] = mid(i); board += A.circle(x + (i === 15 ? 0 : -10), y + (i === 15 ? 11 : 0), 3.5, maya, { sw: 1 }); }
+    board += A.pawn(...mid(12), 15, maya);
+    board += A.tag(262, 22, 'Maya', { fill: maya }) + A.tag(262, 108, 'You', { fill: you });
+    const cash = (who, y, n) => A.k(who + n, A.text(262, y, '$' + n.toLocaleString('en-US'), { size: 11, weight: 800 }));
+    const pawn = (i) => { const [x, y] = mid(i); return A.k('pawn', A.pawn(x, y - 2, 16, you)); };
+    const dice = (a, b) => A.k('dice' + a + b, A.die(92, 104, 24, a) + A.die(122, 104, 24, b));
+    const deed = (x, y) => A.k('deed', A.rect(x + 2, y + 3, 36, 46, C.shadow, { sw: 0, rx: 3 }) + A.rect(x, y, 36, 46, C.white, { rx: 3, sw: 1.2 }) + A.rect(x + 3, y + 3, 30, 11, col.or, { rx: 1, sw: 0.8 }) +
+      A.text(x + 18, y + 26, 'Orange', { size: 6 }) + A.text(x + 18, y + 36, '$180', { size: 6, weight: 800 }));
+    const bill = (x, y) => A.k('bill', A.rect(x, y, 34, 16, '#9fd2f2', { rx: 2, sw: 1 }) + A.text(x + 17, y + 8, '$50', { size: 8, weight: 800 }));
+    const base = board + cash('m', 42, 1200);
+    return [
+      { step: 0, say: 'You sit on Jail (just visiting). Roll: **4 + 4 = 8**.', svg: base + cash('y', 128, 1500) + pawn(0) + dice(4, 4) },
+      { step: 0, say: 'Move 8 spaces clockwise, onto an **orange street** that nobody owns. Price: $180.', svg: base + cash('y', 128, 1500) + pawn(8) + dice(4, 4) + A.glow(...mid(8), 14, 'g8') },
+      { step: 1, say: 'You decline to pay $180, so the bank **auctions** it. Maya bids $110; you bid **$120** and win.', svg: base + cash('y', 128, 1500) + pawn(8) + dice(4, 4) + deed(102, 50) +
+        A.bubble(52, 148, 60, 20, 'Maya $110', { size: 8.5 }) + A.bubble(128, 148, 60, 20, 'You $120', { size: 8.5 }) },
+      { step: 1, say: 'Pay $120 and take the deed. It’s yours now, earning rent.', svg: base + cash('y', 128, 1380) + pawn(8) + dice(4, 4) + deed(244, 146) },
+      { step: 0, say: 'You rolled **doubles**, so roll again: **4 + 3 = 7**. Move on 7 spaces, past Free Parking, onto Maya’s **B&O Railroad**.', svg: base + cash('y', 128, 1380) + pawn(15) + dice(4, 3) + deed(244, 146) + A.glow(...mid(15), 15, 'g15') },
+      { step: 1, say: 'Maya owns **two** railroads, so the rent is **$50**.', svg: base + cash('y', 128, 1380) + pawn(15) + dice(4, 3) + deed(244, 146) + bill(280, 160) + A.glow(...mid(15), 15, 'g15') },
+      { step: 1, say: 'You pay Maya $50. No doubles this time, so your turn ends.', svg: board + cash('m', 42, 1250) + cash('y', 128, 1330) + pawn(15) + dice(4, 3) + deed(244, 146) + bill(245, 60) },
+    ];
+  },
 
   art(A) {
     const C = A.C, X = 72, Y = 12, S = 176, K = 25, n = 9, e = (S - 2 * K) / n;

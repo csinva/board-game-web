@@ -78,6 +78,59 @@ defineGame({
     'Think about who at the table will “get” a clue; tailor it to them.',
   ],
 
+  walk(A) {
+    const C = A.C, W = 44, H = 60;
+    // Little card pictures drawn in the 38×54 inner area at (x, y).
+    const pics = {
+      light: (x, y) => A.rect(x, y, 38, 54, '#283a6b', { sw: 0, rx: 2 }) + A.poly([[x + 16, y + 18], [x + 38, y + 10], [x + 38, y + 26]], '#f5e6b0', { sw: 0, opacity: 0.7 }) + A.rect(x + 11, y + 18, 9, 28, '#f2efe6', { sw: 0.8, rx: 1 }) + A.poly([[x + 9, y + 18], [x + 15.5, y + 10], [x + 22, y + 18]], '#c8423b', { sw: 0.8 }) + A.path(`M${x} ${y + 49} q9 -5 19 0 t19 0`, { stroke: '#7fb7d9', sw: 2 }),
+      moon: (x, y) => A.rect(x, y, 38, 54, '#3b2c5c', { sw: 0, rx: 2 }) + A.circle(x + 19, y + 24, 11, '#f5e6b0', { sw: 0 }) + A.circle(x + 24, y + 20, 10, '#3b2c5c', { sw: 0 }) + A.star(x + 8, y + 10, 2.5, '#f5e6b0', { sw: 0 }) + A.star(x + 30, y + 44, 2.5, '#f5e6b0', { sw: 0 }),
+      stairs: (x, y) => A.rect(x, y, 38, 54, '#f0b8c4', { sw: 0, rx: 2 }) + [0, 1, 2, 3].map(i => A.rect(x + 4 + i * 7, y + 44 - i * 9, 9, 4, '#8a5a33', { sw: 0.6, rx: 0.5 })).join('') + A.circle(x + 30, y + 10, 6, C.white, { sw: 0 }) + A.circle(x + 24, y + 12, 5, C.white, { sw: 0 }),
+      tree: (x, y) => A.rect(x, y, 38, 54, '#a6c98a', { sw: 0, rx: 2 }) + A.rect(x + 17, y + 26, 4, 22, '#5b3a20', { sw: 0 }) + A.circle(x + 19, y + 20, 11, '#3f7a3a', { sw: 0.8 }) + A.line(x, y + 48, x + 38, y + 48, { stroke: '#5b3a20', sw: 1.2 }),
+      boat: (x, y) => A.rect(x, y, 38, 54, '#f2a65a', { sw: 0, rx: 2 }) + A.rect(x, y + 34, 38, 20, '#2f6db5', { sw: 0, rx: 2 }) + A.path(`M${x + 10} ${y + 33} h18 l-4 5 h-10 z`, { fill: '#8a5a33', sw: 0.8 }) + A.poly([[x + 19, y + 14], [x + 19, y + 31], [x + 29, y + 31]], C.white, { sw: 0.8 }),
+      balloon: (x, y) => A.rect(x, y, 38, 54, '#9fd3cf', { sw: 0, rx: 2 }) + A.circle(x + 19, y + 18, 11, '#e07b2e', { sw: 1 }) + A.path(`M${x + 10} ${y + 24} L${x + 16} ${y + 38} M${x + 28} ${y + 24} L${x + 22} ${y + 38}`, { sw: 0.8 }) + A.rect(x + 15, y + 38, 8, 6, '#8a5a33', { sw: 0.8, rx: 1 }),
+    };
+    const face = (x, y, pic, n) => {
+      let s = A.rect(x + 2, y + 3, W, H, C.shadow, { sw: 0, rx: 4 }) + A.rect(x, y, W, H, C.white, { rx: 4, sw: 1.2 }) + pics[pic](x + 3, y + 3);
+      if (n) s += A.circle(x + W - 3, y + H - 3, 6.5, C.ink, { sw: 0 }) + A.text(x + W - 3, y + H - 3, n, { size: 7, weight: 800, fill: C.white });
+      return s;
+    };
+    const back = (x, y) => A.rect(x + 2, y + 3, W, H, C.shadow, { sw: 0, rx: 4 }) + A.rect(x, y, W, H, '#8a5bb0', { rx: 4, sw: 1.2 }) + A.star(x + W / 2, y + H / 2, 9, '#f2c14e', { sw: 0.8 });
+    // Players: Lea (storyteller) top-left; the five others along the bottom.
+    const P = { Lea: [22, 34, C.red], Tom: [48, 172, C.blue], Kai: [104, 172, C.green], Sam: [160, 172, C.yellow], Ana: [216, 172, C.purple], Ben: [272, 172, C.orange] };
+    let board = A.bg('#efe7da');
+    for (const [n, [x, y, f]] of Object.entries(P)) board += A.person(x, y, n === 'Lea' ? 24 : 20, f) + A.text(x, y + (n === 'Lea' ? 21 : 18), n, { size: 8 });
+    const bubble = A.k('clue', A.bubble(42, 4, 76, 28, '“Lonely”', { size: 12, italic: true }));
+    // Who played which card, and where it lands in the shuffled row.
+    const cards = [['Tom', 'moon'], ['Ana', 'stairs'], ['Lea', 'light'], ['Kai', 'tree'], ['Ben', 'boat'], ['Sam', 'balloon']];
+    const rowX = (i) => 10 + i * 51, RY = 66;
+    const pile = (i) => [130 + i * 3, 60 + i * 2];
+    const order = ['Lea', 'Tom', 'Kai', 'Sam', 'Ana', 'Ben'];
+    const inPile = (faceUpLea) => order.map((n, j) => A.k('c-' + n, (n === 'Lea' && faceUpLea) ? face(...pile(j), 'light') : back(...pile(j)))).join('');
+    const inRow = cards.map(([n, pic], i) => A.k('c-' + n, face(rowX(i), RY, pic, i + 1))).join('');
+    const votes = { Ana: 2, Ben: 2, Kai: 0, Sam: 0, Tom: 3 };
+    const tokens = (placed) => Object.entries(votes).map(([n, i], j) => {
+      const [px, py, f] = P[n];
+      const slotOn = Object.entries(votes).filter(([, v]) => v === i).findIndex(([m]) => m === n);
+      const [x, y] = placed ? [rowX(i) + 12 + slotOn * 18, RY + 46] : [px + 14, py - 12];
+      return A.k('v-' + n, A.circle(x, y, 7, f, { sw: 1.2 }) + A.text(x, y, n[0], { size: 7, weight: 800, fill: C.white }));
+    }).join('');
+    const owner = (i, n) => { const x = rowX(i) + W / 2; return A.k('o-' + n, A.rect(x - 14, RY + H + 4, 28, 11, P[n][2], { rx: 5.5, sw: 0 }) + A.text(x, RY + H + 9.5, n, { size: 6, fill: C.white })); };
+    const pts = (n, v) => { const [x, y] = P[n]; const [tx, ty] = n === 'Lea' ? [44, 52] : [x + 18, y + 4]; return A.k('p-' + n, A.rect(tx - 2, ty - 7, 22, 14, '#fff7d6', { rx: 7, sw: 1 }) + A.text(tx + 9, ty, '+' + v, { size: 8, weight: 800 })); };
+    return [
+      { step: 0, say: 'Lea is the storyteller. She picks her **lighthouse** card (shown here), lays it face down and says: “**Lonely**.”',
+        svg: board + bubble + A.k('c-Lea', face(...pile(0), 'light')) + A.glow(pile(0)[0] + W / 2, pile(0)[1] + H / 2, 38, 'g-l') },
+      { step: 1, say: 'Everyone else secretly picks the card from their hand that best fits “Lonely” and passes it to Lea face down.',
+        svg: board + bubble + inPile(false) },
+      { step: 2, say: 'Lea shuffles the six cards and lays them out face up. Which one is hers?',
+        svg: board + bubble + inRow + tokens(false) },
+      { step: 2, say: 'Everyone but Lea **votes** in secret. Ana and Ben pick the lighthouse; Kai and Sam fall for Tom’s moon; Tom picks Kai’s tree.',
+        svg: board + bubble + inRow + tokens(true) },
+      { step: 3, say: 'Some but not all found it: **Lea, Ana and Ben score 3**. Tom gets **2**, one per vote on his decoy; Kai gets 1.',
+        svg: board + inRow + tokens(true) + owner(0, 'Tom') + owner(2, 'Lea') + owner(3, 'Kai') +
+          pts('Lea', 3) + pts('Ana', 3) + pts('Ben', 3) + pts('Tom', 2) + pts('Kai', 1) + A.glow(rowX(2) + W / 2, RY + H / 2, 36, 'g-l') },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     let o = A.bg('#efe7da');

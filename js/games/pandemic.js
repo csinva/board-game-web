@@ -79,6 +79,59 @@ defineGame({
     'Plan the next player’s turn out loud; funnelling cards to one curer is usually fastest.',
   ],
 
+  walk(A) {
+    const C = A.C;
+    const col = { b: '#3d7bd9', y: '#f0c419', r: '#d8403a' };
+    const P = { lag: [34, 118, 'y', 'Lagos'], kha: [80, 92, 'y', 'Khartoum'], bkk: [118, 112, 'r', 'Bangkok'], hk: [152, 82, 'r', 'Hong Kong'],
+      sha: [150, 34, 'r', 'Shanghai'], tok: [196, 46, 'r', 'Tokyo'], man: [196, 118, 'r', 'Manila'] };
+    const E = [['lag', 'kha'], ['bkk', 'hk'], ['hk', 'sha'], ['sha', 'tok'], ['hk', 'man']];
+    let board = A.bg('#17324f');
+    board += A.path('M8 70 Q50 60 100 70 L104 140 Q60 150 20 140 Z', { fill: '#24466b', sw: 0 });
+    board += A.path('M110 20 Q170 10 214 24 L214 140 Q160 150 112 130 Z', { fill: '#24466b', sw: 0 });
+    for (const [a, b] of E) board += A.line(P[a][0], P[a][1], P[b][0], P[b][1], { stroke: '#e9e2d0', sw: 1.3, opacity: 0.6 });
+    for (const k in P) { const [x, y, c, n] = P[k]; board += A.circle(x, y, 5.5, col[c], { stroke: '#fff', sw: 1.3 }) + A.text(x, y + 11, n, { size: 6.5, fill: '#fff' }); }
+    // Right panel: infection + player decks, rate track. Bottom strip: Ana's hand.
+    board += A.rect(222, 0, 98, 200, '#0f2238', { sw: 0, rx: 0 }) + A.rect(0, 152, 222, 48, '#0f2238', { sw: 0, rx: 0 });
+    board += A.text(271, 9, 'Infection deck / discard', { size: 6, fill: '#e9e2d0' });
+    board += A.card(232, 16, 28, 36, '#3c6e47', { label: '☣', size: 12 }) + A.rect(276, 16, 28, 36, 'none', { stroke: '#e9e2d0', dash: '2 2', sw: 1 });
+    board += A.text(271, 66, 'Infection rate', { size: 6, fill: '#e9e2d0' });
+    [2, 2, 2, 3, 3, 4, 4].forEach((v, i) => { board += A.circle(237 + i * 12.5, 80, 5, '#2c4a6e', { stroke: '#e9e2d0', sw: 1 }) + A.text(237 + i * 12.5, 80.5, v, { size: 6, fill: '#fff' }); });
+    board += A.text(271, 100, 'Player deck / discard', { size: 6, fill: '#e9e2d0' });
+    board += A.card(232, 108, 28, 36, '#2c4a6e', { label: '✚', size: 12 }) + A.rect(276, 108, 28, 36, 'none', { stroke: '#e9e2d0', dash: '2 2', sw: 1 });
+    board += A.tag(30, 176, 'Ana', { fill: C.orange });
+    const card = (x, y, c, lab) => A.card(x, y, 30, 38, c, { label: lab, size: 5, labelFill: c === col.y ? C.ink : C.white });
+    const hand = (i) => [60 + i * 36, 157];
+    const rate = (i) => A.k('rate', A.circle(237 + i * 12.5, 80, 7.5, 'none', { stroke: C.orange, sw: 2.2 }));
+    const cubes = (city, n, from = 0) => {
+      const [x, y, c] = P[city]; let s = '';
+      for (let i = from; i < from + n; i++) s += A.k(city + i, A.cube(x - 13 + i * 8.5, y - 19, 7, col[c]));
+      return s;
+    };
+    const pawn = (city) => A.k('ana', A.pawn(P[city][0] + 11, P[city][1] - 3, 15, C.orange));
+    const base = cubes('kha', 1) + cubes('tok', 1) + cubes('bkk', 1);
+    const keep = A.k('c-par', card(...hand(1), col.b, 'Paris')) + A.k('c-lim', card(...hand(2), col.y, 'Lima'));
+    const hkCard = A.k('c-hk', card(...hand(0), col.r, 'H. Kong'));
+    const hkDisc = A.k('c-hk', card(276, 108, col.r, 'H. Kong'));
+    const tokHand = A.k('c-tok', card(...hand(3), col.r, 'Tokyo'));
+    return [
+      { step: 0, say: 'Ana the **Medic** (orange) is in Khartoum. Hong Kong has **3 red cubes**, one away from an outbreak.',
+        svg: board + base + cubes('hk', 3) + cubes('man', 2) + pawn('kha') + hkCard + keep + rate(0) + A.glow(P.hk[0], P.hk[1] - 12, 20) },
+      { step: 0, say: '**Action 1: direct flight.** She discards her Hong Kong card and flies straight there.',
+        svg: board + base + cubes('hk', 3) + cubes('man', 2) + pawn('hk') + hkDisc + keep + rate(0) },
+      { step: 0, say: '**Action 2: treat.** A Medic removes **all** cubes of one colour, so all 3 go.',
+        svg: board + base + cubes('man', 2) + pawn('hk') + hkDisc + keep + rate(0) + A.glow(P.hk[0], P.hk[1] - 12, 20) },
+      { step: 0, say: '**Actions 3–4:** drive along the line to Manila and treat again. Both red cubes gone.',
+        svg: board + base + pawn('man') + hkDisc + keep + rate(0) + A.glow(P.man[0], P.man[1] - 8, 18) },
+      { step: 1, say: '**Draw 2** player cards: Tokyo goes into her hand, but the second is an **Epidemic**!',
+        svg: board + base + pawn('man') + hkDisc + keep + rate(0) + tokHand + A.k('epi', A.card(232, 108, 30, 38, '#5a9a3a', { label: 'EPIDEMIC', size: 4.6 })) + A.glow(246, 126, 24) },
+      { step: 1, say: 'Epidemic: the infection rate marker moves up, and the bottom infection card, **Lagos**, gets **3 cubes**. The infection discards are reshuffled onto the deck.',
+        svg: board + base + pawn('man') + A.k('c-hk', card(276, 108, col.r, 'H. Kong')) + A.k('epi', A.card(280, 112, 30, 38, '#5a9a3a', { label: 'EPIDEMIC', size: 4.6 })) + keep + tokHand + rate(1) + cubes('lag', 3) + A.glow(P.lag[0], P.lag[1] - 12, 20) },
+      { step: 2, say: '**Infect:** the rate is 2, so flip 2 infection cards. Tokyo and Bangkok each get **1 more cube**.',
+        svg: board + base + pawn('man') + A.k('c-hk', card(276, 108, col.r, 'H. Kong')) + A.k('epi', A.card(280, 112, 30, 38, '#5a9a3a', { label: 'EPIDEMIC', size: 4.6 })) + keep + tokHand + rate(1) + cubes('lag', 3) +
+          A.k('i-tok', A.card(276, 12, 30, 30, '#3c6e47', { title: 'Tokyo' })) + A.k('i-bkk', A.card(282, 26, 30, 30, '#3c6e47', { title: 'Bangkok' })) + cubes('tok', 1, 1) + cubes('bkk', 1, 1) },
+    ];
+  },
+
   art(A) {
     const C = A.C;
     const col = { b: '#3d7bd9', y: '#f0c419', k: '#3a3a3a', r: '#d8403a' };

@@ -85,6 +85,35 @@ defineGame({
     'If you might have been swapped, say so: your old teammates may now be your enemies.',
   ],
 
+  walk(A) {
+    const C = A.C, back = '#3b3f6b', moonC = '#f2e6cc', yel = '#f2c14e';
+    const P = { sue: [30, 96], tom: [100, 30], ada: [220, 30], leo: [288, 96], mia: [160, 172] };
+    const slot = { sue: [50, 92], tom: [89, 60], ada: [209, 60], leo: [248, 92], mia: [149, 124] };
+    const roles = { Werewolf: '#b3263e', Robber: '#6b5b8a', Villager: '#3c8d4f' };
+    let board = A.bg('#1c2238') + A.circle(298, 20, 11, moonC, { sw: 0 }) + A.circle(292, 16, 10, '#1c2238', { sw: 0 });
+    board += `<ellipse cx="160" cy="104" rx="128" ry="58" fill="#4a3a2c" stroke="${C.ink}" stroke-width="1.5"/>`;
+    for (const [n, [x, y]] of Object.entries(P)) board += A.person(x, y, 28, { sue: '#6b7aa6', tom: '#5f8f8a', ada: '#a6846b', leo: '#7e8f5f', mia: '#8a6aa6' }[n], { face: '#d9b48f' }) + A.text(x, y + 23, n[0].toUpperCase() + n.slice(1), { size: 8, weight: 700, fill: moonC });
+    const bk = (x, y) => A.card(x, y, 22, 30, back) + A.circle(x + 11, y + 15, 4.5, moonC, { sw: 0 }) + A.circle(x + 13, y + 13, 4, back, { sw: 0 });
+    const face = (x, y, r) => A.card(x - 6, y - 4, 34, 38, roles[r], { label: r.toUpperCase(), size: 4.4, labelFill: C.white });
+    const card = (k, at, r) => A.k(k, r ? face(...at, r) : bk(...at));
+    const centre = [123, 149, 175].map((x, i) => A.k('c' + i, bk(x, 88))).join('') + A.text(160, 126, 'centre', { size: 7, fill: '#cdb89a' });
+    const others = card('cS', slot.sue) + card('cT', slot.tom) + card('cA', slot.ada);
+    const seen = (who) => A.tag(64, 186, 'only ' + who + ' sees', { fill: '#5d4b7a' });
+    const vote = (k, who, x, y) => A.k(k, A.circle(x, y, 7, { S: '#6b7aa6', T: '#5f8f8a', A: '#a6846b', M: '#8a6aa6', L: '#7e8f5f' }[who], { sw: 1.2, stroke: yel }) + A.text(x, y, who, { size: 7, weight: 800, fill: C.white }));
+    return [
+      { step: 0, say: 'Five players, three cards in the centre. Mia peeks at her card: **Robber**. Everyone else sees only backs.', svg: board + centre + others + card('cL', slot.leo) + card('cM', slot.mia, 'Robber') + seen('Mia') },
+      { step: 1, say: 'Night. When the Robber is called, Mia **swaps** her card with Leo’s, without telling him.', svg: board + centre + others + card('cL', slot.mia) + card('cM', slot.leo) + A.glow(160, 166, 16, 'g-mia') },
+      { step: 1, say: 'She looks at her new card: **Werewolf**. Mia is now a werewolf, and Leo is now the Robber.', svg: board + centre + others + card('cL', slot.mia, 'Werewolf') + card('cM', slot.leo) + seen('Mia') },
+      { step: 2, say: 'Day. Leo says he was the Robber. Mia calmly claims **Seer** and says Leo’s card is a Werewolf.', svg: board + centre + others + card('cL', slot.mia) + card('cM', slot.leo) +
+        A.bubble(254, 50, 64, 18, 'I’m Robber!', { size: 8 }) + A.bubble(172, 134, 132, 20, 'Seer here: Leo is a wolf!', { size: 8 }) },
+      { step: 3, say: 'On “3” everyone points at once. **Four** fingers land on Leo; Leo points at Mia.', svg: board + centre + others + card('cL', slot.mia) + card('cM', slot.leo) +
+        vote('vS', 'S', 260, 136) + vote('vT', 'T', 276, 136) + vote('vA', 'A', 292, 136) + vote('vM', 'M', 308, 136) + vote('vL', 'L', 186, 170) + A.glow(288, 96, 22, 'g-leo') },
+      { step: 3, say: 'Flip every card. Leo dies, but his card says **Robber**. The werewolf is Mia, so the **werewolves win**.', svg: board + centre +
+        card('cS', slot.sue, 'Villager') + card('cT', slot.tom, 'Villager') + card('cA', slot.ada, 'Villager') + card('cL', slot.mia, 'Werewolf') + card('cM', slot.leo, 'Robber') +
+        A.k('dead', A.line(276, 82, 300, 108, { stroke: '#e0484f', sw: 3.5 }) + A.line(300, 82, 276, 108, { stroke: '#e0484f', sw: 3.5 })) + A.glow(160, 139, 20, 'g-wolf') },
+    ];
+  },
+
   art(A) {
     const C = A.C, back = '#3b3f6b', moonC = '#f2e6cc';
     let o = A.bg('#1c2238');
