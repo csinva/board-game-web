@@ -24,6 +24,7 @@
 loadGames().then(() => {
   const g = GAME_BY_ID[new URLSearchParams(location.search).get('g')];
   if (!g || !g.walk) { document.getElementById('h').textContent = 'No walk for this game'; return; }
+  window.CURRENT_GAME = g;
   document.getElementById('h').textContent = g.name + ' — walkthrough slides';
   document.getElementById('grid').innerHTML = g.walk(A).map((f, i) =>
     `<div class="f"><svg viewBox="0 0 320 200">${f.svg}</svg><p><b class="st">${i + 1} · step ${f.step + 1}: ${esc(g.turn.steps[f.step].verb)}</b>${md(f.say)}</p></div>`).join('');

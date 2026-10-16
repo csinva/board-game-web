@@ -10,77 +10,110 @@ defineGame({
   mechanics: ['deck-building', 'hand-management', 'engine-building', 'take-that'],
   profile: { complexity: 2, luck: 2, interaction: 2, conflict: 2, talk: 1, planning: 4 },
 
-  pitch: 'Everyone starts with the same weak deck of 10 cards; buy better ones each turn and build a deck that buys the most land.',
-  theme: 'You are a monarch growing a small kingdom into a great one, one card at a time.',
+  // Components drawn once, used inline in text ({copper}, {=c3}) and in the art + walkthrough.
+  icons: (() => {
+    const coin = n => ({ name: n + (n === 1 ? ' coin' : ' coins'), draw: A => A.circle(12, 12, 10, '#e8c547', { sw: 1.4 }) + A.circle(12, 12, 7.6, 'none', { sw: 0.8, stroke: '#b58a12' }) + A.text(12, 12.8, String(n), { size: 12.5, weight: 800 }) });
+    const card = (name, fill, inner) => ({ name, draw: A => A.rect(4, 1, 16, 22, fill, { rx: 2.5, sw: 1.3 }) + inner(A) });
+    const disc = (A, f) => A.circle(12, 12, 5.2, f, { sw: 1.1 });
+    const plus = A => A.circle(18, 18, 5.6, '#2a2420', { sw: 0 }) + A.line(15, 18, 21, 18, { stroke: '#fff', sw: 1.8 }) + A.line(18, 15, 18, 21, { stroke: '#fff', sw: 1.8 });
+    const o = {
+      action: card('Action card', '#efe2c2', A => A.rect(6.5, 4, 11, 8, '#a7c4d9', { rx: 1, sw: 0.8 }) + A.line(7.5, 15.5, 16.5, 15.5, { sw: 1.1 }) + A.line(7.5, 18.5, 14, 18.5, { sw: 1.1 })),
+      victory: card('Victory card', '#5ea25a', A => A.path('M8 6 h8 v5 q0 5 -4 7 q-4 -2 -4 -7 z', { fill: '#fff', sw: 1 })),
+      curse: card('Curse', '#7d55b5', A => A.path('M8 8 l8 8 M16 8 l-8 8', { stroke: '#fff', sw: 2.2 })),
+      copper: card('Copper', '#c08245', A => disc(A, '#e8a86a')),
+      silver: card('Silver', '#b7bec7', A => disc(A, '#e6eaef')),
+      gold: card('Gold', '#e2b33c', A => disc(A, '#f6d873')),
+      estate: card('Estate', '#8fbf6a', A => A.house(12, 17, 9, '#fff')),
+      duchy: card('Duchy', '#5ea25a', A => A.city(12.5, 17.5, 9, '#fff')),
+      province: card('Province', '#2f7a3d', A => A.crown(12, 16, 11, '#e8c547')),
+      vp: { name: 'victory point', draw: A => A.path('M4 3 h16 v8 q0 8 -8 11 q-8 -3 -8 -11 z', { fill: '#2f7a3d', sw: 1.3 }) + A.star(12, 11, 4.5, '#fff', { sw: 0 }) },
+      'plus-card': { name: '+Card', draw: A => A.rect(2, 3, 13, 18, '#7d5532', { rx: 2, sw: 1.2 }) + A.rect(5, 6, 7, 12, 'none', { rx: 1, sw: 1, stroke: '#e8c547' }) + plus(A) },
+      'plus-action': { name: '+Action', draw: A => A.rect(2, 3, 13, 18, '#efe2c2', { rx: 2, sw: 1.2 }) + A.rect(4, 5.5, 9, 6.5, '#a7c4d9', { rx: 1, sw: 0.7 }) + A.line(4.5, 15, 12, 15, { sw: 1 }) + plus(A) },
+      'plus-buy': { name: '+Buy', draw: A => A.path('M5 9 Q8.5 1.5 12 9', { sw: 1.4 }) + A.poly([[1.5, 9], [15.5, 9], [13.5, 19], [3.5, 19]], '#c08245', { sw: 1.2 }) + plus(A) },
+      trash: { name: 'trash', draw: A => A.rect(5, 7, 14, 15, '#8c877f', { rx: 1.5, sw: 1.3 }) + A.rect(3, 4, 18, 3.4, '#a9a49b', { rx: 1, sw: 1.2 }) + A.rect(9.5, 2, 5, 2.4, '#a9a49b', { rx: 1, sw: 1 }) + A.line(9, 10, 9, 19, { sw: 1 }) + A.line(15, 10, 15, 19, { sw: 1 }) },
+    };
+    [0, 1, 2, 3, 4, 5, 6, 8].forEach(n => { o['c' + n] = coin(n); });
+    return o;
+  })(),
 
-  goal: { big: 'Most VP in deck', text: 'When the game ends, the player with the most **victory points** among all their cards wins. Provinces (6 VP) are the big prize.' },
+  pitch: 'Start with 10 weak cards, buy better ones each turn, and finish with the most victory points in your deck.',
+
+  goal: { big: 'Most VP in deck', text: 'Most **victory points** among all your cards when the game ends. {=province} Provinces (6 {=vp}) are the big prize.' },
 
   turn: {
     type: 'sequence',
-    intro: 'Draw 5 cards, then do the three phases in order (remember “A-B-C”):',
+    intro: 'Three phases, in order (A-B-C):',
     steps: [
-      { verb: 'Action', text: 'Play **one** Action card from your hand. If it gives “+Actions”, you may play more.' },
-      { verb: 'Buy', text: 'Play your Treasures, add up the coins, and buy **one** card from the Supply (more with “+Buy”).' },
-      { verb: 'Clean-up', text: 'Discard everything you played, bought and still hold, then draw a new hand of **5**.' },
+      { verb: 'Action', text: 'Play **one** {=action} Action card and follow it: {plus-card} draws, each {plus-action} lets you play one more.' },
+      { verb: 'Buy', text: 'Play {=copper}{=silver}{=gold} Treasures, total the coins, and buy **one** card from the Supply (more with {plus-buy}).' },
+      { verb: 'Clean-up', text: 'Discard all cards in play and in hand, then draw **5**.' },
     ],
   },
 
-  tension: 'Every card you buy dilutes your deck: action cards make turns stronger, but victory cards are dead weight in your hand, so you must decide when to stop building and start buying points.',
+  tension: 'Each card you buy dilutes your deck: {=action} Actions make turns stronger, {=victory} Victory cards do nothing in hand, so you must choose when to switch from building to buying points.',
 
-  flow: [
-    { label: 'Build', items: ['Silver & Gold', 'Draw cards (+Cards)', 'Chain actions (+Actions)'] },
-    { label: 'Cycle', items: ['Bought cards go to discard', 'Shuffle when deck runs out', 'Better hands come round'] },
-    { label: 'Score', items: ['Estate 1 VP', 'Duchy 3 VP', 'Province 6 VP', 'Curse −1 VP'] },
+  structure: [
+    { label: 'Setup', text: 'Each player shuffles 7 {=copper} + 3 {=estate} into a deck and draws 5.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Action, Buy, Clean-up. When your deck runs out, shuffle your discard pile into a new deck.' },
+    { label: 'Game end', text: 'After the turn that empties the {=province} pile or any 3 Supply piles, count {=vp} in your whole deck.' },
   ],
 
-  end: { trigger: 'the Province pile is empty, or any 3 Supply piles are empty', detail: 'The game ends at the end of that turn. Count VP in your whole deck; on a tie, the player who had fewer turns wins.' },
+  points: [
+    ['{=estate} Estate', '1 {=vp}'],
+    ['{=duchy} Duchy', '3 {=vp}'],
+    ['{=province} Province', '6 {=vp}'],
+    ['{=curse} Curse', '−1 {=vp} (given to you by attacks like Witch)'],
+    ['{=victory} Kingdom Victory cards', 'as printed (e.g. Gardens: 1 {=vp} per 10 cards in your deck)'],
+  ],
+
+  end: { trigger: 'the Province pile empties, or any 3 Supply piles empty', detail: 'Finish that turn. (5–6 players, with a second set: any 4 piles.) Tie: fewer turns wins; still tied, share the win.' },
   scoring: [
-    { label: 'Provinces', share: 6 },
-    { label: 'Duchies', share: 2 },
-    { label: 'Estates', share: 1 },
+    { label: '{=province} Provinces', share: 6 },
+    { label: '{=duchy} Duchies', share: 2 },
+    { label: '{=estate} Estates', share: 1 },
   ],
 
   ref: {
     title: 'Basic Supply costs',
     rows: [
-      ['Copper / Silver / Gold', '0 / 3 / 6 coins → worth 1 / 2 / 3'],
-      ['Estate', '2 coins → 1 VP'],
-      ['Duchy', '5 coins → 3 VP'],
-      ['Province', '8 coins → 6 VP'],
-      ['Kingdom cards', '2–6 coins, printed bottom-left'],
+      ['{=copper} Copper', 'costs {=c0} → worth {=c1}'],
+      ['{=silver} Silver', 'costs {=c3} → worth {=c2}'],
+      ['{=gold} Gold', 'costs {=c6} → worth {=c3}'],
+      ['{=estate} {=duchy} {=province}', 'cost {=c2} · {=c5} · {=c8}'],
+      ['{=action} Kingdom cards', 'cost {=c2}–{=c6}, printed bottom-left'],
     ],
   },
 
-  example: 'Your hand is Village, Smithy, Copper, Copper, Estate. You play **Village** (+1 Card, +2 Actions) and draw a Silver, then play **Smithy** (+3 Cards) and draw Gold, Copper, Estate. Your treasures total 1+1+2+3+1 = **8 coins**, so you buy a Province.',
+  example: 'Hand: {=action} Village, {=action} Smithy, {=copper}{=copper}{=estate}. Play **Village** (+1 Card, +2 Actions) and draw {=silver}. Play **Smithy** (+3 Cards) and draw {=gold}{=copper}{=estate}. Treasures: 1+1+2+3+1 = **8 coins**; buy a {province}.',
 
   setup: [
-    'Each player takes 7 Coppers and 3 Estates, shuffles them as their deck, and draws 5.',
-    'Lay out 10 Kingdom piles (10 cards each) beside Treasure, Victory and Curse piles.',
-    'Victory piles: 8 cards each with 2 players, 12 with 3–4. Curses: 10 per player after the first.',
+    'Each player shuffles 7 {copper}s and 3 {estate}s into a deck and draws 5.',
+    'Lay out 10 {=action} Kingdom piles (10 cards each) plus the {=copper}{=silver}{=gold} Treasure, {=estate}{=duchy}{=province} Victory and {=curse} Curse piles, and a Trash spot.',
+    'Victory piles (including Kingdom ones like Gardens): 8 cards each with 2 players, 12 with 3–4. Curses: 10 per player beyond the first.',
   ],
 
   terms: [
-    ['Supply', 'The face-up piles on the table that you buy from.'],
-    ['Kingdom cards', 'The 10 piles of Action cards chosen for this game.'],
-    ['+Actions', 'Lets you play further Action cards this turn.'],
-    ['Trashing', 'Removing a card from the game, so it leaves your deck forever.'],
-    ['Attack', 'Action that hurts other players (e.g. Militia makes them discard to 3).'],
+    ['Supply', 'The face-up piles you buy from.'],
+    ['{=action} Kingdom cards', 'The 10 piles (mostly Actions) chosen for this game.'],
+    ['{=plus-action} +Action', 'Lets you play one more Action card this turn.'],
+    ['{=trash} Trash', 'Remove a card from the game; it leaves your deck for good.'],
+    ['Attack', 'Action that hurts other players (e.g. Militia: each discards down to 3). A Reaction such as Moat, revealed from hand, blocks it.'],
   ],
 
   gotchas: [
-    'Bought cards go to your **discard pile**, not your hand. You see them after your next shuffle.',
-    'Playing an Action uses up your one Action. A card saying “+1 Action” only replaces it, so chain Villages before draw cards.',
-    'Coins don’t carry over: unspent money is lost at Clean-up. Draw your new hand **before** the next player starts.',
+    'Bought cards go to your **discard pile**, not your hand. They reach your hand after a shuffle.',
+    'Each Action played uses your 1 Action; “+1 Action” only replaces it. Play Villages **before** draw cards.',
+    'Unspent coins are lost at Clean-up. Draw your next hand **before** the next player starts.',
   ],
 
   tips: [
-    'A simple first plan: buy **Gold** at 6–7 coins, **Province** at 8, and one or two good actions early.',
-    'Don’t buy Estates or Duchies early; they clog your hand. Start greening only when Provinces run low.',
-    'Too many terminal actions (no +Action) collide in one hand. Pair them with Villages.',
+    'First-game plan: 6–7 coins → **Gold**, 8 → **Province**, plus 1–2 good Actions early.',
+    'Skip Estates and Duchies early; they clog your hand. Buy them once Provinces run low.',
+    'Actions without +Action (terminals) collide in one hand. Pair them with Villages.',
   ],
 
   walk(A) {
-    const C = A.C;
+    const C = A.C, I = this.icons;
     const T = {
       copper: ['#c08245', 'Copper', '1', 0], silver: ['#b7bec7', 'Silver', '2', 3], gold: ['#e2b33c', 'Gold', '3', 6],
       estate: ['#8fbf6a', 'Estate', '1VP', 2], province: ['#2f7a3d', 'Province', '6VP', 8],
@@ -90,9 +123,9 @@ defineGame({
       const [f, n, v, cost] = T[t];
       let s = A.card(x, y, 30, 42, f, {}) + A.rect(x + 4, y + 4, 22, 9, C.white, { rx: 2, sw: 0, opacity: 0.9 }) + A.text(x + 15, y + 8.5, n, { size: 5, weight: 800 });
       if (v[0] === '+') s += A.text(x + 15, y + 24, v, { size: 5.5, weight: 800 });
-      else if (v.indexOf('VP') > 0) s += A.circle(x + 15, y + 24, 8, C.paper, { sw: 1 }) + A.text(x + 15, y + 24.5, v, { size: 5, weight: 800 });
-      else s += A.circle(x + 15, y + 24, 8, '#e8c547', { sw: 1 }) + A.text(x + 15, y + 24.5, v, { size: 9, weight: 800 });
-      return s + A.circle(x + 8, y + 35, 3.8, '#e8c547', { sw: 0.7 }) + A.text(x + 8, y + 35.3, cost, { size: 5, weight: 800 });
+      else if (v.indexOf('VP') > 0) s += A.use(A.path('M4 3 h16 v8 q0 8 -8 11 q-8 -3 -8 -11 z', { fill: '#2f7a3d', sw: 1.3 }), x + 7, y + 16, 16) + A.text(x + 15, y + 22.5, parseInt(v, 10), { size: 6.5, weight: 800, fill: C.white });
+      else s += A.use(I['c' + v].draw(A), x + 7, y + 16, 16);
+      return s + A.use(I['c' + cost].draw(A), x + 3.5, y + 30.5, 9);
     };
     const back = (x, y) => A.card(x, y, 30, 42, '#7d5532', {}) + A.rect(x + 8, y + 8, 14, 26, 'none', { rx: 2, stroke: '#e8c547', sw: 1.2 });
     const DECK = [8, 146], DISC = [282, 146], PROV = [8, 6];
@@ -110,31 +143,31 @@ defineGame({
     const deck = (keys) => keys.map(k => [k, DECK, null]);
     const prov = ['prov', PROV, 'province'];
     return [
-      { step: 0, say: 'Your hand: Village, Smithy, 2 Coppers and an Estate. **Action phase**: you have 1 Action.', svg: base + status(1, 1, 0) +
+      { step: 0, say: 'Hand: Village, Smithy, 2 Coppers, Estate. **Action phase**: you have 1 Action.', svg: base + status(1, 1, 0) +
         show([...deck(['silver', 'gold', 'c3', 'e2', ...NEW]), prov, ['village', H(0), 'village'], ['smithy', H(1), 'smithy'], ['c1', H(2), 'copper'], ['c2', H(3), 'copper'], ['e1', H(4), 'estate']]) + A.glow(63, 167, 24, 'g-hand') },
-      { step: 0, say: 'Play **Village**: +1 Card (you draw a Silver) and +2 Actions.', svg: base + status(2, 1, 0, 1) +
+      { step: 0, say: 'Play **Village**: +1 Card (a Silver), +2 Actions.', svg: base + status(2, 1, 0, 1) +
         show([...deck(['gold', 'c3', 'e2', ...NEW]), prov, ['village', P(0), 'village'], ['smithy', H(0), 'smithy'], ['c1', H(1), 'copper'], ['c2', H(2), 'copper'], ['e1', H(3), 'estate'], ['silver', H(4), 'silver']]) },
-      { step: 0, say: 'Spend an Action on **Smithy**: +3 Cards. You draw Gold, Copper and another Estate.', svg: base + status(1, 1, 0) +
+      { step: 0, say: 'Spend an Action on **Smithy**: +3 Cards ({=gold}{=copper}{=estate}).', svg: base + status(1, 1, 0) +
         show([...deck(NEW), prov, ['village', P(0), 'village'], ['smithy', P(1), 'smithy'], ['c1', H(0), 'copper'], ['c2', H(1), 'copper'], ['e1', H(2), 'estate'], ['silver', H(3), 'silver'], ['gold', H(4), 'gold'], ['c3', H(5), 'copper'], ['e2', H(6), 'estate']]) },
-      { step: 1, say: '**Buy phase.** Play all your Treasures: 1 + 1 + 2 + 3 + 1 = **8 coins**. Estates do nothing in your hand.', svg: base + status(1, 1, 8, 3) +
+      { step: 1, say: '**Buy phase.** Play Treasures: {=copper}{=copper}{=silver}{=gold}{=copper} = **8 coins**. Estates do nothing.', svg: base + status(1, 1, 8, 3) +
         show([...deck(NEW), prov, ['village', P(0), 'village'], ['smithy', P(1), 'smithy'], ['c1', P(2), 'copper'], ['c2', P(3), 'copper'], ['silver', P(4), 'silver'], ['gold', P(5), 'gold'], ['c3', P(6), 'copper'], ['e1', H(0), 'estate'], ['e2', H(1), 'estate']]) },
-      { step: 1, say: 'Spend 8 on a **Province** (6 VP). It goes to your **discard pile**, not your hand.', svg: base + status(1, 0, 0) +
+      { step: 1, say: 'Buy a {province} (6 {=vp}). It goes to your **discard pile**, not your hand.', svg: base + status(1, 0, 0) +
         show([...deck(NEW), ['village', P(0), 'village'], ['smithy', P(1), 'smithy'], ['c1', P(2), 'copper'], ['c2', P(3), 'copper'], ['silver', P(4), 'silver'], ['gold', P(5), 'gold'], ['c3', P(6), 'copper'], ['e1', H(0), 'estate'], ['e2', H(1), 'estate'], ['prov', DISC, 'province']]) + A.glow(297, 167, 21, 'g-disc') },
-      { step: 2, say: '**Clean-up.** Everything you played and still hold goes to the discard pile. Draw a fresh hand of **5**.', svg: base + status(1, 1, 0) +
+      { step: 2, say: '**Clean-up.** Discard everything played and held. Draw **5**.', svg: base + status(1, 1, 0) +
         show([['prov', DISC, 'province'], ...['village', 'smithy', 'c1', 'c2', 'silver', 'gold', 'c3', 'e1'].map((k, i) => [k, DISC, ['village', 'smithy', 'copper', 'copper', 'silver', 'gold', 'copper', 'estate'][i]]), ['e2', DISC, 'estate'],
           ...NEW.map((k, i) => [k, H(i), NEWT[i]])]) },
     ];
   },
 
   art(A) {
-    const C = A.C;
+    const C = A.C, I = this.icons;
     let o = A.bg('#d8c69c');
     o += A.rect(0, 0, 320, 106, '#cdb98b', { sw: 0, rx: 0 });
     const pile = (x, y, fill, cost, name, dark) => {
       let s = A.rect(x + 3, y - 3, 30, 40, '#efe6cf', { rx: 4, sw: 1 }) + A.rect(x + 1.5, y - 1.5, 30, 40, '#efe6cf', { rx: 4, sw: 1 });
       s += A.card(x, y, 30, 40, fill, {});
       s += A.text(x + 15, y + 15, name, { size: name.length > 6 ? 5.2 : 6, weight: 800, fill: dark ? C.ink : C.white });
-      s += A.circle(x + 9, y + 32, 5, '#e8c547', { sw: 0.8 }) + A.text(x + 9, y + 32.5, cost, { size: 6.5, weight: 800 });
+      s += A.use(I['c' + cost].draw(A), x + 3, y + 26, 12);
       return s;
     };
     const basics = [['#c08245', 0, 'Copper'], ['#b7bec7', 3, 'Silver', 1], ['#e2b33c', 6, 'Gold', 1], ['#8fbf6a', 2, 'Estate', 1], ['#5ea25a', 5, 'Duchy'], ['#2f7a3d', 8, 'Province']];
@@ -143,13 +176,14 @@ defineGame({
     kingdom.forEach(([n, c], i) => { o += pile(6 + i * 36, 60, '#efe2c2', c, n, 1); });
     // deck + discard
     o += A.rect(252, 70, 30, 42, '#6f4a2c', { rx: 4, sw: 1 }) + A.card(250, 66, 30, 42, '#7d5532', {}) + A.rect(256, 72, 18, 30, 'none', { rx: 2, stroke: '#e8c547', sw: 1.2 });
-    o += A.card(286, 64, 30, 42, '#c08245', { rotate: 8 }) + A.text(301, 85, '1', { size: 13, weight: 800, fill: C.white });
+    o += A.group(A.card(286, 64, 30, 42, '#c08245', {}) + A.use(I.c1.draw(A), 291, 75, 20), 'rotate(8 301 85)');
     // hand of 5
     const hand = [['#efe2c2', 'Village', '', 1], ['#efe2c2', 'Smithy', '', 1], ['#c08245', 'Copper', '1'], ['#b7bec7', 'Silver', '2', 1], ['#8fbf6a', 'Estate', '1VP', 1]];
     hand.forEach(([f, n, v, d], i) => {
       const t = i - 2, x = 125 + t * 34, y = 128 + Math.abs(t) * 5;
       let s = A.card(x, y, 40, 58, f, { title: n });
-      if (v) s += A.circle(x + 20, y + 36, 11, f === '#8fbf6a' ? '#2f7a3d' : '#e8c547', { sw: 1 }) + A.text(x + 20, y + 36.5, v, { size: v.length > 1 ? 8 : 11, weight: 800, fill: f === '#8fbf6a' ? C.white : C.ink });
+      if (v === '1VP') s += A.use(I.vp.draw(A), x + 9, y + 24, 22);
+      else if (v) s += A.use(I['c' + v].draw(A), x + 8, y + 24, 24);
       else s += A.rect(x + 9, y + 24, 22, 18, d ? '#a7c4d9' : C.cream, { rx: 2, sw: 0.8 }) + A.text(x + 20, y + 49, n === 'Village' ? '+2 Act' : '+3 Card', { size: 6, weight: 700 });
       o += A.group(s, `rotate(${t * 6} ${x + 20} ${y + 58})`);
     });

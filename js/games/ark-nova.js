@@ -11,129 +11,153 @@ defineGame({
   profile: { complexity: 4, luck: 3, interaction: 2, conflict: 1, talk: 1, planning: 4 },
   color: '#3f7f6a',
 
-  pitch: 'Design a modern zoo: build enclosures, house animals from 255 unique cards, and fund conservation projects until your two score tracks meet.',
-  theme: 'You are planning a scientifically run zoo that draws visitors and supports conservation projects around the world.',
+  // Tokens and tracks drawn once: used inline ({appeal}) and on the board in art/walk.
+  icons: {
+    money: { name: 'money', draw: A => A.circle(12, 12, 9.5, '#e9b93a', { sw: 1.4 }) + A.circle(12, 12, 6.6, 'none', { sw: 0.9, stroke: '#a87f15' }) },
+    appeal: { name: 'appeal', draw: A => A.path('M3 6.5 h18 v3.5 a2 2 0 0 0 0 4 v3.5 h-18 v-3.5 a2 2 0 0 0 0 -4 z', { fill: '#e07b2e', sw: 1.3 }) + A.line(15, 8.5, 15, 15.5, { stroke: '#fff', sw: 1.2, dash: '1.6 1.6' }) + A.star(9, 12, 3.6, '#fff', { sw: 0 }) },
+    conservation: { name: 'conservation', draw: A => A.circle(12, 12, 9.5, '#2a9a96', { sw: 1.4 }) + A.path('M7 17 C6.5 10 11 6 17.5 6.5 C18 13 13.5 17.5 7 17 z', { fill: '#fff', sw: 0 }) + A.path('M7.5 16.5 L14 10', { stroke: '#2a9a96', sw: 1.2 }) },
+    reputation: { name: 'reputation', draw: A => A.path('M12 2.5 L20 5.5 V11.5 C20 16.5 16.5 19.8 12 21.5 C7.5 19.8 4 16.5 4 11.5 V5.5 Z', { fill: '#7d55b5', sw: 1.3 }) + A.star(12, 11.5, 5, '#fff', { sw: 0 }) },
+    xtoken: { name: 'X-token', draw: A => A.circle(12, 12, 9.5, '#f2e6cc', { sw: 1.4 }) + A.path('M8.3 8.3 L15.7 15.7 M15.7 8.3 L8.3 15.7', { stroke: '#2a2420', sw: 2.6 }) },
+    enclosure: { name: 'enclosure', draw: A => A.hex(12, 12, 10.5, '#d8b878', { sw: 1.3, stroke: '#7a5a33' }) + A.circle(12, 14.5, 3, '#7a5a33', { sw: 0 }) + [[8, 10.5], [10.7, 8.2], [13.3, 8.2], [16, 10.5]].map(([x, y]) => A.circle(x, y, 1.35, '#7a5a33', { sw: 0 })).join('') },
+    kiosk: { name: 'kiosk', draw: A => A.hex(12, 12, 10.5, '#e07b2e', { sw: 1.3 }) + A.text(12, 12.5, 'K', { size: 10, weight: 800, fill: '#fff' }) },
+    water: { name: 'water', draw: A => A.hex(12, 12, 10.5, '#8cc0d9', { sw: 1.3, stroke: '#4d7f99' }) + A.path('M6 10 q1.5 -2 3 0 t3 0 t3 0 t3 0 M6 14.5 q1.5 -2 3 0 t3 0 t3 0 t3 0', { stroke: '#fff', sw: 1.4 }) },
+    rock: { name: 'rock', draw: A => A.hex(12, 12, 10.5, '#9aa0a8', { sw: 1.3, stroke: '#5e636a' }) + A.poly([[5.5, 17], [10, 8], [13, 12.5], [15, 9.5], [18.5, 17]], '#6d727a', { sw: 0.9 }) },
+  },
 
-  goal: { big: 'Cross the tracks', text: 'Your **appeal** marker climbs one way and your **conservation** marker the other. The player whose markers have crossed **furthest** (score = how far past each other they are) wins.' },
+  pitch: 'Play animals into enclosures for appeal and fund projects for conservation; the two tracks crossing furthest wins.',
+
+  goal: { big: 'Cross the tracks', text: 'Your **appeal** marker climbs one way and your **conservation** marker the other. Your score is how far they have passed each other; **highest** wins.' },
 
   turn: {
     type: 'choose',
-    intro: 'On your turn, use ONE of your 5 action cards. Its slot (1–5) is its strength:',
-    outro: 'Used card moves to slot 1; the others shift right',
+    intro: 'Use ONE of your 5 action cards; its slot (1–5) is its strength. (Or instead: move any card to slot 1 and take 1 X-token, unless you already hold 5.)',
+    outro: 'Used card moves to slot 1; the cards that were left of it shift right',
     steps: [
-      { verb: 'Animals', text: 'Play an animal card into a **free enclosure** big enough for it, paying its cost; gain appeal.' },
-      { verb: 'Cards', text: 'Draw cards from the deck (more at higher strength); at full strength take one from the display instead.' },
-      { verb: 'Build', text: 'Place an enclosure or kiosk on your zoo map; strength is the **max size**, £2 per space.' },
-      { verb: 'Association', text: 'Send a worker for reputation, a partner zoo, a university, or to support a **conservation project**.' },
-      { verb: 'Sponsors', text: 'Play a sponsor card of level up to the strength, or take that much money and advance the break.' },
+      { verb: 'Animals', text: 'Pay an animal’s {money} cost and place it in an **empty {=enclosure} enclosure** at least its size; gain its {appeal}. The card’s table says how many animals per strength.' },
+      { verb: 'Cards', text: 'Advance the break **2**, then draw from the deck (more at higher strength; the table may make you discard 1). At strength 5, instead take any 1 display card (**snap**).' },
+      { verb: 'Build', text: 'Build **one** {enclosure}, {kiosk}, pavilion or petting zoo of size ≤ strength; pay 2 {=money} per space.' },
+      { verb: 'Association', text: 'Place a worker on **one** task of value ≤ strength: **2** +2 {reputation}, **3** partner zoo, **4** university, **5** support a **conservation project** for {=conservation}.' },
+      { verb: 'Sponsors', text: 'Play one sponsor card of level ≤ strength, **or** advance the break that many spaces and take that much {=money}.' },
     ],
   },
 
-  tension: 'The card you just used drops to strength 1, so every turn you trade a strong action now against setting up stronger ones next turn.',
+  tension: 'Each turn: use a strong card now and reset it to strength 1, or a weak one so your strong cards keep climbing.',
 
-  flow: [
-    { label: 'Fund', items: ['Money at each break', 'Appeal raises income', 'Kiosks and sponsors'] },
-    { label: 'Build', items: ['Enclosures on the map', 'Animals in enclosures', 'Partner zoos, universities'] },
-    { label: 'Score', items: ['Appeal from animals', 'Conservation from projects', 'Upgrade action cards'] },
+  structure: [
+    { label: 'Setup', text: 'Zoo maps, action cards, 25 {=money}, keep 4 of 8 cards, 2 final-scoring cards (details below).' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Each turn: one action card, or take an {=xtoken}. No rounds.' },
+    { label: 'Break', repeat: 'when the break token reaches the end', text: 'After the turn that triggers it, that player takes an {=xtoken} (max 5). Then everyone: discard to **3** cards; remove multiplier, venom and constriction tokens; take back association workers (refill partner zoos and universities); discard display folders 1–2 and refill; take income: {=money} by appeal, kiosks, and income icons. Reset the break token.' },
+    { label: 'Tracks cross', text: 'When a player’s {=appeal} and {=conservation} markers share a scoring area or pass each other (checked at the end of a turn or in a break), the end is triggered.' },
+    { label: 'Final scoring', text: 'Add final-scoring cards and end-of-game card effects. Score = appeal minus the target number of your conservation space; highest wins.' },
   ],
 
-  end: { trigger: 'one player’s appeal and conservation markers cross', detail: 'Everyone else then takes one final turn. Final-scoring cards and endgame conservation bonuses are added before comparing.' },
+  points: [
+    ['{=appeal} Appeal', 'Printed on animals (+ some sponsors); pavilions 1 each; reputation past 15 gives 1 per step; covering your whole map +7.'],
+    ['{=conservation} Conservation (CP)', 'Supporting projects, donations, some animals, sponsors and bonuses.'],
+    ['CP value', 'The 1st–10th CP are worth 2 points each, every later CP 3 (the scoring areas on the board).'],
+    ['Final-scoring card', '1–4 CP for its condition. You hold 2; when anyone first reaches 10 CP (or at game end if no one did), everyone discards 1.'],
+    ['End-of-game effects', 'Some sponsors give appeal or CP at game end.'],
+    ['Final score', 'Your appeal minus the lowest appeal value in your conservation marker’s scoring area; can be negative. Tie: most conservation projects supported, then shared.'],
+  ],
+
+  end: { trigger: 'one player’s appeal and conservation markers meet in one scoring area or pass each other', detail: 'If this happens at the end of your turn, every other player takes one more turn; if during a break, everyone (you too) takes one more turn. Then final scoring.' },
   scoring: [
-    { label: 'Appeal (animals)', share: 6 },
-    { label: 'Conservation projects', share: 3 },
+    { label: '{=appeal} Appeal (animals)', share: 6 },
+    { label: '{=conservation} Conservation projects', share: 3 },
     { label: 'Final-scoring card', share: 1 },
   ],
 
   ref: {
-    title: 'Conservation points',
+    title: 'Tokens and scoring',
     rows: [
-      ['First 10 CP', '2 VP each'],
-      ['Every CP after 10', '3 VP each'],
-      ['Break', 'income from appeal, refill display'],
-      ['X-token', '+1 strength on any one action'],
+      ['Tokens', '{money} {appeal} {conservation} {reputation} {xtoken}'],
+      ['{=enclosure} Build', '2 {=money} per space; size ≤ strength'],
+      ['{=conservation} 1st–10th CP', '{=vp}{=vp} each'],
+      ['{=conservation} Every CP after 10', '{=vp}{=vp}{=vp} each'],
+      ['{=reputation} Association', '**2** +2 reputation · **3** partner zoo · **4** university · **5** project'],
+      ['{=xtoken} X-token', '+1 strength each, any number per action; hold up to 5'],
     ],
   },
 
-  example: 'Your Build card sits in slot **4**. You build a size‑4 enclosure, paying £8, ready for the big cat in your hand. Build slides back to slot 1 and your other cards shift right, so next turn Animals is stronger and you can house the cat for its cost and gain its **appeal**.',
+  example: 'Build is in slot **4**. You build a size‑4 enclosure for 8 money, ready for the big cat in your hand. Build drops to slot 1 and the cards that were left of it shift right, so next turn Animals is stronger: pay the cat’s cost and gain its **{appeal}**.',
 
   setup: [
-    'Each player takes a zoo map, 5 action cards (Animals starts in slot 1), £25 and 8 starting cards, keeping 4.',
-    'Place appeal markers on the track and conservation markers at 0 on the opposite side.',
-    'Lay out the 6-card display, base conservation projects and the association board.',
+    'Put the break token on the start space for your player count. Place 4 random bonus tiles, the 6-card display, and the association board with 1 partner zoo per continent, 1 university of each kind and 3 base conservation projects (4 with 4 players).',
+    '2 players: cover the left level of the left project, the middle of the middle and the right of the right, plus the left column of donation spaces, with 6 tokens of an unused colour; these are blocked.',
+    'Each player: zoo map (Map A in a first game, with its printed 3-space enclosure), 5 action cards side I (Animals in slot 1, the rest random), 25 {=money}, 7 player tokens on the map’s left edge, 1 active worker (3 more lying below).',
+    'Draw 8 cards and keep 4; draw 2 final-scoring cards and keep both secret.',
+    'Conservation and reputation markers on their first spaces; {=appeal} appeal at 0, 1, 2, 3 in turn order.',
   ],
 
   terms: [
-    ['Appeal', 'Visitors; raises income and moves toward the conservation marker.'],
-    ['Conservation (CP)', 'Points from projects; moves toward appeal from the other side.'],
-    ['Strength', 'The slot number (1–5) of an action card; higher is better.'],
-    ['Upgrade', 'Flip an action card to its stronger side (unlocked via conservation).'],
-    ['Reputation', 'How far into the card display you may reach.'],
+    ['{=appeal} Appeal', 'Sets your break income; moves toward the conservation marker.'],
+    ['{=conservation} Conservation (CP)', 'Points from projects; moves toward appeal from the other end.'],
+    ['Strength', 'An action card’s slot number (1–5), +1 per X-token spent; higher is stronger.'],
+    ['Upgrade', 'Flip an action card to side II: from 2 CP, the reputation track, or your 2nd partner zoo or 2nd university.'],
+    ['{=reputation} Reputation', 'Your reach into the display: folders up to your marker. Max 9 until Cards is upgraded.'],
   ],
 
   gotchas: [
-    'Using a card resets it to **slot 1**; strength comes from not using it for a while.',
-    'Animals need an enclosure **at least their size** and often icons like water or rock next to it.',
-    'Each conservation project level can be supported by only **one** player.',
+    'Using a card resets it to **slot 1**; only the cards left of it shift right.',
+    'Animals need an **empty** enclosure **at least their size**, sometimes next to {water} or {rock}; one animal per standard enclosure.',
+    'Each conservation project level goes to only **one** player, and you may support each project only **once**.',
+    'Every Cards action advances the break **2**; at the break, hand limit is **3**.',
+    'Association: placing on a task where you already have a worker costs **2** workers; other colours don’t count.',
   ],
 
   tips: [
-    'Upgrade your Animals or Association card early; upgrades unlock strong extra effects.',
-    'Small, cheap animals give steady appeal; don’t wait too long for the perfect big one.',
-    'Plan the order of your 5 cards a few turns ahead so the one you need is in slot 4 or 5.',
+    'Upgrade Animals or Association early; their upgraded sides add strong effects.',
+    'Small, cheap animals give steady {=appeal}; don’t hold out for a big one.',
+    'Plan your card order a few turns ahead so the one you need sits in slot 4 or 5.',
   ],
 
   extended: [
     { title: 'Upgraded action cards', items: [
-      'Each action card has a basic side (I) and an upgraded side (II). You upgrade by reaching marked spaces on the conservation track and from some card or project rewards.',
-      '**Animals II**: plays more animals at lower strength and can take an animal from the display within your reputation range.',
-      '**Build II**: lets you build several different buildings in one action and unlocks the special enclosures (reptile house, large bird aviary).',
-      '**Association II**: several different tasks in one action (total value up to the strength) and lets you **donate** money for conservation points.',
-      '**Cards II** draws more and snaps from the display at lower strength; **Sponsors II** can play several sponsors at once.',
+      'Each action card has a basic side (I) and an upgraded side (II). Upgrades come from 2 CP (or take a worker instead), the reputation track, and your 2nd partner zoo and 2nd university. You can’t upgrade all five.',
+      '**Animals II**: may also play animals from the display within reputation range (pay the folder number extra); at strength 5+, gain 1 reputation first.',
+      '**Build II**: several **different** buildings, total size ≤ strength; adds the reptile house and large bird aviary (size 5) and lets you build on spaces marked II.',
+      '**Association II**: several **different** tasks, total value ≤ strength; a project card may come from the display (pay the folder number); plus 1 **donation**: pay the lowest visible amount for 1 CP. 3rd and 4th partner zoos need this side.',
+      '**Cards II**: draw from the display within reputation range and/or the deck; snap from strength 3; reputation can pass 9.',
+      '**Sponsors II**: several sponsors with total level ≤ strength + 1, also from the display (pay the folder number); the break option pays double money.',
     ] },
     { title: 'Card types', items: [
-      '**Animals**: cost, enclosure size, and requirements (water or rock spaces nearby, a petting zoo, reputation). They give appeal, plus icons for continents and animal categories.',
-      '**Sponsors**: a level (played with Sponsors of at least that strength), and ongoing effects, income or special buildings.',
-      '**Conservation projects**: played with the Association action; they need a number of matching icons in your zoo.',
-      '**Final scoring cards**: secret goals you keep in hand; they add conservation points at game end.',
+      '**Animals**: cost, enclosure size and requirements (water or rock nearby, petting zoo, reputation). They give appeal plus continent and category icons.',
+      '**Sponsors**: a level (Sponsors strength must reach it) and ongoing effects, income or special buildings.',
+      '**Conservation projects**: played with Association; they need a number of matching icons in your zoo.',
+      '**Final scoring cards**: secret goals that add CP at game end.',
     ] },
     { title: 'Enclosures and buildings', items: [
-      'Standard enclosures (size 1–5) hold one animal and flip to their occupied side when filled; an empty one can be needed later, so build ahead.',
-      'Kiosks earn money at the break from adjacent pavilions and other buildings; pavilions give 1 appeal.',
-      'Every building after the first must touch one you already have. Covering bonus spaces on the map gives one-time rewards.',
+      'Standard enclosures (size 1–5) hold one animal and flip when filled. Build ahead: each animal needs an empty one. Special enclosures (petting zoo, reptile house, large bird aviary; one each) hold several animals of their type.',
+      '{kiosk}s: at least 2 empty spaces between any two. At each break, each kiosk earns 1 money per adjacent pavilion, special enclosure, unique building or **occupied** standard enclosure. Pavilions give 1 appeal when built.',
+      'Pay 2 money per space. Buildings can’t cover {=water} water or {=rock} rock. Your first building must cover a border space; each later one must touch one you have. Covering a bonus space gives its reward once.',
     ] },
     { title: 'Association tasks', items: [
-      'Place 1 association worker on a task of value up to the strength: **2** reputation, **3** partner zoo (a continent), **4** university, **5** support a conservation project.',
-      'If a task area already has workers, you need extra workers to use it again this break.',
-      'Supporting a project: show the required icons, take the level you qualify for (more icons = more CP). Each level can be claimed by **one** player only.',
+      'You need an active worker. Place 1 on a task of value ≤ strength: **2** +2 reputation, **3** partner zoo (−3 money per matching continent icon on animals; max 4), **4** university (research icons, reputation; one raises hand limit to 5), **5** support a conservation project.',
+      'If 1 of your workers is already on that task, place 2; with 3 of yours there, it is closed until the break. Workers return at each break.',
+      'Supporting a project: play a project card from hand (or support one in play), then cover one unclaimed level whose condition you meet (usually a count of icons on your cards, partner zoos and universities) with a token from your map’s left edge. Gain its CP and the uncovered bonus.',
     ] },
-    { title: 'The break', items: [
-      'Taking the X-token action, some sponsors and the Sponsors money option push the break marker. When it reaches the end, the break happens.',
-      'Discard down to the hand limit, take workers back, remove the 2 leftmost display cards and refill.',
-      'Income: money from your appeal level, plus kiosks and sponsor income.',
+    { title: 'What advances the break', items: [
+      'Every Cards action (2), the Sponsors money option (strength) and some card effects. The X-token action does not. The player who moves it onto the last space takes 1 {xtoken}.',
     ] },
-    { title: 'X-tokens and reputation', items: [
-      'Instead of an action, you may move any card to slot 1 to take an **X-token**. Spend X-tokens to add +1 strength each to a later action.',
-      'Reputation sets how far into the 6-card display you can reach and gives bonuses at marked levels.',
-    ] },
-    { title: 'Final score', items: [
-      'Appeal counts up from one end; conservation points count down from the other at 2 VP per CP up to 10, then 3 VP per CP.',
-      'When anyone’s markers cross, everyone else gets one last turn. Add final scoring cards and endgame bonuses; your score is how far your two markers have passed each other (it can be negative).',
+    { title: 'Conservation track bonuses', items: [
+      '**2 CP**: upgrade an action card or activate a worker. **5 / 8 CP**: 5 money or a bonus tile there. **10 CP**: the first time anyone reaches it, all players discard 1 final-scoring card.',
+      'Reputation counts to 15; further reputation gives 1 appeal per step.',
     ] },
   ],
 
   walk(A) {
-    const C = A.C, r = 10.5;
+    const C = A.C, r = 10.5, I = this.icons, ic = (k, x, y, size) => A.use(I[k].draw(A), x - size / 2, y - size / 2, size);
     const hx = (q, rr) => [24 + q * r * 1.732 + (rr % 2) * r * 0.866, 22 + rr * r * 1.5];
     let board = A.bg('#dfe7d3') + A.rect(6, 6, 196, 132, '#c5d6a8', { rx: 6, sw: 1.4 });
     const water = ['6,1', '7,1', '6,2'], rock = ['1,5', '2,5'];
     for (let rr = 0; rr < 7; rr++) for (let q = 0; q < 9; q++) {
       const [x, y] = hx(q, rr), id = q + ',' + rr;
-      board += A.hex(x, y, r, water.includes(id) ? '#8cc0d9' : rock.includes(id) ? '#9aa0a8' : '#e8efd9', { sw: 0.6, stroke: '#7d8f68' });
+      board += water.includes(id) ? ic('water', x, y, 24) : rock.includes(id) ? ic('rock', x, y, 24) : A.hex(x, y, r, '#e8efd9', { sw: 0.6, stroke: '#7d8f68' });
     }
-    // existing small enclosure with a bird, and a kiosk
-    board += A.hex(...hx(5, 4), r, '#d8b878', { sw: 1.2 }) + A.bird(...hx(5, 4), 12, '#3e7cb0');
-    board += A.hex(...hx(7, 5), r, '#e07b2e', { sw: 1.2 }) + A.text(...hx(7, 5), 'K', { size: 7, weight: 800, fill: C.white });
-    const encl = [[2, 2], [3, 2], [2, 3], [3, 3]];
+    // existing buildings: a bird enclosure on the border, a kiosk touching it; the new enclosure touches both
+    board += A.hex(...hx(5, 6), r, '#d8b878', { sw: 1.2 }) + A.bird(...hx(5, 6), 12, '#3e7cb0');
+    board += ic('kiosk', ...hx(5, 5), 24);
+    const encl = [[3, 4], [4, 4], [3, 5], [4, 5]];
     const ex = encl.reduce((s, [q, rr]) => s + hx(q, rr)[0], 0) / 4, ey = encl.reduce((s, [q, rr]) => s + hx(q, rr)[1], 0) / 4;
     const enclosure = A.k('encl', encl.map(([q, rr]) => A.hex(...hx(q, rr), r, '#d8b878', { sw: 1.3, stroke: '#7a5a33' })).join(''));
     const ghost = A.k('ghost', encl.map(([q, rr]) => A.hex(...hx(q, rr), r, 'rgba(255,255,255,.55)', { sw: 1.4, dash: '3 2' })).join(''));
@@ -144,48 +168,49 @@ defineGame({
     const row = (order) => order.map((n, i) => A.k('ac-' + n, A.card(12 + i * 61, 158, 50, 34, AC[n], {}) + A.text(37 + i * 61, 175, n, { size: 6.5, weight: 800, fill: C.white }))).join('');
     const o1 = ['Cards', 'Animals', 'Association', 'Build', 'Sponsors'], o2 = ['Build', 'Cards', 'Animals', 'Association', 'Sponsors'], o3 = ['Animals', 'Build', 'Cards', 'Association', 'Sponsors'];
     // right panel: money, hand card, appeal
-    board += A.text(214, 18, 'Money', { size: 7, anchor: 'start', fill: '#6b6255' });
-    const money = (m) => A.text(214, 32, '£' + m, { size: 14, weight: 800, anchor: 'start' });
+    board += A.text(214, 18, 'Money', { size: 7, anchor: 'start', fill: '#6b6255' }) + ic('money', 221, 32, 15);
+    const money = (m) => A.text(232, 32, String(m), { size: 14, weight: 800, anchor: 'start' });
     const catCard = A.k('catcard', A.card(260, 10, 52, 74, '#e9d6a7', {}) + A.text(286, 22, 'Big cat', { size: 6, weight: 800 }) +
-      A.text(286, 60, 'size 4 · £15', { size: 5.5 }) + A.text(286, 70, '+5 appeal', { size: 5.5, fill: C.orange }));
+      A.text(286, 60, 'size 4 · cost 15', { size: 5.5 }) + A.text(286, 70, '+5 appeal', { size: 5.5, fill: C.orange }));
     const cat = (x, y) => A.k('cat', A.circle(x, y, 9, '#c98a2e', { sw: 1.2 }) + A.circle(x - 3, y - 2, 1, C.ink, { sw: 0 }) + A.circle(x + 3, y - 2, 1, C.ink, { sw: 0 }) + A.path(`M${x - 6} ${y - 6} l2 -5 l3 4 M${x + 6} ${y - 6} l-2 -5 l-3 4`, { sw: 1.1 }));
-    board += A.rect(212, 96, 102, 40, '#f6f1e2', { rx: 5, sw: 1.2 }) + A.text(263, 105, 'Appeal', { size: 7, weight: 700, fill: C.orange });
+    board += A.rect(212, 96, 102, 40, '#f6f1e2', { rx: 5, sw: 1.2 }) + ic('appeal', 247, 105, 11) + A.text(266, 105, 'Appeal', { size: 7, weight: 700, fill: C.orange });
     for (let i = 0; i < 9; i++) board += A.line(220 + i * 11, 114, 220 + i * 11, 128, { stroke: '#c9c0a8', sw: 1 }) + (i % 2 ? '' : A.text(220 + i * 11, 132, 10 + i, { size: 5.5, fill: '#6b6255' }));
-    const appeal = (v) => A.k('appeal', A.circle(220 + (v - 10) * 11, 121, 5, C.orange, { sw: 1.2 }));
-    const coins = (pos) => pos.map(([x, y], i) => A.k('coin' + i, A.circle(x, y, 5, C.yellow, { sw: 1 }) + A.text(x, y + 0.5, '2', { size: 6, weight: 800 }))).join('');
+    const appeal = (v) => A.k('appeal', ic('appeal', 220 + (v - 10) * 11, 121, 13));
+    const coins = (pos) => pos.map(([x, y], i) => A.k('coin' + i, A.circle(x, y, 5, '#e9b93a', { sw: 1 }) + A.text(x, y + 0.5, '2', { size: 6, weight: 800, fill: '#5e4508' }))).join('');
     const atBank = [0, 1, 2, 3].map(i => [218 + i * 11, 48]), atEncl = [0, 1, 2, 3].map(i => [ex - 16 + i * 11, ey]);
     return [
-      { step: 2, say: 'Your **Build** card sits in slot 4, so this turn it has strength 4.',
+      { step: 2, say: '**Build** sits in slot 4: strength 4 this turn.',
         svg: board + row(o1) + money(25) + coins(atBank) + catCard + cat(286, 42) + appeal(11) + A.glow(220, 175, 24, 'g-build') },
-      { step: 2, say: 'Strength 4 = an enclosure of up to **4 spaces**. You pick a spot big enough for the size‑4 cat in your hand.',
+      { step: 2, say: 'Strength 4 = an enclosure of up to **4 spaces**: room for the size‑4 cat in your hand.',
         svg: board + row(o1) + money(25) + coins(atBank) + ghost + catCard + cat(286, 42) + appeal(11) + A.glow(ex, ey, 30, 'g-encl') },
-      { step: 2, say: 'Pay **£2 per space** (£8) and place the enclosure.',
+      { step: 2, say: 'Pay **2 money per space** (8) and place it touching your existing buildings.',
         svg: board + row(o1) + money(17) + enclosure + coins(atEncl) + catCard + cat(286, 42) + appeal(11) },
-      { step: 2, say: 'Build drops to **slot 1** and the cards before it shift right. Animals is now strength 3.',
+      { step: 2, say: 'Build drops to **slot 1**; the cards that were left of it shift right. Animals is now strength 3.',
         svg: board + row(o2) + money(17) + enclosure + catCard + cat(286, 42) + appeal(11) + A.glow(159, 175, 24, 'g-anim') },
-      { step: 0, say: 'Next turn, use **Animals**: pay the cat’s £15 and put it in the empty enclosure, which is big enough.',
+      { step: 0, say: 'Next turn, use **Animals**: pay the cat’s 15 money and place it in the empty enclosure.',
         svg: board + row(o2) + money(2) + enclosure + cat(ex, ey) + appeal(11) + A.glow(ex, ey, 30, 'g-encl') },
-      { step: 0, say: 'The cat adds **+5 appeal**, and Animals now goes back to slot 1 while Build climbs to 2.',
+      { step: 0, say: 'The cat gives **+5 {=appeal}**. Animals drops to slot 1; Build climbs to slot 2.',
         svg: board + row(o3) + money(2) + enclosure + cat(ex, ey) + appeal(16) + A.glow(286, 121, 9, 'g-app') },
     ];
   },
 
   art(A) {
-    const C = A.C;
+    const C = A.C, I = this.icons, ic = (k, x, y, size) => A.use(I[k].draw(A), x - size / 2, y - size / 2, size);
     let o = A.bg('#dfe7d3');
     // zoo map board
     o += A.rect(6, 34, 196, 120, '#c5d6a8', { rx: 6, sw: 1.4 });
     const s = 12.5, ox = 22, oy = 48;
     const fill = (q, r) => {
       if (q >= 1 && q <= 3 && r <= 1) return '#d8b878';      // big enclosure
-      if (q >= 7 && q <= 8 && r >= 2 && r <= 3) return '#8cc0d9'; // water enclosure
-      if (q === 5 && r === 0) return '#e07b2e';               // kiosk
-      if (r === 4 && q >= 5 && q <= 6) return '#9aa0a8';      // rock
+      if (q >= 7 && q <= 8 && r >= 2 && r <= 3) return 'water';  // water spaces
+      if (q === 4 && r === 3) return 'kiosk';
+      if (r === 4 && q >= 5 && q <= 6) return 'rock';
       return null;
     };
     for (let r = 0; r < 5; r++) for (let q = 0; q < 9; q++) {
       const x = ox + q * s * 1.732 + (r % 2) * s * 0.866, y = oy + r * s * 1.5;
-      o += A.hex(x, y, s, fill(q, r) || '#e8efd9', { sw: 0.6, stroke: '#7d8f68' });
+      const f = fill(q, r);
+      o += I[f] ? ic(f, x, y, s * 24 / 10.5) : A.hex(x, y, s, f || '#e8efd9', { sw: 0.6, stroke: '#7d8f68' });
     }
     // animals in enclosures
     o += A.circle(72, 56, 7, '#b5772e', { sw: 1 }) + A.circle(69, 54, 1, C.ink, { sw: 0 });
@@ -195,7 +220,7 @@ defineGame({
     for (let i = 0; i < 20; i++) o += A.line(14 + i * 15, 10, 14 + i * 15, 24, { stroke: '#c9c0a8', sw: 1 });
     o += A.arrow(16, 17, 128, 17, { stroke: '#e07b2e', sw: 3 });
     o += A.arrow(306, 17, 204, 17, { stroke: '#2a9a96', sw: 3 });
-    o += A.circle(128, 17, 6, '#e07b2e', { sw: 1.2 }) + A.circle(204, 17, 6, '#2a9a96', { sw: 1.2 });
+    o += ic('appeal', 128, 17, 16) + ic('conservation', 204, 17, 15);
     // action cards row 1–5
     const names = ['#8a5a33', '#7d55b5', '#3c8d4f', '#2f6db5', '#c8423b'];
     names.forEach((f, i) => { o += A.card(8 + i * 39, 160, 35, 34, f, { label: i + 1, size: 15 }); });
@@ -205,9 +230,9 @@ defineGame({
     o += A.card(264, 46, 44, 62, '#e9d6a7', {});
     o += A.path('M276 80 q10 -12 20 0 q-10 8 -20 0 z', { fill: '#3e7cb0', sw: 1 });
     // money and conservation project
-    o += A.circle(222, 128, 8, C.yellow, { sw: 1 }) + A.circle(234, 124, 8, C.yellow, { sw: 1 });
+    o += ic('money', 222, 130, 19) + ic('money', 236, 124, 19);
     o += A.rect(254, 116, 56, 40, '#f6f1e2', { rx: 4, sw: 1.2 });
-    o += A.rect(260, 126, 12, 12, '#2a9a96', { rx: 2, sw: 0.8 }) + A.rect(276, 126, 12, 12, '#e8efd9', { rx: 2, sw: 0.8 }) + A.rect(292, 126, 12, 12, '#e8efd9', { rx: 2, sw: 0.8 });
+    o += ic('conservation', 266, 132, 14) + A.rect(276, 126, 12, 12, '#e8efd9', { rx: 2, sw: 0.8 }) + A.rect(292, 126, 12, 12, '#e8efd9', { rx: 2, sw: 0.8 });
     o += A.note(128, 17, 72, 38, 'Appeal →', { w: 62 }) ;
     o += A.note(204, 17, 172, 38, '← Conservation', { w: 92 });
     o += A.note(60, 60, 100, 140, 'Enclosure', { w: 66 });

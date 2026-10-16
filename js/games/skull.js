@@ -4,83 +4,101 @@ defineGame({
   year: 2011,
   designer: 'Hervé Marly',
   family: 'hidden',
-  players: [3, 6], best: '4–6',
+  players: [3, 6], best: '5–6',
   time: [15, 45],
   age: 10,
   mechanics: ['bluffing', 'auction', 'press-your-luck', 'player-elimination', 'deduction'],
   profile: { complexity: 1, luck: 2, interaction: 5, conflict: 3, talk: 4, planning: 1 },
   color: '#7a2a3a',
 
-  pitch: 'Hide a skull among roses, then bid on how many flowers you can flip without hitting one. Pure nerve with four discs.',
-  theme: 'You are a biker-gang member daring your rivals to call your bluff, one skull at a time.',
+  // Discs seen from above. `tint` redraws a disc in a player's colour for the art and walkthrough.
+  icons: (() => {
+    const ring = '#8a6a5a';
+    const rose = (A, c) => {
+      let s = A.circle(12, 12, 10.5, c, { sw: 1.2 }) + A.circle(12, 12, 8, '#f2e6cc', { sw: 0 });
+      for (let i = 0; i < 5; i++) { const a = i * 72 * Math.PI / 180; s += A.circle(+(12 + 3.4 * Math.cos(a)).toFixed(2), +(12 + 3.4 * Math.sin(a)).toFixed(2), 2.9, '#d9446a', { sw: 0.6 }); }
+      return s + A.circle(12, 12, 2.1, '#e8c547', { sw: 0.6 });
+    };
+    const skull = (A, c) => A.circle(12, 12, 10.5, c, { sw: 1.2 }) + A.circle(12, 12, 8, '#1e1a18', { sw: 0 }) + A.circle(12, 10.8, 4.9, '#fff', { sw: 0 }) + A.rect(9.2, 13.6, 5.6, 4, '#fff', { sw: 0, rx: 0.8 }) +
+      A.circle(10, 10.6, 1.5, '#1e1a18', { sw: 0 }) + A.circle(14, 10.6, 1.5, '#1e1a18', { sw: 0 }) + A.line(11, 14.6, 11, 17, { stroke: '#1e1a18', sw: 0.7 }) + A.line(13, 14.6, 13, 17, { stroke: '#1e1a18', sw: 0.7 });
+    const disc = (A, c) => A.circle(12, 12, 10.5, c, { sw: 1.2 }) + A.circle(12, 12, 5.5, 'none', { stroke: '#fff', sw: 1, opacity: 0.6 });
+    const mat = (fill) => A => `<ellipse cx="12" cy="13" rx="11" ry="7.5" fill="${fill}" stroke="#2a2420" stroke-width="1.3"/>`;
+    return {
+      rose: { name: 'rose', draw: A => rose(A, ring), tint: rose },
+      skull: { name: 'skull', draw: A => skull(A, ring), tint: skull },
+      disc: { name: 'face-down disc', draw: A => disc(A, ring), tint: disc },
+      mat: { name: 'mat', draw: mat('#7a5a4a') },
+      'mat-won': { name: 'rose side', draw: A => mat('#f2e6cc')(A) + A.circle(5, 13, 1.8, '#d9668f', { sw: 0.6 }) + A.circle(19, 13, 1.8, '#d9668f', { sw: 0.6 }) + A.circle(12, 13, 2.2, '#d9446a', { sw: 0.6 }) },
+    };
+  })(),
 
-  goal: { big: 'Win 2 challenges', text: 'Win **two challenges** (flip as many roses as you bid), or be the last player with discs left.' },
+  pitch: 'Place rose or skull discs face down, then bid how many roses you can flip; win 2 bids or be the last with discs.',
+
+  goal: { big: 'Win 2 challenges', text: 'Win **two challenges** (flip as many roses as you bid), or be the last player with discs.' },
 
   turn: {
     type: 'round',
     intro: 'Each round goes through these phases:',
-    outro: 'Then a new round; the skull’s owner starts it',
+    outro: 'New round: the challenger starts',
     steps: [
-      { verb: 'Place', text: 'Everyone puts **one disc** face down on their mat at the same time.' },
-      { verb: 'Add or bid', text: 'In turn, either add another disc to your own stack or open the bidding with a number.' },
-      { verb: 'Raise/pass', text: 'Once a bid is made, each player must **raise** it or pass out of the round. Bids can’t exceed the discs on the table.' },
-      { verb: 'Flip', text: 'The top bidder flips that many discs, **all of their own first**, then the top discs of anyone else’s stacks.' },
+      { verb: 'Place', text: 'Everyone places **one disc** face down on their mat at once.' },
+      { verb: 'Add or bid', text: 'In turn, add one disc to your stack or start the bidding with a number. With no discs in hand, you must bid.' },
+      { verb: 'Raise/pass', text: 'In turn, each player **raises** or passes (out until next round). Bids can’t exceed the discs down; a bid of all of them ends bidding.' },
+      { verb: 'Flip', text: 'The top bidder flips that many discs: **all of their own first**, then the top disc of any stacks they choose.' },
     ],
   },
 
-  tension: 'Putting your skull down lets you sabotage a bidder, but a bid you can’t back with your own roses forces you to trust everyone else’s.',
+  tension: 'Placing your skull lets you sink a bidder, but bidding past your own roses means trusting everyone else’s stacks.',
 
-  flow: [
-    { label: 'Hide', items: ['Rose or skull?', 'Add more discs', 'Read the others'] },
-    { label: 'Bid', items: ['Open low', 'Raise or pass', 'Highest bidder flips'] },
-    { label: 'Reveal', items: ['All roses: flip your mat', 'Skull: lose a disc at random'] },
+  structure: [
+    { label: 'Setup', text: 'Each player takes a {=mat} and 4 discs in its colour: 3 {=rose} and 1 {=skull}.' },
+    { label: 'Rounds', repeat: 'until someone wins', text: 'Place, add or bid, raise or pass, then the top bidder flips. All discs return to hands.' },
+    { label: 'Game end', text: 'A second successful challenge wins; so does being the last player with discs.' },
   ],
 
   end: {
     trigger: 'a player wins their second challenge, or only one player still has discs',
-    detail: 'The first success flips your mat to its rose side; the second wins outright.',
+    detail: 'Your first success flips your mat to its rose side; the second wins.',
     results: [
       { side: 'Winner', text: 'the first player to win 2 challenges, or the last player with any discs.' },
-      { side: 'Out', text: 'a player who has lost all 4 discs.' },
     ],
   },
 
   ref: {
     title: 'Challenge results',
     rows: [
-      ['All roses', 'success: flip your mat (2nd success wins)'],
-      ['Hit someone else’s skull', 'its owner takes 1 of your discs at random, unseen'],
-      ['Hit your own skull', 'you discard 1 disc of your choice'],
-      ['Next round', 'skull owner starts; if it was yours, you pick who starts'],
-      ['Lost all 4 discs', 'you are out of the game'],
+      ['All {=rose}', 'success: flip your mat to {=mat-won}; a second success wins'],
+      ['Another player’s {=skull}', 'its owner takes 1 of your discs at random and discards it unseen'],
+      ['Your own {=skull}', 'you discard 1 disc of your choice, unseen'],
+      ['Next round', 'the challenger starts; if eliminated, the skull’s owner starts (own skull: you choose)'],
+      ['No discs left', 'you are out of the game'],
     ],
   },
 
-  example: 'Five discs are down. Ana bids **3**; Ben raises to 4, Cy passes, Ana passes. Ben flips his own 2 discs (roses), then Cy’s top disc: rose. He needs one more and flips Ana’s top disc: **skull**. Ana removes one of Ben’s 4 discs at random and discards it face down, so only Ben knows if he lost his skull.',
+  example: 'Five discs are down. Ana bids **3**; Ben raises to 4; Cy and Ana pass. Ben flips his own 2 discs ({=rose}{=rose}), then Cy’s top disc: {=rose}. He flips Ana’s top disc: {=skull}. Ana takes one of Ben’s 4 discs at random and discards it face down, so nobody else knows if it was his skull.',
 
   setup: [
-    'Give each player a mat and **4 discs**: 3 roses and 1 skull, matching the mat.',
+    'Give each player a {mat} and **4 discs** in its colour: 3 {rose}s and 1 {skull}.',
     'Mats start plain side up.',
-    'Pick a first player; everyone holds their discs hidden in hand.',
+    'Pick a first player. Keep your discs hidden in hand.',
   ],
 
   terms: [
-    ['Mat', 'Your coaster. Flipped to the rose side after your first success.'],
-    ['Stack', 'The face-down discs you have played this round.'],
-    ['Challenge', 'Your bid: the number of roses you claim you can flip.'],
-    ['Disc', 'One of your 4 pieces: a rose (safe) or the skull.'],
+    ['{=mat} Mat', 'Your coaster. Flips to the rose side ({=mat-won}) after your first success.'],
+    ['{=disc} Stack', 'Your face-down discs played this round.'],
+    ['Challenge', 'The winning bid: flip that many discs without hitting a {=skull}.'],
   ],
 
   gotchas: [
-    'The bidder must flip **all of their own** discs first, so your own skull always sinks you.',
-    'Lost discs are taken **at random** and kept hidden, so nobody else knows if you still have your skull.',
-    'You can only flip the **top** disc of another stack, one at a time; you choose which stacks to flip from.',
+    'The bidder flips **all of their own** discs first, so their own skull always sinks them.',
+    'Lost discs are taken **at random** and stay hidden, so nobody else knows if you still have your skull.',
+    'Flip only the **top** disc of another stack, one at a time; you choose which stacks.',
   ],
 
   tips: [
-    'Play a rose, then bid on your own stack: it’s the safest bid in the game.',
-    'Stacking extra discs makes your mat look dangerous even when it holds only roses.',
-    'When someone raises suspiciously high, ask yourself if they’re protecting their own skull.',
+    'Place roses, then bid no more than your own stack: the safest bid.',
+    'Adding extra discs makes your stack look dangerous even when it holds only roses.',
+    'A suspiciously high raise may protect the raiser’s own skull.',
   ],
 
   walk(A) {
@@ -92,15 +110,12 @@ defineGame({
       board += `<ellipse cx="${x}" cy="130" rx="44" ry="20" fill="${col}" stroke="${C.ink}" stroke-width="1.3"/>`;
     }
     const col = (p) => P[p][1];
-    const inHand = (p, i) => A.k(p + i, A.circle(P[p][0] - 27 + i * 18, 76, 7.5, col(p), { sw: 1.1 }));
+    const inHand = (p, i) => A.k(p + i, A.use(this.icons.disc.tint(A, col(p)), P[p][0] - 27 + i * 18 - 8.6, 67.4, 17.2));
     const onMat = (p, i, h) => A.k(p + i, `<ellipse cx="${P[p][0]}" cy="${127 - h * 8 + 3}" rx="22" ry="8" fill="#1e1a18" stroke="${C.ink}" stroke-width="1"/><ellipse cx="${P[p][0]}" cy="${127 - h * 8}" rx="22" ry="8" fill="${col(p)}" stroke="${C.ink}" stroke-width="1"/>`);
-    const rose = (k, x, y, c) => {
-      let s = A.circle(x, y, 13, c, { sw: 1.2 }) + A.circle(x, y, 10, C.cream, { sw: 0 });
-      for (let i = 0; i < 5; i++) { const a = i * 72 * Math.PI / 180; s += A.circle(+(x + 4.2 * Math.cos(a)).toFixed(1), +(y + 4.2 * Math.sin(a)).toFixed(1), 3.6, '#d9446a', { sw: 0.7 }); }
-      return A.k(k, s + A.circle(x, y, 2.6, '#e8c547', { sw: 0.7 }));
-    };
-    const skull = (k, x, y, c) => A.k(k, A.circle(x, y, 13, c, { sw: 1.2 }) + A.circle(x, y, 10, '#1e1a18', { sw: 0 }) + A.circle(x, y - 1.5, 6, C.white, { sw: 0 }) + A.rect(x - 3.5, y + 2, 7, 5, C.white, { sw: 0, rx: 1 }) +
-      A.circle(x - 2.4, y - 1.8, 1.8, '#1e1a18', { sw: 0 }) + A.circle(x + 2.4, y - 1.8, 1.8, '#1e1a18', { sw: 0 }));
+    // Flipped discs are the inline icons, tinted to the owner's colour.
+    const I = this.icons, D = 29.7;
+    const rose = (k, x, y, c) => A.k(k, A.use(I.rose.tint(A, c), x - D / 2, y - D / 2, D));
+    const skull = (k, x, y, c) => A.k(k, A.use(I.skull.tint(A, c), x - D / 2, y - D / 2, D));
     const say = (p, str) => A.k('b-' + p, A.bubble(P[p][0] + 8, 2, str.length * 5.5 + 14, 18, str, { size: 8.5 }));
     // Who has what on their mat.
     const hands = (n) => ['ana', 'cy', 'ben'].map(p => { let s = ''; for (let i = n[p]; i < 4; i++) s += inHand(p, i); return s; }).join('');
@@ -110,14 +125,14 @@ defineGame({
     const benFlips = rose('ben0', 238, 172, col('ben')) + rose('ben1', 282, 172, col('ben'));
     const cyFlip = rose('cy1', 160, 172, col('cy'));
     return [
-      { step: 0, say: 'Everyone holds 3 roses and 1 skull. All at once, each player puts **one disc** face down on their mat. Ana’s is her skull.', svg: board + h1 + placed1 },
-      { step: 1, say: 'In turn, Ben and then Cy each **add** a disc to their own stack. Five discs are down.', svg: board + h2 + five },
-      { step: 1, say: 'Ana **opens the bidding at 3**. A bluff: she’d have to flip her own skull first.', svg: board + h2 + five + say('ana', 'Bid 3') },
-      { step: 2, say: 'Ben **raises to 4**. Cy passes, then Ana passes. Ben must flip 4 roses.', svg: board + h2 + five + say('ana', 'Pass') + say('cy', 'Pass') + say('ben', '4!') + A.glow(260, 36, 18, 'g-ben') },
-      { step: 3, say: 'He flips **all his own discs first**: 2 roses. Then Cy’s top disc: a rose. That’s 3.', svg: board + h2 + onMat('ana', 0, 0) + onMat('cy', 0, 0) + benFlips + cyFlip },
-      { step: 3, say: 'He needs one more and flips Ana’s top disc: **the skull**. The challenge fails.', svg: board + h2 + onMat('cy', 0, 0) + benFlips + cyFlip + skull('ana0', 60, 172, col('ana')) + A.glow(60, 172, 18, 'g-skull') },
-      { step: 3, say: 'Discs go back to hands. Ana takes one of Ben’s 4 discs **at random** and discards it unseen; only Ben will know if it was his skull.', svg: board + hands({ ana: 0, cy: 0, ben: 0 }).replace(/<g data-k="ben3">.*?<\/g>/, '') +
-        A.k('ben3', A.circle(290, 176, 7.5, col('ben'), { sw: 1.1 })) + A.text(290, 160, 'discarded', { size: 7, fill: '#e8d5c0' }) + A.glow(290, 176, 12, 'g-gone') + say('ben', '3 left') },
+      { step: 0, say: 'Each player holds 3 {=rose} and 1 {=skull}. All at once, each places **one disc** face down. Ana’s is her skull.', svg: board + h1 + placed1 },
+      { step: 1, say: 'In turn, Ben and Cy each **add** a disc to their stack. Five discs are down.', svg: board + h2 + five },
+      { step: 1, say: 'Ana **bids 3**: a bluff, since she would flip her own skull first.', svg: board + h2 + five + say('ana', 'Bid 3') },
+      { step: 2, say: 'Ben **raises to 4**. Cy and Ana pass. Ben must flip 4 roses.', svg: board + h2 + five + say('ana', 'Pass') + say('cy', 'Pass') + say('ben', '4!') + A.glow(260, 36, 18, 'g-ben') },
+      { step: 3, say: 'He flips **all his own discs first**: {=rose}{=rose}. Then Cy’s top disc: {=rose}. That’s 3.', svg: board + h2 + onMat('ana', 0, 0) + onMat('cy', 0, 0) + benFlips + cyFlip },
+      { step: 3, say: 'He flips Ana’s top disc: {=skull}. The challenge **fails**.', svg: board + h2 + onMat('cy', 0, 0) + benFlips + cyFlip + skull('ana0', 60, 172, col('ana')) + A.glow(60, 172, 18, 'g-skull') },
+      { step: 3, say: 'Discs return to hands. Ana takes one of Ben’s 4 discs **at random** and discards it unseen. Ben starts the next round.', svg: board + hands({ ana: 0, cy: 0, ben: 0 }).replace(/<g data-k="ben3">.*?<\/g>/, '') +
+        A.k('ben3', A.use(this.icons.disc.tint(A, col('ben')), 281.4, 167.4, 17.2)) + A.text(290, 160, 'discarded', { size: 7, fill: '#e8d5c0' }) + A.glow(290, 176, 12, 'g-gone') + say('ben', '3 left') },
     ];
   },
 
@@ -140,18 +155,9 @@ defineGame({
       return s;
     };
     // A face-up disc seen from above: rose or skull.
-    const rose = (x, y, col) => {
-      let s = A.circle(x, y, 13, col, { sw: 1.2 }) + A.circle(x, y, 10, C.cream, { sw: 0 });
-      for (let i = 0; i < 5; i++) { const a = i * 72 * Math.PI / 180; s += A.circle(+(x + 4.2 * Math.cos(a)).toFixed(1), +(y + 4.2 * Math.sin(a)).toFixed(1), 3.6, '#d9446a', { sw: 0.7 }); }
-      return s + A.circle(x, y, 2.6, '#e8c547', { sw: 0.7 });
-    };
-    const skull = (x, y, col) => {
-      let s = A.circle(x, y, 13, col, { sw: 1.2 }) + A.circle(x, y, 10, '#1e1a18', { sw: 0 });
-      s += A.circle(x, y - 1.5, 6, C.white, { sw: 0 }) + A.rect(x - 3.5, y + 2, 7, 5, C.white, { sw: 0, rx: 1 });
-      s += A.circle(x - 2.4, y - 1.8, 1.8, '#1e1a18', { sw: 0 }) + A.circle(x + 2.4, y - 1.8, 1.8, '#1e1a18', { sw: 0 });
-      s += A.line(x - 1.2, y + 3.5, x - 1.2, y + 6.5, { stroke: '#1e1a18', sw: 0.8 }) + A.line(x + 1.2, y + 3.5, x + 1.2, y + 6.5, { stroke: '#1e1a18', sw: 0.8 });
-      return s;
-    };
+    const I = this.icons, D = 29.7;
+    const rose = (x, y, col) => A.use(I.rose.tint(A, col), x - D / 2, y - D / 2, D);
+    const skull = (x, y, col) => A.use(I.skull.tint(A, col), x - D / 2, y - D / 2, D);
     // Players around the table.
     o += A.person(26, 92, 28, '#6b7aa6', { face: '#d9b48f' });
     o += A.person(160, 24, 26, '#5f8f8a', { face: '#d9b48f' });
@@ -174,7 +180,7 @@ defineGame({
     o += A.note(182, 146, 248, 176, 'Own discs flip first');
     o += A.note(250, 92, 274, 40, 'Skull: bid fails');
     o += A.note(144, 64, 66, 48, 'Mat flipped = 1 win');
-    o += A.note(106, 122, 52, 150, 'Rose = safe');
+    o += A.note(106, 122, 52, 150, 'Rose: safe');
     return o;
   },
 });

@@ -208,5 +208,19 @@
     },
   };
 
+  // Draw a 24×24 icon (or any svg) at (x, y) scaled to `size` px.
+  A.use = (svg, x, y, size = 24) => `<g transform="translate(${x} ${y}) scale(${size / 24})">${svg}</g>`;
+
+  // Shared icons any game can reference in text as {key} / {=key}. Each draws in a 24×24 box.
+  const suit = (ch, col) => ({ name: ch === '♠' ? 'spades' : ch === '♥' ? 'hearts' : ch === '♦' ? 'diamonds' : 'clubs', draw: () => A.text(12, 13, ch + '\uFE0E', { size: 20, fill: col, weight: 400 }) });
+  A.ICONS = {
+    spade: suit('♠', C.black), heart: suit('♥', C.red), diamond: suit('♦', C.red), club: suit('♣', C.black),
+    vp: { name: 'victory point', draw: () => A.star(12, 12.5, 10, C.yellow, { sw: 1.3 }) },
+    coin: { name: 'coin', draw: () => A.circle(12, 12, 9.5, '#f2c84b', { sw: 1.4 }) + A.circle(12, 12, 6, 'none', { sw: 1, stroke: '#b8901f' }) },
+    card: { name: 'card', draw: () => A.rect(5, 2, 14, 20, '#5a6fb3', { rx: 2.5, sw: 1.3 }) + A.rect(8, 5, 8, 14, 'none', { rx: 1.5, sw: 1, stroke: '#c9d3f2' }) },
+    die: { name: 'die', draw: () => A.die(2.5, 2.5, 19, 5) },
+  };
+  for (let v = 1; v <= 6; v++) A.ICONS['d' + v] = { name: String(v), draw: () => A.die(2.5, 2.5, 19, v) };
+
   window.A = A;
 })();

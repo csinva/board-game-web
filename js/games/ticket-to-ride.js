@@ -10,72 +10,96 @@ defineGame({
   mechanics: ['network', 'set-collection', 'hand-management', 'drafting'],
   profile: { complexity: 1, luck: 3, interaction: 3, conflict: 2, talk: 2, planning: 3 },
 
-  pitch: 'Collect sets of coloured train cards and spend them to claim railway routes, linking the cities on your secret tickets.',
-  theme: 'You are a rail baron racing across America to connect cities before your rivals block the lines.',
+  // Train cards, trains and tickets: used inline in text and drawn the same way in art + walk.
+  icons: (() => {
+    const tc = (fill, name) => ({ name, draw: A => A.rect(4, 1, 16, 22, fill, { rx: 2.5, sw: 1.3 }) + A.rect(7, 8.5, 10, 6, 'rgba(255,255,255,.8)', { rx: 1.5, sw: 0.7 }) + A.circle(9.2, 15.5, 1.3, '#2a2420', { sw: 0 }) + A.circle(14.8, 15.5, 1.3, '#2a2420', { sw: 0 }) });
+    return {
+      red: tc('#c8423b', 'red card'), orange: tc('#e07b2e', 'orange card'), yellow: tc('#e2b33c', 'yellow card'), green: tc('#3c8d4f', 'green card'),
+      blue: tc('#2f6db5', 'blue card'), pink: tc('#d9668f', 'pink card'), black: tc('#2b2b2b', 'black card'), white: tc('#ffffff', 'white card'),
+      loco: { name: 'locomotive', draw: A => A.rect(4, 1, 16, 22, '#fff', { rx: 2.5, sw: 1.3 }) + ['#c8423b', '#e07b2e', '#e2b33c', '#3c8d4f', '#2f6db5', '#7d55b5'].map((c, i) => A.rect(6, 3 + i * 3, 12, 3, c, { rx: 0, sw: 0 })).join('') + A.rect(4, 1, 16, 22, 'none', { rx: 2.5, sw: 1.3 }) },
+      train: { name: 'train', draw: A => A.rect(2, 7, 20, 9, '#c8423b', { rx: 2.5, sw: 1.3 }) + A.rect(5, 9.5, 6, 3.5, 'rgba(255,255,255,.6)', { rx: 0.8, sw: 0 }) + A.rect(13, 9.5, 6, 3.5, 'rgba(255,255,255,.6)', { rx: 0.8, sw: 0 }) + A.circle(7, 17.5, 2.2, '#2a2420', { sw: 0 }) + A.circle(17, 17.5, 2.2, '#2a2420', { sw: 0 }) },
+      ticket: { name: 'destination ticket', draw: A => A.rect(1, 4, 22, 16, '#efe4c6', { rx: 2, sw: 1.3 }) + A.path('M6 9 Q8 17 17 15', { stroke: '#c8423b', sw: 1.3, dash: '2 1.6' }) + A.circle(6, 9, 2.4, '#c8423b', { sw: 0.9 }) + A.circle(17, 15, 2.4, '#c8423b', { sw: 0.9 }) },
+    };
+  })(),
 
-  goal: { big: 'Most points', text: 'Score the **most points** from claimed routes, completed destination tickets and the longest continuous path. Unfinished tickets cost you points.' },
+  pitch: 'Collect sets of train cards to claim routes between cities; long routes and completed tickets score most.',
+
+  goal: { big: 'Most points', text: 'Most points from routes, completed destination tickets and the longest continuous path. Unfinished tickets **subtract** their value.' },
 
   turn: {
     type: 'choose',
     steps: [
-      { verb: 'Draw cards', text: 'Take **2** train cards, face-up or from the deck. A face-up locomotive counts as both picks.' },
-      { verb: 'Claim route', text: 'Play cards of **one colour** equal to a route’s length and place your trains on it. Score it at once.' },
-      { verb: 'Tickets', text: 'Draw **3** destination tickets and keep at least 1.' },
+      { verb: 'Draw cards', text: 'Take **2** train cards {=orange}{=green}, face-up or from the deck. A face-up {loco} counts as both.' },
+      { verb: 'Claim route', text: 'Claim **one** open route: play cards of its colour ({=blue}{=blue}{=blue}) equal to its length (gray: any **one** colour), place your {train}s on it and score it.' },
+      { verb: 'Tickets', text: 'Draw **3** {ticket}s; keep at least 1. Return the rest to the bottom of the pile.' },
     ],
   },
 
-  tension: 'Each turn you either draw cards to build a hand or claim a route before someone else does, and waiting too long can see a rival block the only line you need.',
+  tension: 'Every turn spent drawing cards is a turn a rival can take the one route you need.',
 
-  flow: [
-    { label: 'Collect', items: ['Train cards', 'Sets of one colour', 'Locomotives (wild)'] },
-    { label: 'Claim', items: ['Routes of 1–6 trains', 'Gray: any one colour', 'Link your ticket cities'] },
-    { label: 'Score', items: ['Route points', 'Completed tickets +', 'Failed tickets −', 'Longest path +10'] },
+  structure: [
+    { label: 'Setup', text: 'Deal 4 train cards and 3 {ticket}s each; keep at least 2 tickets. Turn 5 cards face-up.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Each turn: draw cards, claim one route, or draw tickets. No rounds or phases.' },
+    { label: 'Last round', text: 'A player ends a turn with **0–2** {=train} left: everyone, including them, gets one more turn.' },
+    { label: 'Final scoring', text: 'Reveal tickets: add completed, subtract failed. Longest continuous path +10.' },
   ],
 
-  end: { trigger: 'a player ends a turn with 2 or fewer trains left', detail: 'Everyone, including that player, takes **one final turn**. Then reveal and score tickets.' },
+  points: [
+    ['{=train} Route', 'scored when claimed, by length (table)'],
+    ['{=ticket} Completed ticket', '+ its value at game end'],
+    ['{=ticket} Failed ticket', '− its value'],
+    ['Longest path', '+10 for the longest continuous line of your trains (loops allowed; each train counts once); ties all score'],
+  ],
+
+  end: { trigger: 'a player ends a turn with 2 or fewer trains left', detail: 'Everyone, including that player, takes **one final turn**. Then reveal and score tickets. Tie: most completed tickets wins, then the longest path.' },
   scoring: [
-    { label: 'Routes', share: 5 },
-    { label: 'Tickets', share: 4 },
+    { label: '{=train} Routes', share: 5 },
+    { label: '{=ticket} Tickets', share: 4 },
     { label: 'Longest path', share: 1 },
   ],
 
   ref: {
-    title: 'Route points',
+    title: 'Route points by length',
     rows: [
-      ['1 train', '1 point'],
-      ['2 trains', '2 points'],
-      ['3 trains', '4 points'],
-      ['4 trains', '7 points'],
-      ['5 trains', '10 points'],
-      ['6 trains', '15 points'],
+      ['{=train}', '1'],
+      ['{=train}{=train}', '2'],
+      ['{=train}{=train}{=train}', '4'],
+      ['{=train}{=train}{=train}{=train}', '7'],
+      ['{=train}{=train}{=train}{=train}{=train}', '10'],
+      ['{=train}{=train}{=train}{=train}{=train}{=train}', '15'],
     ],
   },
 
-  example: 'Your secret ticket is **Denver–El Paso (4 points)**. You play 2 orange cards to claim the gray 2-train Denver–Santa Fe route (gray takes any one colour), place 2 trains and score **2 points**. One more 2-train route, Santa Fe–El Paso, will complete the ticket.',
+  example: 'Your {=ticket} is **Denver–El Paso (4)**. You play {=orange}{=orange} on the gray 2-train Denver–Santa Fe route, place {=train}{=train} and score **2**. Santa Fe–El Paso (2 trains) will complete the ticket.',
 
   setup: [
-    'Each player takes 45 trains of one colour and 4 train cards.',
-    'Deal 3 destination tickets each; keep at least 2.',
+    'Each player takes 45 {train}s of one colour and 4 train cards.',
+    'Deal 3 {ticket}s each; keep at least 2 and return the rest to the bottom of the pile.',
+    'Put scoring markers on Start.',
     'Turn 5 train cards face-up beside the deck.',
   ],
 
   terms: [
-    ['Train card', 'Coloured card you spend to claim routes.'],
-    ['Locomotive', 'Rainbow wild card; can stand in for any colour.'],
-    ['Destination ticket', 'Secret goal: link two cities for its points, or lose them.'],
+    ['{=red} Train card', 'Coloured card spent to claim routes.'],
+    ['{=loco} Locomotive', 'Wild: counts as any colour.'],
+    ['{=ticket} Destination ticket', 'Secret goal: connect two cities to gain its points, or lose them.'],
     ['Double route', 'Two parallel routes between the same cities.'],
   ],
 
   gotchas: [
-    'If you take a face-up locomotive, that is your **whole draw**. You also can’t take one as your second card.',
-    'In 2–3 player games only **one** track of each double route can be used.',
-    'If 3 locomotives are ever face-up at once, discard all 5 and deal 5 new cards.',
+    'A face-up {loco} is your **whole draw**, and you can’t take one as your second card. A {loco} drawn blind from the deck counts as one card.',
+    'Gray routes take any **one** colour; coloured routes need that colour. {loco}s can fill in for any colour.',
+    'A claimed route need not connect to your other routes.',
+    'Never claim both tracks of a double route. With 2–3 players only **one** track can be used.',
+    'If 3 {=loco} are face-up at once, discard all 5 and deal 5 new.',
+    'When the deck runs out, shuffle the discards into a new deck. If there are none, you can’t draw cards.',
+    'If fewer than 3 {ticket}s remain, draw what is left.',
   ],
 
   tips: [
-    'Keep your first tickets and finish them; a big unfinished ticket can wipe out your lead.',
-    'Claim the scarce, bottleneck routes on your path first; draw cards for the rest.',
-    'Long routes are worth far more per train: a 6-route scores 15, six 1-routes only 6.',
+    'Finish your first tickets before drawing more; an unfinished big ticket can erase your lead.',
+    'Claim bottleneck routes on your path first; draw cards for the rest.',
+    'Long routes pay more per train: one 6-route scores 15, six 1-routes score 6.',
   ],
 
   walk(A) {
@@ -83,7 +107,7 @@ defineGame({
     const P = { den: [70, 40], sf: [118, 108], ep: [96, 172], phx: [26, 130], okc: [176, 92] };
     const NM = { den: 'Denver', sf: 'Santa Fe', ep: 'El Paso', phx: 'Phoenix', okc: 'Okla. City' };
     const ends = (a, b) => { const [x1, y1] = P[a], [x2, y2] = P[b], d = Math.hypot(x2 - x1, y2 - y1), ux = (x2 - x1) / d, uy = (y2 - y1) / d; return [x1 + ux * 9, y1 + uy * 9, x2 - ux * 9, y2 - uy * 9]; };
-    const R = [['den', 'sf', 2, gray], ['sf', 'ep', 2, gray], ['den', 'okc', 4, C.yellow], ['sf', 'okc', 3, C.blue], ['phx', 'sf', 3, gray], ['phx', 'ep', 3, C.green]];
+    const R = [['den', 'sf', 2, gray], ['sf', 'ep', 2, gray], ['sf', 'okc', 3, C.blue], ['phx', 'sf', 3, gray], ['phx', 'ep', 3, gray]];
     let board = A.bg('#e8dab4') + A.rect(200, 0, 120, 200, '#f6efe0', { sw: 0, rx: 0 }) + A.line(200, 0, 200, 200, { sw: 2 });
     for (const [a, b, n, f] of R) board += A.route(...ends(a, b), n, f, { w: 9 });
     for (const k in P) board += A.circle(P[k][0], P[k][1], 6.5, C.red, { sw: 1.5 }) + A.circle(P[k][0], P[k][1], 2.5, C.cream, { sw: 0 });
@@ -93,28 +117,24 @@ defineGame({
     // Ticket
     board += A.card(240, 50, 72, 40, '#efe4c6', { face: '#efe4c6' }) + A.text(274, 62, 'Denver – El Paso', { size: 6.5, weight: 700 }) + A.text(274, 76, '4', { size: 12, weight: 800 });
     board += A.tag(260, 118, 'Your hand', { fill: C.red });
-    const tc = (x, y, f) => {
-      if (f !== 'loco') return A.card(x, y, 20, 28, f, {}) + A.rect(x + 5, y + 11, 10, 6, 'rgba(255,255,255,.75)', { rx: 1.5, sw: 0.6 });
-      let s = A.card(x, y, 20, 28, C.white, {});
-      ['#c8423b', '#e07b2e', '#e2b33c', '#3c8d4f', '#2f6db5', '#7d55b5'].forEach((c, i) => { s += A.rect(x + 3, y + 3 + i * 3.67, 14, 3.67, c, { sw: 0, rx: 0 }); });
-      return s;
-    };
+    // Same drawings as the inline card icons (20×27 here).
+    const tc = (x, y, f) => A.rect(x + 2, y + 3, 20, 27.5, C.shadow, { sw: 0, rx: 3 }) + A.use(this.icons[f].draw(A), x - 5, y - 1.25, 30);
     const disp = (i) => [206 + i * 22, 18], hand = (i) => [206 + i * 22, 132];
-    const show = ['blue', 'or', 'loco', 'green', 'pink'], F = { blue: C.blue, or: C.orange, loco: 'loco', green: C.green, pink: C.pink };
+    const show = ['blue', 'or', 'loco', 'green', 'pink'], F = { blue: 'blue', or: 'orange', loco: 'loco', green: 'green', pink: 'pink' };
     const display = (skip, extra = '') => show.map((c, i) => i === skip ? '' : A.k('d-' + c, tc(...disp(i), F[c]))).join('') + extra;
-    const h0 = A.k('h-or', tc(...hand(0), C.orange)) + A.k('h-pink', tc(...hand(1), C.pink)) + A.k('h-blue', tc(...hand(2), C.blue));
+    const h0 = A.k('h-or', tc(...hand(0), 'orange')) + A.k('h-pink', tc(...hand(1), 'pink')) + A.k('h-blue', tc(...hand(2), 'blue'));
     const score = (n) => A.k('score' + n, A.rect(206, 170, 56, 18, C.white, { rx: 9, sw: 1 }) + A.text(234, 179, 'Score ' + n, { size: 8.5, weight: 800 }));
     const [a1, b1, a2, b2] = ends('den', 'sf'), mid = [(a1 + a2) / 2, (b1 + b2) / 2];
-    const refill = A.k('d-new', tc(...disp(1), C.yellow)), top = A.k('deck', A.card(208, 52, 20, 28, '#4a4a6a', { label: '?', size: 10 }));
+    const refill = A.k('d-new', tc(...disp(1), 'yellow')), top = A.k('deck', A.card(208, 52, 20, 28, '#4a4a6a', { label: '?', size: 10 }));
     return [
-      { step: 0, say: 'Your secret ticket is **Denver – El Paso** (4 points). You need a line of your trains between them.', svg: board + display() + top + h0 + score(0) + A.glow(...P.den, 12, 'g-den') + A.glow(...P.ep, 12, 'g-ep') },
-      { step: 0, say: '**Draw cards.** Take the face-up **orange** card. A new card is turned up to replace it.', svg: board + display(1, refill) + top + h0 + A.k('d-or', tc(...hand(3), C.orange)) + score(0) },
-      { step: 0, say: 'Your second card comes blind from the deck: green. That was your whole turn.', svg: board + display(1, refill) + h0 + A.k('d-or', tc(...hand(3), C.orange)) + A.k('deck', tc(...hand(4), C.green)) + score(0) },
-      { step: 1, say: '**Next turn, claim a route.** The gray Denver – Santa Fe route takes 2 cards of any one colour: play your 2 oranges.', svg: board + display(1, refill) + A.k('h-pink', tc(...hand(0), C.pink)) + A.k('h-blue', tc(...hand(1), C.blue)) + A.k('deck', tc(...hand(2), C.green)) +
-        A.k('h-or', tc(mid[0] - 22, mid[1] - 14, C.orange)) + A.k('d-or', tc(mid[0] + 2, mid[1] - 14, C.orange)) + score(0) },
-      { step: 1, say: 'The cards are discarded and 2 of your trains go on the route. A 2-train route scores **2 points**.', svg: board + display(1, refill) + A.k('h-pink', tc(...hand(0), C.pink)) + A.k('h-blue', tc(...hand(1), C.blue)) + A.k('deck', tc(...hand(2), C.green)) +
+      { step: 0, say: 'Your secret {=ticket}: **Denver – El Paso** (4 points). Connect them with your trains.', svg: board + display() + top + h0 + score(0) + A.glow(...P.den, 12, 'g-den') + A.glow(...P.ep, 12, 'g-ep') },
+      { step: 0, say: '**Draw cards.** Take the face-up {=orange}. A new card fills its slot.', svg: board + display(1, refill) + top + h0 + A.k('d-or', tc(...hand(3), 'orange')) + score(0) },
+      { step: 0, say: 'Second card, blind from the deck: {=green}. Turn over.', svg: board + display(1, refill) + h0 + A.k('d-or', tc(...hand(3), 'orange')) + A.k('deck', tc(...hand(4), 'green')) + score(0) },
+      { step: 1, say: '**Next turn: claim.** Gray Denver – Santa Fe takes 2 cards of any one colour: play {=orange}{=orange}.', svg: board + display(1, refill) + A.k('h-pink', tc(...hand(0), 'pink')) + A.k('h-blue', tc(...hand(1), 'blue')) + A.k('deck', tc(...hand(2), 'green')) +
+        A.k('h-or', tc(mid[0] - 22, mid[1] - 14, 'orange')) + A.k('d-or', tc(mid[0] + 2, mid[1] - 14, 'orange')) + score(0) },
+      { step: 1, say: 'Discard the cards and place 2 {train}s. A 2-train route scores **2 points**.', svg: board + display(1, refill) + A.k('h-pink', tc(...hand(0), 'pink')) + A.k('h-blue', tc(...hand(1), 'blue')) + A.k('deck', tc(...hand(2), 'green')) +
         A.k('trains', A.route(a1, b1, a2, b2, 2, gray, { w: 9, trains: C.red })) + score(2) + A.glow(mid[0], mid[1], 22, 'g-route') },
-      { step: 1, say: 'One more 2-train route, **Santa Fe – El Paso**, completes the ticket for +4 at the end.', svg: board + display(1, refill) + A.k('h-pink', tc(...hand(0), C.pink)) + A.k('h-blue', tc(...hand(1), C.blue)) + A.k('deck', tc(...hand(2), C.green)) +
+      { step: 1, say: '**Santa Fe – El Paso** (2 trains) would complete the ticket: +4 at game end.', svg: board + display(1, refill) + A.k('h-pink', tc(...hand(0), 'pink')) + A.k('h-blue', tc(...hand(1), 'blue')) + A.k('deck', tc(...hand(2), 'green')) +
         A.k('trains', A.route(a1, b1, a2, b2, 2, gray, { w: 9, trains: C.red })) + score(2) + A.glow(107, 140, 22, 'g-next') },
     ];
   },
@@ -141,14 +161,10 @@ defineGame({
     o += A.circle(22, 160, 3, C.red, { sw: 1 }) + A.circle(48, 178, 3, C.red, { sw: 1 }) + A.path('M22 160 Q28 176 48 178', { stroke: C.red, sw: 1.4, dash: '2 2' });
     o += A.text(49, 157, '9', { size: 11, weight: 800 });
     // face-up train cards
-    const cards = [C.blue, C.orange, 'loco', C.green, C.pink];
-    cards.forEach((f, i) => {
+    // Face-up train cards: the same drawings as the inline icons.
+    ['blue', 'orange', 'loco', 'green', 'pink'].forEach((k, i) => {
       const x = 150 + i * 33, y = 150;
-      if (f === 'loco') {
-        o += A.card(x, y, 30, 42, C.white, {});
-        ['#c8423b', '#e07b2e', '#e2b33c', '#3c8d4f', '#2f6db5', '#7d55b5'].forEach((c, k) => { o += A.rect(x + 3, y + 3 + k * 6, 24, 6, c, { sw: 0, rx: 0 }); });
-      } else o += A.card(x, y, 30, 42, f, {});
-      o += A.rect(x + 7, y + 17, 16, 8, 'rgba(255,255,255,.75)', { rx: 2, sw: 0.8 }) + A.circle(x + 10, y + 26, 2, C.ink, { sw: 0 }) + A.circle(x + 20, y + 26, 2, C.ink, { sw: 0 });
+      o += A.rect(x + 2, y + 3, 30, 41, C.shadow, { sw: 0, rx: 4 }) + A.use(this.icons[k].draw(A), x - 7.5, y - 1.9, 45);
     });
     o += A.note(83, 86, 70, 60, 'Claimed route');
     o += A.note(40, 168, 104, 146, 'Secret ticket', { w: 80 });

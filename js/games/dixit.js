@@ -11,71 +11,81 @@ defineGame({
   profile: { complexity: 1, luck: 2, interaction: 3, conflict: 1, talk: 3, planning: 1 },
   color: '#8a5bb0',
 
-  pitch: 'Describe a dreamlike picture with a clue that is not too obvious and not too obscure, then spot the real card among the decoys.',
-  theme: 'You are storytellers sharing riddles about strange, beautiful pictures.',
+  // `tint` redraws a token in a player's colour (voting dials, score rabbits) for the art and walkthrough.
+  icons: (() => {
+    const vote = (A, c, n = '3') => A.circle(12, 12, 9.5, c, { sw: 1.4 }) + (n ? A.text(12, 12.4, n, { size: 10, weight: 800, fill: '#fff' }) : '');
+    const rabbit = (A, c) => A.rect(8.2, 0.8, 2.8, 8.5, c, { rx: 1.4, sw: 1, rotate: -14 }) + A.rect(13, 0.8, 2.8, 8.5, c, { rx: 1.4, sw: 1, rotate: 14 }) +
+      A.circle(12, 17, 6.3, c, { sw: 1.2 }) + A.circle(12, 9.5, 4.2, c, { sw: 1.2 }) + A.circle(13.6, 9, 0.8, '#2a2420', { sw: 0 });
+    return {
+      storyteller: { name: 'storyteller', draw: A => A.path('M4 3 h16 q2 0 2 2 v9 q0 2 -2 2 h-9 l-5 5 v-5 h-2 q-2 0 -2 -2 v-9 q0 -2 2 -2z', { fill: '#8a5bb0', sw: 1.3 }) + A.text(12, 10, '“ ”', { size: 10, weight: 800, fill: '#fff' }) },
+      vote: { name: 'voting dial', draw: A => vote(A, '#2f6db5'), tint: vote },
+      rabbit: { name: 'rabbit', draw: A => rabbit(A, '#c8423b'), tint: rabbit },
+      picture: { name: 'picture card', draw: A => A.rect(4, 1, 16, 22, '#fff', { rx: 2.5, sw: 1.3 }) + A.rect(6, 3, 12, 18, '#3b2c5c', { rx: 1, sw: 0 }) + A.circle(12, 9.5, 3.6, '#f5e6b0', { sw: 0 }) + A.circle(13.8, 8.3, 3.2, '#3b2c5c', { sw: 0 }) + A.path('M6 18 q3 -3 6 0 t6 0', { stroke: '#7fb7d9', sw: 1.2 }) },
+    };
+  })(),
 
-  goal: { big: '30 points', text: 'Score the most points, usually by **guessing** the storyteller’s card and by **fooling** others into picking yours.' },
+  pitch: 'Give a clue for a picture card; others add look-alikes and vote. Score when some, but not all, find your card.',
+
+  goal: { big: '30 points', text: 'Most points wins. Score by **finding** the storyteller’s card and by drawing votes to your own card.' },
 
   turn: {
     type: 'round',
-    intro: 'Each round one player is the storyteller (it rotates left):',
+    intro: 'Each round one player is the storyteller (it passes left):',
     steps: [
-      { verb: 'Tell', text: 'The storyteller picks a card from their hand of 6 and says a **clue**: a word, sound, phrase or song.' },
-      { verb: 'Match', text: 'Everyone else secretly gives the storyteller the card from their hand that best fits the clue.' },
-      { verb: 'Vote', text: 'Shuffle and lay the cards out face up. Everyone but the storyteller **secretly votes** for the storyteller’s card.' },
-      { verb: 'Score', text: 'Reveal votes, score, and refill hands to 6.' },
+      { verb: 'Tell', text: 'The {storyteller} picks a card from their hand of 6 and gives a **clue**: a word, sound, phrase or song.' },
+      { verb: 'Match', text: 'Everyone else secretly gives the storyteller their best-fitting card, face down.' },
+      { verb: 'Vote', text: 'Shuffle and lay the cards out face up, numbered. Everyone but the storyteller secretly sets their {vote} to the card they think is the storyteller’s.' },
+      { verb: 'Score', text: 'Reveal votes, score (see Scoring), discard the played cards and refill hands to 6.' },
     ],
     outro: 'Next storyteller',
   },
 
-  tension: 'The storyteller scores only if **some but not all** players find their card, so the clue must be exactly half-obvious.',
+  tension: 'The storyteller scores only if **some but not all** players find their card, so the clue must be half-obvious.',
 
-  flow: [
-    { label: 'Tell', items: ['Pick a card', 'Give a clue', 'Not too clear, not too vague'] },
-    { label: 'Fool', items: ['Pick a decoy', 'Match the clue’s mood'] },
-    { label: 'Score', items: ['Find the real card', 'Votes on your decoy', 'Move your rabbit'] },
+  structure: [
+    { label: 'Setup', text: 'Each player takes a {=rabbit} on 0 and the {vote} in their colour; deal 6 {=picture} each.' },
+    { label: 'Rounds', repeat: 'storyteller passes left', text: 'Clue, match, vote, score, refill to 6. If the deck runs short, shuffle the discards into it.' },
+    { label: 'Game end', text: 'After a round in which a {=rabbit} reaches 30 or more, most points wins.' },
   ],
 
-  end: { trigger: 'A player reaches 30 points, or the draw deck runs out', detail: 'Most points wins.' },
+  points: [
+    ['{=storyteller} Storyteller', '3 if some but not all players find your card; 0 if all or none do'],
+    ['Finding the card', '3 to each player who finds it (some but not all found it)'],
+    ['All or none found it', '2 to every player except the storyteller'],
+    ['{=vote} Votes on your card', '+1 per vote it drew (not for the storyteller)'],
+  ],
+
+  end: { trigger: 'A round ends with any player on 30 or more points', detail: 'Most points wins; tied players share the win.' },
   scoring: [
     { label: 'Finding the storyteller’s card', share: 4 },
-    { label: 'Votes on your decoys', share: 2 },
-    { label: 'Your own clues', share: 2 },
+    { label: '{=vote} Votes on your decoys', share: 2 },
+    { label: '{=storyteller} Your own clues', share: 2 },
   ],
 
-  ref: {
-    title: 'Scoring each round',
-    rows: [
-      ['Everyone or no one finds it', 'storyteller 0, everyone else 2'],
-      ['Otherwise', 'storyteller and each correct guesser 3'],
-      ['Decoy card', 'its owner gets 1 per vote it attracted'],
-    ],
-  },
-
-  example: 'Lea plays a lighthouse card and says “**Lonely**.” Five others add cards. Two of them find the lighthouse, so Lea and those two score 3 each. Tom guessed wrong, but Kai and Sam voted for his decoy, so Tom still scores 2.',
+  example: 'Lea plays a lighthouse card and says “**Lonely**.” Five others add cards. Two find the lighthouse, so Lea and those two score 3 each. Tom guessed wrong, but Kai and Sam voted for his decoy, so Tom still scores 2.',
 
   setup: [
-    'Each player takes a rabbit on the score track at 0 and a set of numbered voting tokens.',
-    'Shuffle the cards and deal **6** to each player.',
-    'Choose a first storyteller; it passes left each round.',
+    'Each player puts a {rabbit} on 0 on the score track and takes the {vote} of their colour.',
+    'Shuffle the {picture}s and deal **6** to each player (3 players: 7 each).',
+    'Choose a first storyteller; the role passes left each round.',
   ],
 
   terms: [
-    ['Storyteller', 'The active player who gives the clue this round.'],
+    ['{=storyteller} Storyteller', 'The player who gives the clue this round.'],
     ['Clue', 'Anything you can say or hum about your card.'],
     ['Decoy', 'A card another player adds to mislead the voters.'],
   ],
 
   gotchas: [
     'You may **not vote** for your own card.',
-    'If **everybody** finds the storyteller’s card, it scores 0 for the storyteller (a too-easy clue).',
-    'Decoy bonuses go to non-storytellers only, and you still get them even if you guessed wrong.',
+    'If **everybody** or **nobody** finds the storyteller’s card, the storyteller scores 0.',
+    'With 3 players, hold 7 cards; each non-storyteller submits **2** cards and draws 2 to refill.',
   ],
 
   tips: [
-    'Aim for clues that one or two people will get, such as an in-joke, a film line or a feeling.',
+    'Aim for clues that one or two players will get: an in-joke, a film line, a feeling.',
     'Pick decoys that match the clue’s **mood**, not just its literal meaning.',
-    'Think about who at the table will “get” a clue; tailor it to them.',
+    'Tailor clues to who at the table will “get” them.',
   ],
 
   walk(A) {
@@ -112,20 +122,20 @@ defineGame({
       const [px, py, f] = P[n];
       const slotOn = Object.entries(votes).filter(([, v]) => v === i).findIndex(([m]) => m === n);
       const [x, y] = placed ? [rowX(i) + 12 + slotOn * 18, RY + 46] : [px + 14, py - 12];
-      return A.k('v-' + n, A.circle(x, y, 7, f, { sw: 1.2 }) + A.text(x, y, n[0], { size: 7, weight: 800, fill: C.white }));
+      return A.k('v-' + n, A.use(this.icons.vote.tint(A, f, n[0]), x - 8.84, y - 8.84, 17.7));
     }).join('');
     const owner = (i, n) => { const x = rowX(i) + W / 2; return A.k('o-' + n, A.rect(x - 14, RY + H + 4, 28, 11, P[n][2], { rx: 5.5, sw: 0 }) + A.text(x, RY + H + 9.5, n, { size: 6, fill: C.white })); };
     const pts = (n, v) => { const [x, y] = P[n]; const [tx, ty] = n === 'Lea' ? [44, 52] : [x + 18, y + 4]; return A.k('p-' + n, A.rect(tx - 2, ty - 7, 22, 14, '#fff7d6', { rx: 7, sw: 1 }) + A.text(tx + 9, ty, '+' + v, { size: 8, weight: 800 })); };
     return [
-      { step: 0, say: 'Lea is the storyteller. She picks her **lighthouse** card (shown here), lays it face down and says: “**Lonely**.”',
+      { step: 0, say: 'Lea is the {storyteller}. She lays her **lighthouse** card face down and says: “**Lonely**.”',
         svg: board + bubble + A.k('c-Lea', face(...pile(0), 'light')) + A.glow(pile(0)[0] + W / 2, pile(0)[1] + H / 2, 38, 'g-l') },
-      { step: 1, say: 'Everyone else secretly picks the card from their hand that best fits “Lonely” and passes it to Lea face down.',
+      { step: 1, say: 'Everyone else passes Lea, face down, the card from their hand that best fits “Lonely”.',
         svg: board + bubble + inPile(false) },
-      { step: 2, say: 'Lea shuffles the six cards and lays them out face up. Which one is hers?',
+      { step: 2, say: 'Lea shuffles the six cards and lays them out face up.',
         svg: board + bubble + inRow + tokens(false) },
-      { step: 2, say: 'Everyone but Lea **votes** in secret. Ana and Ben pick the lighthouse; Kai and Sam fall for Tom’s moon; Tom picks Kai’s tree.',
+      { step: 2, say: 'Everyone but Lea **votes** in secret with a {=vote}. Ana and Ben pick the lighthouse; Kai and Sam pick Tom’s moon; Tom picks Kai’s tree.',
         svg: board + bubble + inRow + tokens(true) },
-      { step: 3, say: 'Some but not all found it: **Lea, Ana and Ben score 3**. Tom gets **2**, one per vote on his decoy; Kai gets 1.',
+      { step: 3, say: 'Some but not all found it: **Lea, Ana and Ben score 3**. Tom gets **2**, one per vote on his card; Kai gets 1.',
         svg: board + inRow + tokens(true) + owner(0, 'Tom') + owner(2, 'Lea') + owner(3, 'Kai') +
           pts('Lea', 3) + pts('Ana', 3) + pts('Ben', 3) + pts('Tom', 2) + pts('Kai', 1) + A.glow(rowX(2) + W / 2, RY + H / 2, 36, 'g-l') },
     ];
@@ -142,7 +152,8 @@ defineGame({
     }
     for (let i = 0; i < track.length - 1; i++) o += A.line(track[i][0], track[i][1], track[i + 1][0], track[i + 1][1], { stroke: '#c9b48e', sw: 6 });
     track.forEach(([x, y], i) => { o += A.circle(x, y, 9, i % 5 === 0 ? '#e9d6a7' : '#f8f1e3', { sw: 1 }) + A.text(x, y, i, { size: 7, weight: 700, fill: '#7a6248' }); });
-    o += A.meeple(16, 102, 16, C.red) + A.meeple(42, 134, 16, C.blue) + A.meeple(68, 74, 16, C.green) + A.meeple(94, 132, 16, C.yellow);
+    const rab = (x, y, c) => A.use(this.icons.rabbit.tint(A, c), x - 9, y - 22, 18);
+    o += rab(16, 102, C.red) + rab(42, 134, C.blue) + rab(68, 74, C.green) + rab(94, 132, C.yellow);
     // Storyteller clue.
     o += A.bubble(8, 6, 96, 30, '“Lonely”', { size: 13, italic: true });
     // Six face-up cards in two rows.
@@ -163,8 +174,9 @@ defineGame({
       n++;
     }
     // Votes placed on the storyteller's card (1) and a decoy (5).
-    o += A.circle(140, 74, 6, C.blue, { sw: 1 }) + A.circle(154, 74, 6, C.yellow, { sw: 1 });
-    o += A.circle(210, 166, 6, C.green, { sw: 1 }) + A.circle(224, 166, 6, C.purple, { sw: 1 });
+    const vt = (x, y, c, n) => A.use(this.icons.vote.tint(A, c, n), x - 7.6, y - 7.6, 15.2);
+    o += vt(140, 74, C.blue, '1') + vt(156, 74, C.yellow, '1');
+    o += vt(210, 166, C.green, '5') + vt(226, 166, C.purple, '5');
     o += A.note(150, 40, 100, 52, 'Storyteller’s card');
     o += A.note(218, 166, 248, 190, 'Votes on a decoy');
     o += A.note(42, 134, 52, 189, 'Score track to 30');

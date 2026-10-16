@@ -4,83 +4,97 @@ defineGame({
   year: 2022,
   designer: 'Steven Medway',
   family: 'hidden',
-  players: [5, 20], best: '10–15',
-  time: [60, 120],
-  age: 14,
+  players: [5, 20], best: '9–12',
+  time: [30, 120],
+  age: 15,
   mechanics: ['hidden-roles', 'deduction', 'voting', 'bluffing', 'variable-powers', 'team'],
   profile: { complexity: 4, luck: 2, interaction: 5, conflict: 4, talk: 5, planning: 3 },
   color: '#7a1f2e',
 
-  pitch: 'A village hunts a hidden Demon by day while it kills by night. Everyone has a power, and the dead keep playing.',
-  theme: 'You are a villager of Ravenswood Bluff, where a Demon and its Minions hide among your neighbours.',
+  // Character tokens: blue = good, red = evil. The shroud and ghost-vote token match the art.
+  icons: {
+    townsfolk: { name: 'Townsfolk', draw: A => A.circle(12, 12, 10.5, '#2f6db5', { sw: 1.3 }) + A.person(12, 10.5, 14, '#fff', { face: '#fff' }) },
+    outsider: { name: 'Outsider', draw: A => A.circle(12, 12, 10.5, '#9fcde6', { sw: 1.3 }) + A.person(12, 10.5, 14, '#2f6db5', { face: '#2f6db5' }) },
+    minion: { name: 'Minion', draw: A => A.circle(12, 12, 10.5, '#e58a6a', { sw: 1.3 }) + A.person(12, 10.5, 14, '#7a1f2e', { face: '#7a1f2e' }) },
+    demon: { name: 'Demon', draw: A => A.circle(12, 12, 10.5, '#7a1f2e', { sw: 1.3 }) + A.person(12, 11.5, 13, '#f2e6cc', { face: '#f2e6cc' }) + A.poly([[7.6, 6.5], [6.5, 2.5], [10, 5.2]], '#f2e6cc', { sw: 0.6 }) + A.poly([[16.4, 6.5], [17.5, 2.5], [14, 5.2]], '#f2e6cc', { sw: 0.6 }) },
+    ghost: { name: 'ghost vote', draw: A => A.circle(12, 12, 10, '#fff', { sw: 1.4 }) + A.path('M7.8 17.5 v-6 a4.2 4.2 0 0 1 8.4 0 v6 l-1.4 -1.4 l-1.4 1.4 l-1.4 -1.4 l-1.4 1.4 l-1.4 -1.4z', { fill: '#8c877f', sw: 0.6 }) + A.circle(10.6, 11.2, 0.8, '#fff', { sw: 0 }) + A.circle(13.4, 11.2, 0.8, '#fff', { sw: 0 }) },
+    shroud: { name: 'shroud', draw: A => A.path('M4 22.5 L12 1.5 L20 22.5 Z', { fill: '#1d1a22', sw: 1.2 }) + A.line(12, 6, 12, 19, { stroke: '#7c7686', sw: 0.8 }) },
+    grimoire: { name: 'Grimoire', draw: A => A.rect(2, 5, 20, 14, '#6b2a2a', { rx: 2, sw: 1.3 }) + A.line(12, 5.5, 12, 18.5, { stroke: '#e2b33c', sw: 1.2 }) + A.circle(7, 10, 2, '#e2b33c', { sw: 0 }) + A.circle(17, 14, 2, '#b3263e', { sw: 0.6 }) },
+  },
 
-  goal: { big: 'Kill the Demon', text: '**Good** wins by executing the Demon. **Evil** wins when only 2 players are left alive.' },
+  pitch: 'Good players hunt a hidden Demon through talk and daily executions; evil wins if only 2 players remain alive.',
+
+  goal: { big: 'Kill the Demon', text: '**Good** wins when the Demon dies. **Evil** wins when only 2 players are alive.' },
 
   turn: {
     type: 'round',
-    intro: 'A Storyteller runs each day and night:',
+    intro: 'A Storyteller runs each night and day:',
     steps: [
-      { verb: 'Night', text: 'Eyes closed. The Storyteller wakes characters one by one to use powers; the **Imp** picks someone to kill.' },
-      { verb: 'Dawn', text: 'The Storyteller reveals who died in the night. The dead stay at the table.' },
-      { verb: 'Talk', text: 'Everyone chats openly and privately, sharing (or inventing) what their character learned.' },
-      { verb: 'Nominate', text: 'Living players nominate; everyone raises a hand to vote. The top vote with **half the living or more** is executed.' },
+      { verb: 'Night', text: 'Eyes closed. The Storyteller wakes characters in night order to use abilities; from night 2 the {demon} kills.' },
+      { verb: 'Dawn', text: 'The Storyteller announces who died, not their character. The dead stay at the table.' },
+      { verb: 'Talk', text: 'Open and private chats: share, or invent, what your character learned.' },
+      { verb: 'Nominate', text: 'Living players nominate; all vote by raising a hand. The top nominee with votes ≥ **half the living** is executed.' },
     ],
   },
 
-  tension: 'Good players need to share information to find the Demon, but every claim you make also tells the Demon whom to kill next.',
+  tension: 'Good must share information to find the Demon, but every claim also tells the Demon whom to kill next.',
 
-  flow: [
-    { label: 'Learn', items: ['Night information', 'Private chats', 'Claims & bluffs'] },
-    { label: 'Narrow', items: ['Compare stories', 'Spot the lies', 'Account for poison & drunkenness'] },
-    { label: 'Execute', items: ['Nominate', 'Vote', 'Max 1 execution a day'] },
+  structure: [
+    { label: 'Setup', text: 'The Storyteller deals secret characters (see table) and sets up the {=grimoire}.' },
+    { label: 'First night', text: 'With 7+ players, {minion}s and the {demon} learn each other and the Demon gets 3 bluffs. Some {=townsfolk} get starting info. No kill.' },
+    { label: 'Day', repeat: 'until a team wins', text: 'Dawn deaths, then talk and nominations. At most **1** execution.' },
+    { label: 'Night', repeat: 'then day again', text: 'Poisoner and Monk act, the {=demon} kills, then information roles wake.' },
+    { label: 'Game end', text: 'Demon dead: good wins. Only 2 alive: evil wins.' },
   ],
 
   end: {
-    trigger: 'the Demon dies, or only 2 players are left alive',
-    detail: 'A few characters add other endings: executing the Saint makes evil win, and the Mayor can win for good with 3 alive and no execution.',
+    trigger: 'the Demon dies, or only 2 players are alive',
+    detail: 'Some characters add endings: executing the Saint makes evil win; the Mayor wins for good with 3 alive and no execution.',
     results: [
       { side: 'Good wins', text: 'if the Demon dies (and no Minion becomes the new Demon).' },
-      { side: 'Evil wins', text: 'if just 2 players are alive, or if good executes the Saint.' },
+      { side: 'Evil wins', text: 'if only 2 players are alive, or if good executes the Saint.' },
     ],
   },
 
   ref: {
-    title: 'Trouble Brewing teams',
+    title: 'Characters by player count (Trouble Brewing)',
     rows: [
-      ['Townsfolk (13)', 'good; helpful info or powers, e.g. Empath, Slayer'],
-      ['Outsiders (4)', 'good, but with a drawback, e.g. Drunk, Saint'],
-      ['Minions (4)', 'evil helpers, e.g. Poisoner, Scarlet Woman'],
-      ['Demon: Imp', 'evil; kills one player each night after the first'],
-      ['Execution', 'needs votes ≥ half the living, and more than any other nominee'],
+      ['Types', '{townsfolk} {outsider} good · {minion} {demon} evil'],
+      ['5–6 players', '3 {=townsfolk} · 0–1 {=outsider} · 1 {=minion} · 1 {=demon}'],
+      ['7–9 players', '5 {=townsfolk} · 0–2 {=outsider} · 1 {=minion} · 1 {=demon}'],
+      ['10–12 players', '7 {=townsfolk} · 0–2 {=outsider} · 2 {=minion} · 1 {=demon}'],
+      ['13–15 players', '9 {=townsfolk} · 0–2 {=outsider} · 3 {=minion} · 1 {=demon}'],
+      ['Execution', 'votes ≥ half the living (round up), and more than any other nominee that day'],
     ],
   },
 
-  example: 'On day 2 Mia (Empath) says one neighbour is evil. She nominates **Raj**; 6 of 11 living players vote, which meets the 6 needed. Raj is executed; the game goes on, so he wasn’t the Demon (secretly he was the Poisoner). Tonight the Imp kills Mia.',
+  example: 'On day 2 Mia (Empath) says a neighbour is evil. She nominates **Raj**; 6 of 11 living players vote, meeting the 6 needed. Raj is executed and the game goes on, so he wasn’t the Demon (he was the Poisoner). That night the Imp kills Mia.',
 
   setup: [
-    'The Storyteller picks characters from the script to match the player count and deals each player a **secret token**.',
-    'Evil players learn each other; the Demon also learns 3 good characters **not in play** to bluff as.',
-    'Start with the first night: some Townsfolk wake to receive starting information.',
+    'The Storyteller picks characters for the player count (see table; each player above a bracket’s minimum adds 1 {=outsider}) and deals each a **secret token**.',
+    'First night (7+ players only): evil learn each other; the {=demon} also learns 3 good characters **not in play** to bluff as.',
+    'Above 15 players, the extra players are Travellers (a separate set of characters).',
+    'Players sit in a circle; seat order matters for many abilities.',
   ],
 
   terms: [
-    ['Storyteller', 'The non-player host who runs nights, tracks the Grimoire and may bend information.'],
-    ['Grimoire', 'The Storyteller’s board showing every true character and status.'],
-    ['Ghost vote', 'Dead players keep one vote to use once for the rest of the game.'],
+    ['Storyteller', 'The non-playing host: runs nights, keeps the Grimoire, chooses what drunk or poisoned players learn.'],
+    ['{=grimoire} Grimoire', 'The Storyteller’s board showing every true character and status.'],
+    ['{=ghost} Ghost vote', 'Dead players keep one vote to use once for the rest of the game.'],
     ['Drunk / poisoned', 'Your ability doesn’t work and your info may be false, but you aren’t told.'],
     ['Script', 'The set of characters in use; Trouble Brewing is the beginner one.'],
   ],
 
   gotchas: [
-    'Dead players can still **talk** and win with their team, but cannot nominate and have only **one ghost vote** left.',
-    'Each living player can **nominate once** and **be nominated once** per day. A tie for most votes means nobody dies.',
-    'If the Imp dies with 5+ players alive, the **Scarlet Woman** becomes the new Imp; the Imp can also kill itself at night to pass the role to a Minion.',
+    'Dead players get a {shroud}. They still **talk** and win with their team, but can’t nominate and have only **one** {ghost} left.',
+    'Each living player may **nominate once** per day, and each player may **be nominated once** per day. A tie for most votes means nobody dies.',
+    'If the Imp dies with 5+ players alive, the **Scarlet Woman** becomes the Imp; the Imp can also kill itself at night to make a Minion the new Imp.',
   ],
 
   tips: [
-    'Talk to lots of people privately; information wins the game for good.',
-    'If you’re evil, pick one of the Demon’s bluffs and live it fully.',
-    'Your information may be wrong if you are drunk or poisoned; compare it with others before trusting it.',
+    'Talk privately with many players; information is good’s only weapon.',
+    'As evil, pick one of the Demon’s bluffs and play it fully.',
+    'You may be drunk or poisoned: check your info against others’ before trusting it.',
   ],
 
   extended: [
@@ -96,11 +110,10 @@ defineGame({
       'Outsiders (good, with a drawback): **Butler** may only vote if their chosen master votes; **Drunk** thinks they are a Townsfolk but has no power; **Recluse** may register as evil or as a Minion/Demon; **Saint**: if executed, good loses.',
       'Minions: **Poisoner** poisons a player each night (their ability fails, info may be false); **Spy** sees the Grimoire and may register as good; **Scarlet Woman** becomes the Imp if it dies with 5+ alive; **Baron** adds 2 Outsiders to the game.',
       'Demon: the **Imp** kills one player each night except the first. If it kills itself, a Minion becomes the new Imp.',
-      'Team sizes (Townsfolk / Outsiders / Minions / Demon): 5 players 3/0/1/1, 7 players 5/0/1/1, 9 players 5/2/1/1, 10 players 7/0/2/1, 12 players 7/2/2/1, 15 players 9/2/3/1.',
     ] },
     { title: 'The night order', items: [
-      '**First night**: Minions learn each other and the Demon; the Demon learns its Minions and 3 bluffs; then Poisoner, Washerwoman, Librarian, Investigator, Chef, Empath, Fortune Teller, Butler, Spy.',
-      '**Other nights**: Poisoner, Monk, Scarlet Woman, Imp, then the information roles (Ravenkeeper, Undertaker, Empath, Fortune Teller), with the Butler and Spy last.',
+      '**First night**: with 7+ players, Minions learn each other and the Demon, and the Demon learns its Minions and 3 bluffs; then Poisoner, Washerwoman, Librarian, Investigator, Chef, Empath, Fortune Teller, Butler, Spy.',
+      '**Other nights**: Poisoner, Monk, Scarlet Woman, Imp, then Ravenkeeper, Empath, Fortune Teller, Undertaker, with the Butler and Spy last.',
       'The order matters: the Poisoner acts first, so anyone woken later that night gets possibly false info; the Monk protects before the Imp attacks.',
       'At dawn the Storyteller announces only **who** died, never how or what character they were.',
     ] },
@@ -131,7 +144,7 @@ defineGame({
   ],
 
   walk(A) {
-    const C = A.C, gold = '#f2c14e';
+    const C = A.C, gold = '#f2c14e', I = this.icons, ic = (k, x, y, size) => A.use(I[k].draw(A), x, y, size);
     const seat = (i) => { const a = (-90 + i * 30) * Math.PI / 180; return [+(160 + 132 * Math.cos(a)).toFixed(1), +(104 + 72 * Math.sin(a)).toFixed(1)]; };
     const cols = ['#6b7aa6', '#8a6aa6', '#5f8f8a', '#a6846b', '#7e8f5f', '#6b8aa6', '#a66b7a', '#b07a4f', '#9a3a3a', '#8f7a5f', '#5f7a8f', '#7a5f8f'];
     const names = { 2: 'Tom', 6: 'Lin', 7: 'Mia', 8: 'Raj' };
@@ -139,7 +152,7 @@ defineGame({
       let s = A.bg(night ? '#1d1a33' : '#6f86a8');
       s += night ? A.circle(296, 18, 10, '#f2e6cc', { sw: 0 }) + A.circle(291, 14, 9, '#1d1a33', { sw: 0 }) : A.circle(296, 18, 10, '#f6d36b', { sw: 1 });
       s += `<ellipse cx="160" cy="104" rx="118" ry="60" fill="${night ? '#4a3c44' : '#8a6e5e'}" stroke="${C.ink}" stroke-width="1.4"/>`;
-      s += A.rect(146, 66, 28, 18, '#6b2a2a', { rx: 2 }) + A.line(160, 67, 160, 83, { stroke: '#e2b33c', sw: 1 }) + A.text(160, 92, 'Grimoire', { size: 6.5, fill: '#f2e6cc' });
+      s += A.use(I.grimoire.draw(A), 144, 59, 32) + A.text(160, 92, 'Grimoire', { size: 6.5, fill: '#f2e6cc' });
       for (let i = 0; i < 12; i++) {
         if (i === away) continue;
         const [x, y] = seat(i);
@@ -148,27 +161,27 @@ defineGame({
       }
       return s;
     };
-    const shroud = (i) => { const [x, y] = seat(i); return A.k('sh' + i, A.path(`M${x - 10} ${y + 12} L${x} ${y - 14} L${x + 10} ${y + 12} Z`, { fill: '#1d1a22', sw: 1, opacity: 0.85 }) + A.circle(x + 11, y + 9, 3.5, C.white, { sw: 1 })); };
+    const shroud = (i) => { const [x, y] = seat(i); return A.k('sh' + i, `<g opacity="0.88">${ic('shroud', x - 12, y - 15, 28)}</g>` + ic('ghost', x + 5, y + 2, 13)); };
     const hand = (i) => { const [x, y] = seat(i); return A.k('h' + i, A.line(x + 7, y + 3, x + 12, y - 10, { stroke: gold, sw: 3 }) + A.circle(x + 12, y - 11, 3, gold, { sw: 0.8 })); };
     const voters = [0, 1, 4, 6, 7, 10].map(hand).join('');
     const rajCentre = A.k('p8', A.person(160, 130, 24, '#9a3a3a', { face: '#d9b48f' })) + A.text(160, 148, 'Raj', { size: 7.5, weight: 700, fill: '#f2e6cc' });
     const [mx, my] = seat(7);
     return [
-      { step: 0, say: 'Night 2, eyes closed. The Storyteller wakes the **Empath**: Mia is shown **1**, so one of her two living neighbours is evil.', svg: scene(true, []) +
+      { step: 0, say: 'Night 2. The {=demon} **Imp** wakes and points at Tom. Only the Storyteller sees who the Imp is.', svg: scene(true, []) + A.k('kill', A.circle(...seat(2), 15, 'none', { stroke: '#e0484f', sw: 3 })) },
+      { step: 0, say: 'Later that night the Storyteller wakes the **Empath**: Mia is shown **1**, so one of her two living neighbours is evil.', svg: scene(true, []) +
         A.k('emp', A.circle(mx + 18, my - 14, 7, gold, { sw: 1 }) + A.text(mx + 18, my - 14, '1', { size: 8, weight: 800 })) + A.tag(160, 112, 'only Mia sees', { fill: '#5d4b7a' }) + A.glow(mx, my - 2, 13, 'g-mia') },
-      { step: 0, say: 'The **Imp** wakes and points at Tom. Only the Storyteller sees who the Imp is.', svg: scene(true, []) + A.k('kill', A.circle(...seat(2), 15, 'none', { stroke: '#e0484f', sw: 3 })) },
-      { step: 1, say: 'Dawn. The Storyteller announces that **Tom died** in the night, but not his character. 11 players are alive.', svg: scene(false, [2]) + shroud(2) },
-      { step: 2, say: 'Day 2. Mia shares her info: one of her neighbours, **Raj** or **Lin**, is evil.', svg: scene(false, [2]) + shroud(2) +
+      { step: 1, say: 'Dawn. The Storyteller announces that **Tom died**, not his character. 11 players are alive.', svg: scene(false, [2]) + shroud(2) },
+      { step: 2, say: 'Day 2. Mia shares her info: **Raj** or **Lin** is evil.', svg: scene(false, [2]) + shroud(2) +
         A.bubble(mx - 2, 118, 124, 18, 'One of Raj or Lin is evil!', { size: 7.5 }) + A.glow(seat(8)[0], seat(8)[1] - 2, 13, 'g-raj') + A.glow(seat(6)[0], seat(6)[1] - 2, 13, 'g-lin') },
-      { step: 3, say: 'Mia **nominates Raj**. Hands go up: **6 votes**, and 6 is half of 11 living, rounded up. Raj is about to die.', svg: scene(false, [2], 8) + shroud(2) + rajCentre + voters +
+      { step: 3, say: 'Mia **nominates Raj**. **6 votes**: half of 11 living, rounded up. Raj is about to die.', svg: scene(false, [2], 8) + shroud(2) + rajCentre + voters +
         A.k('count', A.rect(122, 97, 76, 16, '#fffdf7', { rx: 8, sw: 1 }) + A.text(160, 105, '6 votes · need 6', { size: 7.5 })) },
-      { step: 3, say: 'Raj is executed. The game goes on, so he **wasn’t the Demon** (secretly he was the Poisoner). Now 10 are alive.', svg: scene(false, [2, 8]) + shroud(2) + shroud(8) },
-      { step: 0, say: 'Night 3. The Imp strikes the loudest good voice: at dawn, **Mia** is dead. She keeps one ghost vote.', svg: scene(true, [2, 8, 7]) + shroud(2) + shroud(8) + shroud(7) + A.glow(mx, my - 2, 13, 'g-mia') },
+      { step: 3, say: 'Raj is executed. The game goes on, so he **wasn’t the Demon** (secretly, the Poisoner). 10 are alive.', svg: scene(false, [2, 8]) + shroud(2) + shroud(8) },
+      { step: 0, say: 'Night 3. The Imp kills **Mia**. She gets a {shroud} and keeps one {ghost}.', svg: scene(true, [2, 8, 7]) + shroud(2) + shroud(8) + shroud(7) + A.glow(mx, my - 2, 13, 'g-mia') },
     ];
   },
 
   art(A) {
-    const C = A.C, dusk = '#2a2440';
+    const C = A.C, dusk = '#2a2440', I = this.icons, ic = (k, x, y, size) => A.use(I[k].draw(A), x, y, size);
     let o = A.bg(dusk);
     for (const [x, y] of [[20, 14], [56, 30], [96, 10], [232, 12], [270, 30], [304, 16]]) o += A.star(x, y, 2.4, '#f2e6cc', { sw: 0 });
     o += A.circle(300, 46, 10, '#f2e6cc', { sw: 0 }) + A.circle(295, 42, 9, dusk, { sw: 0 });
@@ -188,8 +201,7 @@ defineGame({
     for (const [x, y, col, dead, hand] of seats) {
       if (dead) {
         o += A.person(x, y, 27, '#3a3540', { face: '#7c7686' });
-        o += A.path(`M${x - 12} ${y + 16} L${x} ${y - 17} L${x + 12} ${y + 16} Z`, { fill: '#1d1a22', sw: 1, opacity: 0.85 });
-        o += A.circle(x + 14, y + 12, 4.5, C.white, { sw: 1 });
+        o += `<g opacity="0.88">${ic('shroud', x - 14.5, y - 18, 34)}</g>` + ic('ghost', x + 7, y + 4, 15);
       } else {
         o += A.person(x, y, 27, col, { face: '#d9b48f' });
         if (hand) o += A.line(x + 9, y + 5, x + 14, y - 14, { stroke: '#d9b48f', sw: 3.4 }) + A.circle(x + 14, y - 15, 3, '#d9b48f', { sw: 0.8 });
@@ -201,8 +213,7 @@ defineGame({
     o += A.curve(212, 176, 196, 172, 176, 156, { stroke: '#f2c14e', sw: 1.8, head: 6 });
     // Storyteller with the Grimoire.
     o += A.person(160, 192, 20, '#2b2233', { face: '#d9b48f' });
-    o += A.rect(104, 176, 30, 18, '#6b2a2a', { rx: 2 }) + A.line(119, 177, 119, 193, { stroke: '#e2b33c', sw: 1 });
-    o += A.circle(111, 183, 2.4, '#e2b33c', { sw: 0 }) + A.circle(127, 187, 2.4, '#b3263e', { sw: 0 });
+    o += ic('grimoire', 102, 167, 34);
     o += A.note(160, 150, 236, 140, 'Nominated: vote now');
     o += A.note(285, 128, 270, 70, 'Dead: 1 ghost vote');
     o += A.note(110, 182, 54, 148, 'Storyteller’s Grimoire');

@@ -10,76 +10,102 @@ defineGame({
   mechanics: ['word', 'tile-placement', 'spatial', 'hand-management'],
   profile: { complexity: 1, luck: 3, interaction: 3, conflict: 2, talk: 1, planning: 2 },
 
-  pitch: 'Build crossword-style words from seven letter tiles, aiming them at the bonus squares that multiply your score.',
-  theme: 'You are a wordsmith filling one shared crossword, letter by letter.',
+  // Letter tiles ({=l-q}), premium squares ({=tw}), blank, rack and bag; the bag is reused in art + walk.
+  icons: (() => {
+    const V = { a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1, j: 8, k: 5, l: 1, m: 3, n: 1, o: 1, p: 3, q: 10, r: 1, s: 1, t: 1, u: 1, v: 4, w: 4, x: 8, y: 4, z: 10 };
+    const sq = (name, fill, label, ink) => ({ name, draw: A => A.rect(1, 1, 22, 22, fill, { rx: 2, sw: 1.1 }) + A.text(12, 12.5, label, { size: 10.5, weight: 800, fill: ink, spacing: -0.3 }) });
+    const o = {
+      dl: sq('double letter', '#a9d3ea', 'DL', '#2a2420'),
+      tl: sq('triple letter', '#3f74b8', 'TL', '#fff'),
+      dw: sq('double word', '#f2a7a0', 'DW', '#2a2420'),
+      tw: sq('triple word', '#d2463c', 'TW', '#fff'),
+      star: { name: 'centre star', draw: A => A.rect(1, 1, 22, 22, '#f2a7a0', { rx: 2, sw: 1.1 }) + A.star(12, 12.5, 8.5, '#2a2420', { sw: 0 }) },
+      blank: { name: 'blank tile', draw: A => A.rect(1.5, 1.5, 21, 21, '#f3e2b5', { rx: 3, sw: 1.2 }) },
+      rack: { name: 'rack', draw: A => [0, 1, 2].map(i => A.rect(2.5 + i * 6.5, 6, 6, 7, '#f3e2b5', { rx: 1, sw: 0.9 })).join('') + A.poly([[1, 20], [23, 20], [21.5, 13], [2.5, 13]], '#7a5232', { sw: 1.2 }) },
+      bag: { name: 'tile bag', draw: A => A.path('M12 7 q-10 2.5 -9 10.5 q1 5 9 5 q8 0 9 -5 q1 -8 -9 -10.5 z', { fill: '#5b3f8c', sw: 1.3 }) + A.path('M12 7 l-3 -5 h6 l-3 5', { fill: '#4a3275', sw: 1.1 }) },
+    };
+    for (const k in V) o['l-' + k] = { name: k.toUpperCase() + ' (' + V[k] + ')', draw: A => A.rect(1.5, 1.5, 21, 21, '#f3e2b5', { rx: 3, sw: 1.2 }) + A.text(10.5, 12, k.toUpperCase(), { size: 14, weight: 800 }) + A.text(19, 19, String(V[k]), { size: V[k] > 9 ? 5 : 6, weight: 800 }) };
+    return o;
+  })(),
 
-  goal: { big: 'Highest score', text: 'Score the **most points** by the time the tiles run out. Each word scores the letter values on its tiles, boosted by premium squares.' },
+  pitch: 'Place letter tiles to form crossword-style words, using premium squares to multiply scores; highest total wins.',
+
+  goal: { big: 'Highest score', text: 'Most **points** when the tiles run out. A word scores its tile values, boosted by premium squares.' },
 
   turn: {
     type: 'choose',
     steps: [
-      { verb: 'Play a word', text: 'Place tiles in **one row or column** so they form a word joined to the tiles already down. Score every new word you made, then refill to 7.' },
-      { verb: 'Exchange', text: 'Swap any number of tiles with the bag instead of playing (only if 7+ tiles remain in it). You score 0.' },
-      { verb: 'Pass', text: 'Do nothing and score 0.' },
+      { verb: 'Play a word', text: 'Place tiles in **one row or column**, joined to tiles on the board. Score every new word formed, then refill to 7.' },
+      { verb: 'Exchange', text: 'Set any number of tiles aside face-down, draw as many, then return them to the bag. Score 0.' },
+      { verb: 'Pass', text: 'Score 0.' },
     ],
   },
 
-  tension: 'A long word with your best letters scores now, but it opens the triple-word squares to your opponent and leaves you with a weak rack, so you keep weighing score against board and rack.',
+  tension: 'A big word scores now but may open a {=tw} to your opponent or leave you a weak rack, so you weigh score against board and rack.',
 
-  flow: [
-    { label: 'Draw', items: ['7 tiles on your rack', 'Refill after each play'] },
-    { label: 'Place', items: ['One line only', 'Must touch existing tiles', 'Every new word must be valid'] },
-    { label: 'Score', items: ['Letter values', 'Double / triple letter', 'Double / triple word', 'Use all 7: +50'] },
+  structure: [
+    { label: 'Setup', text: 'All 100 tiles go in the {bag}; each player draws 7. The first word must cover the {star}.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Play a word, exchange or pass. After playing, draw back to 7 while the bag lasts.' },
+    { label: 'Game end', text: 'The bag is empty and one player plays their last tile, or every player passes twice in a row.' },
+    { label: 'Final scoring', text: 'Each player subtracts their unplayed tiles. A player who went out adds everyone else’s unplayed total.' },
   ],
 
-  end: { trigger: 'the bag is empty and one player uses their last tile (or no one can play)', detail: 'Everyone subtracts the value of tiles left on their rack. A player who went out adds everyone else’s leftover total.' },
+  points: [
+    ['{=l-a} Letters', 'The value printed on each tile; {=blank} scores 0'],
+    ['{=dl} {=tl} Letter squares', 'Double / triple that tile’s value'],
+    ['{=dw} {=tw} Word squares', 'Double / triple the whole word, after letter bonuses. Two word squares in one word multiply (×4 or ×9)'],
+    ['{=star} Centre star', 'Double word for the first play'],
+    ['Every new word', 'Each word your tiles form scores in full; premiums count only under new tiles'],
+    ['Bingo', '+50 for playing all 7 tiles in one turn'],
+  ],
+
+  end: { trigger: 'the bag is empty and a player plays their last tile, or every player passes twice in a row', detail: 'Tie: the higher score before the unplayed-tile adjustment wins.' },
   scoring: [
     { label: 'Word scores', share: 7 },
-    { label: 'Premium squares', share: 3 },
+    { label: '{=dl}{=tw} Premium squares', share: 3 },
     { label: '50-pt bingos', share: 1 },
   ],
 
   ref: {
     title: 'Tile values',
     rows: [
-      ['1 point', 'A E I O U L N S T R'],
-      ['2 / 3 points', 'D G / B C M P'],
-      ['4 / 5 points', 'F H V W Y / K'],
-      ['8 / 10 points', 'J X / Q Z'],
-      ['Blank (×2)', '0 points, any letter'],
+      ['1 point', '{=l-a}{=l-e}{=l-i}{=l-o}{=l-u}{=l-l}{=l-n}{=l-s}{=l-t}{=l-r}'],
+      ['2 · 3 points', '{=l-d}{=l-g} · {=l-b}{=l-c}{=l-m}{=l-p}'],
+      ['4 · 5 points', '{=l-f}{=l-h}{=l-v}{=l-w}{=l-y} · {=l-k}'],
+      ['8 · 10 points', '{=l-j}{=l-x} · {=l-q}{=l-z}'],
+      ['{=blank} Blank (×2)', '0 points; stands for any letter'],
     ],
   },
 
-  example: 'The board shows **BOARD** across the centre. You hold Q, U and A, and place them above its D to spell **QUAD** downward: Q10 + U1 + A1 + D2 = **14 points**. The D was already on the board, so it counts its face value but no premium. You draw 3 tiles back up to 7.',
+  example: '**BOARD** runs across the centre. You hold {=l-q}{=l-u}{=l-a} and place them above its D to spell **QUAD** downward: 10 + 1 + 1 + 2 = **14 points**. The D was already down, so it gets no premium. Draw 3 tiles back to 7.',
 
   setup: [
-    'Put all 100 tiles face-down in the bag; each player draws 7 onto their rack.',
-    'Everyone draws a tile; the letter nearest A goes first (blank beats all).',
-    'The first word must be 2+ letters and cover the **centre star**, which is a double-word square.',
+    'Put all 100 tiles in the {bag}. Each player draws 1 tile; nearest to A goes first ({=blank} beats all), then play goes clockwise. Return those tiles.',
+    'In turn order, each player draws 7 onto a {rack}, hidden from the others.',
+    'The first word needs 2+ letters and must cover the {star} (a double-word square).',
   ],
 
   terms: [
-    ['Rack', 'Your stand of 7 tiles, hidden from the others.'],
-    ['Premium square', 'Coloured square that doubles or triples a letter or the whole word.'],
-    ['Bingo', 'Using all 7 tiles in one turn: +50 points.'],
-    ['Blank', 'Wild tile worth 0 that stands for any letter all game.'],
-    ['Challenge', 'Disputing a word; check the agreed dictionary.'],
+    ['{=rack} Rack', 'Your 7 tiles, hidden from the others.'],
+    ['Bingo', 'Playing all 7 tiles in one turn: +50.'],
+    ['{=blank} Blank', 'Wild tile worth 0; the letter you name stays fixed all game.'],
+    ['Challenge', 'Dispute a play before the next turn starts; check the dictionary. Invalid: the player takes the tiles back and scores 0. Valid: the challenger loses their next turn.'],
   ],
 
   gotchas: [
     'Premium squares count **only on the turn** a tile is first placed on them.',
-    'Every new word formed by your tiles scores, including side words made by touching tiles.',
-    'All tiles in one turn go in a **single line** with no gaps (existing tiles can fill gaps).',
+    'Every new word your tiles form scores, including side words made by touching tiles.',
+    'All tiles in a turn go in a **single line** with no gaps (board tiles may fill gaps).',
   ],
 
   tips: [
-    'Learn the two-letter words (QI, ZA, XU, JO…); they let you score sideways by stacking parallel words.',
-    'Keep a balanced rack: save S and blanks for big plays, and dump awkward duplicates.',
-    'Aim high-value letters (J, Q, X, Z) at triple-letter squares, ideally forming two words at once.',
+    'Learn the 2-letter words (QI, ZA, XU, JO); they let you stack parallel words.',
+    'Keep a balanced rack: save S and {=blank} blanks for big plays; dump awkward duplicates.',
+    'Aim {=l-j}{=l-q}{=l-x}{=l-z} at {=tl} and {=dl}, ideally scoring 2 words at once.',
   ],
 
   walk(A) {
-    const C = A.C, s = 17, bx = 10, by = 12, c0 = 1, r0 = 2, T = 16, tileFill = '#f3e2b5';
+    const C = A.C, I = this.icons, s = 17, bx = 10, by = 12, c0 = 1, r0 = 2, T = 16, tileFill = '#f3e2b5';
     const key = (i, j) => i + ',' + j, P = {};
     [[0, 0], [0, 7], [0, 14], [7, 0], [7, 14], [14, 0], [14, 7], [14, 14]].forEach(([i, j]) => P[key(i, j)] = '#d2463c');
     for (let k = 1; k <= 4; k++) [[k, k], [14 - k, k], [k, 14 - k], [14 - k, 14 - k]].forEach(([i, j]) => P[key(i, j)] = '#f2a7a0');
@@ -96,7 +122,7 @@ defineGame({
     const RK = (i) => [184 + i * 18, 166];
     base += A.poly([[180, 186], [312, 186], [308, 172], [184, 172]], '#7a5232', { sw: 1.2 }) + A.text(246, 194, 'Your rack', { size: 7, weight: 700, fill: C.ink });
     const BAG = [262, 110];
-    const bag = A.path('M262 96 q-16 4 -14 24 q2 12 24 12 q22 0 24 -12 q2 -20 -14 -24 z', { fill: '#5b3f8c', sw: 1.4 }) + A.path('M262 96 l-4 -8 h20 l-4 8', { fill: '#4a3275', sw: 1.2 }) + A.text(272, 118, 'bag', { size: 8, weight: 700, fill: C.white });
+    const bag = A.use(I.bag.draw(A), 246, 84, 52) + A.text(272, 120, 'bag', { size: 8, weight: 700, fill: C.white });
     const keep = [['E', 1, 3], ['O', 1, 4], ['I', 1, 5], ['L', 1, 6]];
     const keepS = keep.map(([l, v, i]) => A.k('k' + i, tile(...RK(i), l, v))).join('');
     const quad = [['Q', 10], ['U', 1], ['A', 1]];
@@ -108,19 +134,19 @@ defineGame({
     const score = (v, hi) => (hi ? A.rect(226, 5, 60, 18, '#ffd76a', { rx: 9, sw: 0 }) : '') + A.text(256, 14, 'Score ' + v, { size: 10, weight: 800 });
     const [dx, dy] = at(7, 7), [qx, qy] = at(7, 4);
     return [
-      { step: 0, say: '**BOARD** runs across the centre. Your rack holds Q, U, A, E, O, I, L, and the Q is worth **10**.', svg: base + inBag + bag + score(31) + onRack + keepS + A.glow(192, 174, 14, 'g-q') },
-      { step: 0, say: 'Place Q, U, A in one column above the **D** to spell **QUAD** downward, joined to BOARD.', svg: base + inBag + bag + score(31) + onBoard + keepS + A.glow(dx + 8, qy + 34, 40, 'g-word') },
-      { step: 0, say: 'Score it: Q10 + U1 + A1 + D2 = **14**. The D was already down, so it counts its face value but never a premium again.', svg: base + inBag + bag + score(45, 1) + onBoard + keepS +
+      { step: 0, say: '**BOARD** runs across the centre. Your rack: Q, U, A, E, O, I, L. The {=l-q} is worth **10**.', svg: base + inBag + bag + score(31) + onRack + keepS + A.glow(192, 174, 14, 'g-q') },
+      { step: 0, say: 'Place {=l-q}{=l-u}{=l-a} in one column above the **D** to spell **QUAD**, joined to BOARD.', svg: base + inBag + bag + score(31) + onBoard + keepS + A.glow(dx + 8, qy + 34, 40, 'g-word') },
+      { step: 0, say: 'Score: 10 + 1 + 1 + 2 = **14**. The D was already down: face value, no premium.', svg: base + inBag + bag + score(45, 1) + onBoard + keepS +
         A.text(dx + 30, qy + 8, '10', { size: 9, weight: 800 }) + A.text(dx + 30, qy + 25, '1', { size: 9, weight: 800 }) + A.text(dx + 30, qy + 42, '1', { size: 9, weight: 800 }) + A.text(dx + 30, dy + 8, '2', { size: 9, weight: 800 }) +
         A.k('sum', A.bubble(186, 34, 64, 26, '+14', { size: 12 })) },
-      { step: 0, say: 'Draw **3** tiles from the bag to refill your rack to 7. Your turn is over.', svg: base + bag + score(45) + onBoard + keepS + drawn },
-      { step: 1, say: 'Other options on a turn: **exchange** tiles with the bag, or **pass**. Both score 0, so they’re for a hopeless rack.', svg: base + bag + score(45) + onBoard + keepS + drawn +
+      { step: 0, say: 'Draw **3** tiles to refill your rack to 7. Turn over.', svg: base + bag + score(45) + onBoard + keepS + drawn },
+      { step: 1, say: 'Instead of playing, you may **exchange** tiles with the bag or **pass**. Both score 0.', svg: base + bag + score(45) + onBoard + keepS + drawn +
         A.curve(230, 160, 214, 120, 248, 112, { sw: 1.6, dash: '3 2' }) },
     ];
   },
 
   art(A) {
-    const C = A.C, s = 12, bx = 10, by = 10;
+    const C = A.C, I = this.icons, s = 12, bx = 10, by = 10;
     let o = A.bg('#b98a55');
     o += A.rect(bx - 4, by - 4, 15 * s + 8, 15 * s + 8, '#1f5e4a', { rx: 4, sw: 1.2 });
     const key = (i, j) => i + ',' + j, P = {};
@@ -137,11 +163,10 @@ defineGame({
     o += A.poly([[204, 190], [314, 190], [310, 176], [208, 176]], '#7a5232', { sw: 1.2 });
     rack.forEach(([l, v], i) => { o += A.tile(207 + i * 15, 160, 14, '#f3e2b5', { letter: l, sub: v }); });
     // bag
-    o += A.path('M252 98 q-14 4 -12 22 q2 11 22 11 q20 0 22 -11 q2 -18 -12 -22 z', { fill: '#5b3f8c', sw: 1.4 });
-    o += A.path('M252 98 l-4 -8 h20 l-4 8', { fill: '#4a3275', sw: 1.2 });
-    o += A.note(bx + 14 * s + 6, by + 6, 262, 18, 'Triple word ×3');
+    o += A.use(I.bag.draw(A), 230, 84, 48);
+    o += A.note(bx + 14 * s + 6, by + 6, 262, 18, 'Triple word');
     o += A.note(bx + 9 * s + 11.5, by + 4 * s + 6, 262, 46, 'Letter value: Q = 10');
-    o += A.note(bx + 7 * s + 11, by + 7 * s + 1, 262, 70, 'Words must cross');
+    o += A.note(bx + 7 * s + 11, by + 7 * s + 1, 262, 70, 'Words must connect');
     o += A.note(260, 182, 262, 146, 'Rack of 7 tiles', { w: 90 });
     return o;
   },

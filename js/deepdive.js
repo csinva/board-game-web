@@ -1,7 +1,7 @@
 // The Board Game Deep-Dive: scatter any two dimensions, plus a "gamer profile" reading.
 (function () {
   // Brighter family colours for the dark background.
-  const FAM_C = { build: '#ff8a5c', engine: '#5fd39a', cards: '#b48cff', tile: '#5dade2', classic: '#d9c7a8', hidden: '#ff6b81', coop: '#3fd0c9', party: '#ffc94d', trick: '#ff8fc8', conflict: '#9aa8d6', epic: '#e0a560' };
+  const FAM_C = { build: '#ff8a5c', engine: '#5fd39a', cards: '#b48cff', tile: '#5dade2', classic: '#d9c7a8', hidden: '#ff6b81', coop: '#3fd0c9', party: '#ffc94d', trick: '#ff8fc8', deck: '#c3dc6e', conflict: '#9aa8d6', epic: '#e0a560' };
 
   const METRICS = [
     { k: 'weight', label: 'Rules', lo: '🪶 learn it in minutes', hi: '🧠 bring the rulebook', blurb: 'How much rules overhead before your first turn.' },
@@ -32,7 +32,7 @@
     };
     logNorm('playMin', 'time'); logNorm('teachMin', 'teach');
 
-    document.getElementById('sub').innerHTML = `<b>${games.length} board games</b>, from Sushi Go! to Twilight Imperium, Hearts to Magic. Pick one dimension per axis, solo a family, and hover any dot for its card.`;
+    document.getElementById('sub').innerHTML = `<b>${games.length} games</b> scored on 11 traits. Pick a trait per axis, filter by family, hover a dot for details.`;
 
     // ---------- tabs ----------
     document.querySelectorAll('.tab').forEach(t => t.onclick = () => {

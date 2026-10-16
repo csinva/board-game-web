@@ -34,24 +34,35 @@
     const type = t.type || 'sequence';
     const intro = t.intro || { sequence: 'On your turn, in order:', choose: 'On your turn, do <b>one</b> of:', simultaneous: 'Everyone plays <b>at the same time</b>:', round: 'Each round:' }[type];
     const outro = t.outro || { sequence: 'Next player', choose: 'Next player', simultaneous: 'Next round', round: 'Next round' }[type];
-    const steps = t.steps.map((s, i) => `<li data-step="${i}"><span class="verb">${type === 'choose' ? String.fromCharCode(65 + i) : i + 1}. ${esc(s.verb)}</span><span class="what">${md(s.text)}</span></li>`).join('');
+    const steps = t.steps.map((s, i) => `<li data-step="${i}"><span class="verb">${type === 'choose' ? String.fromCharCode(65 + i) : i + 1}. ${md(s.verb)}</span><span class="what">${md(s.text)}</span></li>`).join('');
     return `<p class="turn-intro">${intro}</p><ol class="turn turn-${type}">${steps}</ol><div class="turn-loop"><span>↻ ${esc(outro)}</span></div>`;
   }
 
   function endPanel(g) {
     let s = `<p class="end-trigger">${md(g.end.trigger.charAt(0).toUpperCase() + g.end.trigger.slice(1))}</p>`;
     if (g.end.detail) s += `<p class="small">${md(g.end.detail)}</p>`;
-    if (g.scoring && g.scoring.length) {
-      const tot = g.scoring.reduce((a, b) => a + b.share, 0);
-      const shades = [1, 0.72, 0.5, 0.33, 0.2, 0.12];
-      s += `<div class="score-label">Where points usually come from</div><div class="scorebar">${g.scoring.map((x, i) =>
-        `<span style="flex:${x.share};--o:${shades[i % shades.length]}" title="${esc(x.label)}: ~${Math.round(100 * x.share / tot)}%"></span>`).join('')}</div>
-        <ul class="score-legend">${g.scoring.map((x, i) => `<li><i style="--o:${shades[i % shades.length]}"></i>${esc(x.label)}</li>`).join('')}</ul>`;
-    }
-    if (g.end.results) {
-      s += `<ul class="results">${g.end.results.map(r => `<li><b>${esc(r.side)}</b> ${md(r.text)}</li>`).join('')}</ul>`;
-    }
+    if (g.end.results) s += `<ul class="results">${g.end.results.map(r => `<li><b>${esc(r.side)}</b> ${md(r.text)}</li>`).join('')}</ul>`;
     return s;
+  }
+
+  // The whole game as a timeline: setup → (repeated) rounds/phases → end.
+  function structurePanel(g) {
+    return `<ol class="timeline">${g.structure.map(st => `<li${st.repeat ? ' class="rep"' : ''}>
+      <div class="tl-label">${md(st.label)}${st.repeat ? `<span class="tl-rep">↻ ${md(st.repeat)}</span>` : ''}</div>
+      <div class="tl-text">${md(st.text)}</div></li>`).join('')}</ol>`;
+  }
+
+  function pointsPanel(g) {
+    return `<table class="points">${g.points.map(([k, v]) => `<tr><th>${md(k)}</th><td>${md(v)}</td></tr>`).join('')}</table>`;
+  }
+
+  // Strategy: where a typical winning score comes from (not a rule).
+  function sharesPanel(g) {
+    const tot = g.scoring.reduce((a, b) => a + b.share, 0);
+    const shades = [1, 0.72, 0.5, 0.33, 0.2, 0.12];
+    return `<div class="scorebar">${g.scoring.map((x, i) =>
+      `<span style="flex:${x.share};--o:${shades[i % shades.length]}" title="${esc(x.label.replace(/\{=?([a-z0-9-]+)\}/g, '$1'))}: ~${Math.round(100 * x.share / tot)}%"></span>`).join('')}</div>
+      <ul class="score-legend">${g.scoring.map((x, i) => `<li><i style="--o:${shades[i % shades.length]}"></i>${md(x.label)} <b>~${Math.round(100 * x.share / tot)}%</b></li>`).join('')}</ul>`;
   }
 
   function radar(g, size = 190) {
@@ -80,9 +91,9 @@
 
   // "I already know …" bar: only kin games (curated close relatives) are offered.
   function knowBar(g) {
-    const kin = window.kinOf(g.id).filter(k => window.bridgeFor(g.id, k.id));
+    const kin = window.kinOf(g.id).filter(k => k.teach && window.bridgeFor(g.id, k.id));
     if (!kin.length) return '';
-    return `<div class="know-bar"><span class="know-lbl">Already know one of these? Pick it and this page explains ${esc(g.name)} in its terms:</span>
+    return `<div class="know-bar"><span class="know-lbl">Know ${kin.length > 1 ? 'one of these' : 'this'}? Most rules carry over. Pick it to see only what differs:</span>
       ${kin.map(k => { const o = window.GAME_BY_ID[k.id]; return `<button class="know-pill" data-know="${o.id}" style="--fam:${window.FAMILIES[o.family].color}">${esc(o.name)}</button>`; }).join('')}</div>
       <div id="bridge-slot"></div>`;
   }
@@ -114,14 +125,20 @@
       round: `Each round goes through ${t.steps.length} steps.`,
     }[type];
     return `<ol class="script">
-      <li><span class="cue">The story</span><div>“This is <b>${esc(g.name)}</b>. ${esc(g.theme)}”</div></li>
-      <li><span class="cue">The goal</span><div>“${md(g.goal.text)}”</div></li>
+      <li><span class="cue">The goal</span><div>“In <b>${esc(g.name)}</b>: ${lower(md(g.goal.text))}”</div></li>
       <li><span class="cue">The clock</span><div>“The game ends when ${lower(md(g.end.trigger))}.${g.end.detail ? ' ' + md(g.end.detail) : ''}”</div></li>
       <li><span class="cue">The turn</span><div>“${turnLine}<ul>${steps.map(s => `<li>${s}</li>`).join('')}</ul>”</div></li>
       <li><span class="cue">The heart</span><div>“The interesting part: ${lower(md(g.tension))}”</div></li>
       <li><span class="cue">Show it</span><div>Play one turn face-up, narrating: “${md(g.example)}”</div></li>
       <li><span class="cue">Then stop</span><div>Start playing. Mention these only when they first come up: ${g.gotchas.map(x => `<i>${esc(strip(x).split(/[.;:]/)[0])}</i>`).join(', ')}.</div></li>
     </ol>`;
+  }
+
+  // Half-width panels in pairs; an odd one out goes full width.
+  function halves(list) {
+    list = list.filter(Boolean);
+    if (list.length % 2) list[list.length - 1] = list[list.length - 1].replace(' half"', ' half full"');
+    return list.join('');
   }
 
   function turnPanel(g) {
@@ -133,11 +150,12 @@
 
   function extended(g) {
     if (!g.extended || !g.extended.length) return '';
-    return `<details class="extended"><summary>Extended details <span>for when you’re ready to go deeper</span></summary>
+    return `<details class="extended"><summary>Extended details <span>for later games</span></summary>
       <div class="ext-grid">${g.extended.map(x => `<section><h3>${esc(x.title)}</h3>${x.text ? `<p>${md(x.text)}</p>` : ''}${x.items ? `<ul>${x.items.map(i => `<li>${md(i)}</li>`).join('')}</ul>` : ''}</section>`).join('')}</div></details>`;
   }
 
   window.renderSheet = function (g) {
+    window.CURRENT_GAME = g;
     const fam = window.FAMILIES[g.family];
     const accent = g.color || fam.color;
     const heavy = g.profile.complexity >= 4;
@@ -156,24 +174,30 @@
       </header>
       ${knowBar(g)}
       <div class="sheet-grid">
-        ${panel(1, 'What it is', `<figure class="art"><svg viewBox="0 0 320 200" role="img" aria-label="Illustration of ${esc(g.name)}">${g.art(window.A)}</svg></figure><p class="theme">${md(g.theme)}</p>`, 'p-art')}
+        ${panel(1, 'What it is', `<figure class="art"><svg viewBox="0 0 320 200" role="img" aria-label="Illustration of ${esc(g.name)}">${g.art(window.A)}</svg></figure>`, 'p-art')}
         ${panel(2, 'How you win', `<div class="goal-big">${esc(g.goal.big)}</div><p>${md(g.goal.text)}</p>`, 'p-goal')}
         ${panel(3, 'How it ends', endPanel(g), 'p-end')}
         ${panel(4, 'Your turn', turnPanel(g), 'p-turn')}
-        ${panel(5, 'How it flows', `<div class="flow">${g.flow.map(st => `<div class="stage"><div class="stage-label">${esc(st.label)}</div><ul>${st.items.map(i => `<li>${md(i)}</li>`).join('')}</ul></div>`).join('<div class="flow-arrow" aria-hidden="true">→</div>')}</div>`, 'p-flow')}
-        ${panel(6, 'The key decision', `<p class="tension-big">${md(g.tension)}</p>`, 'p-tension')}
-        ${panel('', 'Setup', `<ol class="setup">${g.setup.map(x => `<li>${md(x)}</li>`).join('')}</ol>`, 'p-setup')}
-        ${refPanel}
-        ${panel('', 'Key terms', `<dl class="terms">${g.terms.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${md(v)}</dd>`).join('')}</dl>`, 'p-terms')}
-        ${panel(7, 'Rules people miss', `<ul class="warn">${g.gotchas.map(x => `<li>${md(x)}</li>`).join('')}</ul>`, 'p-gotchas')}
-        ${panel(8, 'First-game tips', `<ul class="tips">${g.tips.map(x => `<li>${md(x)}</li>`).join('')}</ul>`, 'p-tips')}
+        ${panel(5, 'How the game flows', structurePanel(g), 'p-structure')}
+        ${halves([
+          g.points ? panel(6, 'Scoring', pointsPanel(g), 'p-points half') : '',
+          panel('', 'Setup', `<ol class="setup">${g.setup.map(x => `<li>${md(x)}</li>`).join('')}</ol>`, 'p-setup half'),
+          g.ref ? panel('', esc(g.ref.title), `<table class="ref">${g.ref.rows.map(r => `<tr><th>${md(r[0])}</th><td>${md(r[1])}</td></tr>`).join('')}</table>`, 'p-ref half') : '',
+          panel('', 'Key terms', `<dl class="terms">${g.terms.map(([k, v]) => `<dt>${md(k)}</dt><dd>${md(v)}</dd>`).join('')}</dl>`, 'p-terms half'),
+        ])}
+        ${panel('!', 'Rules people miss', `<ul class="warn">${g.gotchas.map(x => `<li>${md(x)}</li>`).join('')}</ul>`, 'p-gotchas')}
+        ${extended(g)}
+        <div class="band">Strategy</div>
+        ${panel('', 'The key decision', `<p class="tension-big">${md(g.tension)}</p>`, 'p-tension' + (g.scoring ? '' : ' wide'))}
+        ${panel('', 'First-game tips', `<ul class="tips">${g.tips.map(x => `<li>${md(x)}</li>`).join('')}</ul>`, 'p-tips' + (g.scoring ? '' : ' wide'))}
+        ${g.scoring ? panel('', 'Where points usually come from', sharesPanel(g), 'p-shares') : ''}
+        <div class="band">Is it for you?</div>
         ${panel('', 'What it feels like', `<div class="profile">${radar(g)}${profileBars(g)}</div>`, 'p-profile')}
         ${panel('', 'Similar games', similarList(g), 'p-similar')}
       </div>
-      <footer class="sheet-foot"><span>${g.mechanics.map(m => `<span class="mech">${esc(window.MECHANICS[m])}</span>`).join('')}</span><span class="foot-brand">Board Game Field Guide</span></footer>
+      <footer class="sheet-foot"><span>${g.mechanics.map(m => `<span class="mech">${esc(window.MECHANICS[m])}</span>`).join('')}</span><span class="foot-brand">Board Game Web</span></footer>
     </article>
-    ${extended(g)}
-    <details class="teach"><summary>Teaching it to others? A read-aloud script</summary>${teachScript(g)}</details>`;
+    <details class="teach"><summary>Teaching others? Read-aloud script</summary>${teachScript(g)}</details>`;
   };
 
   // Wire up the interactive parts after the sheet is in the DOM.

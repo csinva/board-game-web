@@ -4,80 +4,100 @@ defineGame({
   year: 2021,
   designer: 'Randy Flynn',
   family: 'tile',
-  players: [1, 4], best: '2–4',
+  players: [1, 4], best: '2–3',
   time: [30, 45],
   age: 10,
   mechanics: ['tile-placement', 'drafting', 'pattern-building', 'spatial', 'set-collection'],
   profile: { complexity: 2, luck: 2, interaction: 2, conflict: 1, talk: 1, planning: 3 },
 
-  pitch: 'Draft a habitat tile and an animal each turn, growing a Pacific Northwest landscape that scores for big habitats and clever wildlife patterns.',
-  theme: 'You are shaping a corner of the Pacific Northwest wilderness and filling it with wildlife.',
+  // Wildlife tokens, habitats and the nature token: used inline and drawn the same way in art + walk.
+  icons: (() => {
+    const tok = (col, ch, name) => ({ name, draw: A => A.circle(12, 12, 10.5, '#f5ecd6', { sw: 1.2 }) + A.circle(12, 12, 8.4, col, { sw: 0 }) + A.text(12, 12.7, ch, { size: 11.5, weight: 800, fill: '#fff' }) });
+    const hab = (col, name) => ({ name, draw: A => A.hex(12, 12, 11, col, { sw: 1.3 }) });
+    return {
+      bear: tok('#6b4a2f', 'B', 'bear'), elk: tok('#c08a4e', 'E', 'elk'), salmon: tok('#d65a5a', 'S', 'salmon'), hawk: tok('#6fb1d9', 'H', 'hawk'), fox: tok('#e07b2e', 'F', 'fox'),
+      mountain: hab('#9aa1a8', 'mountain'), forest: hab('#2f6b34', 'forest'), prairie: hab('#d9c45a', 'prairie'), wetland: hab('#7fc0a0', 'wetland'), river: hab('#4a8fcb', 'river'),
+      nature: { name: 'nature token', draw: A => A.path('M12 2 C19 6 20 15 12 22 C4 15 5 6 12 2Z', { fill: '#8a5a33', sw: 1.2 }) + A.path('M8.2 9 l3.8 2.5 l3.8 -2.5 M7.6 13.5 l4.4 2.8 l4.4 -2.8 M9.5 18 l2.5 1.5 l2.5 -1.5', { stroke: '#e3c08f', sw: 1.1 }) },
+    };
+  })(),
 
-  goal: { big: 'Most points', text: 'Score the most points from **wildlife patterns** (set by 5 scoring cards) and from your **largest connected area** of each habitat.' },
+  pitch: 'Draft a habitat tile and wildlife token each turn; score animal patterns and your largest habitat areas.',
+
+  goal: { big: 'Most points', text: 'Most points from **wildlife patterns** (one scoring card per animal) and your **largest area** of each habitat.' },
 
   turn: {
     type: 'sequence',
     steps: [
-      { verb: 'Pick', text: 'Take one of the 4 **tile + token pairs** on display (spend a nature token to take any tile with any token).' },
-      { verb: 'Place tile', text: 'Add the habitat tile to your area, touching at least one of your tiles, in any rotation.' },
-      { verb: 'Place animal', text: 'Put the wildlife token on one of your **empty** tiles that shows that animal, or return it to the bag.' },
+      { verb: 'Pick', text: 'Take one of the 4 **tile + token pairs** on display, or spend a {nature} to take any tile with any token.' },
+      { verb: 'Place tile', text: 'Add the habitat tile touching at least one of your tiles, in any rotation.' },
+      { verb: 'Place animal', text: 'Put the token on an **empty** tile that shows that animal, or return it to the bag. On a keystone tile, take a {=nature}.' },
       { verb: 'Refill', text: 'Fill the empty display slot with a new tile and token.' },
     ],
   },
 
-  tension: 'The tile you want usually comes paired with the wrong animal, so every pick trades growing your habitats against completing wildlife patterns.',
+  tension: 'The tile you want usually comes with the wrong animal, so each pick trades habitat growth against wildlife patterns.',
 
-  flow: [
-    { label: 'Draft', items: ['Tile + token pair', 'Nature tokens to unpair', 'Swap out 3–4 matching animals'] },
-    { label: 'Build', items: ['Grow habitat corridors', 'Place animals in patterns', 'Keystone tile → nature token'] },
-    { label: 'Score', items: ['Wildlife cards', 'Largest area of each habitat', 'Majority bonus', 'Leftover nature tokens'] },
+  structure: [
+    { label: 'Setup', text: 'A 3-tile starter habitat each; stack 20 tiles per player + 3; display 4 tile + token pairs.' },
+    { label: 'Turns', repeat: '20 each', text: 'Pick a pair, place the tile, place or return the token, refill the display.' },
+    { label: 'Final scoring', text: 'When the tile stack runs out: wildlife cards, largest habitat areas and bonuses, unspent {=nature}.' },
   ],
 
-  end: { trigger: 'the tile stack runs out', detail: 'That is exactly 20 turns each. Then score wildlife, habitats, bonuses and nature tokens.' },
+  points: [
+    ['{=bear} Bears (A)', 'groups of exactly 2: 1 / 2 / 3 / 4 pairs = 4 / 11 / 19 / 27'],
+    ['{=elk} Elk (A)', 'each straight line, by length 1 / 2 / 3 / 4 = 2 / 5 / 9 / 13'],
+    ['{=salmon} Salmon (A)', 'each run (every salmon touches ≤ 2 others), by length 1–7+ = 2 / 5 / 8 / 12 / 16 / 20 / 25'],
+    ['{=hawk} Hawks (A)', 'hawks touching no other hawk: 1–8+ = 2 / 5 / 8 / 11 / 14 / 18 / 22 / 26'],
+    ['{=fox} Foxes (A)', '1 per different animal type next to each fox (foxes count)'],
+    ['Habitats', '1 per tile in your largest area of each; +3 for the biggest at the table, +1 second. Tied biggest: 2 each (1 each if 3+ tie), no second. 2 players: +2 biggest, 1 each if tied'],
+    ['{=nature} Nature tokens', '1 each, unspent'],
+  ],
+
+  end: { trigger: 'the tile stack runs out', detail: 'Exactly 20 turns each. Ties: most nature tokens.' },
   scoring: [
     { label: 'Wildlife cards', share: 6 },
     { label: 'Habitat areas', share: 3 },
     { label: 'Habitat bonuses', share: 1 },
-    { label: 'Nature tokens', share: 0.5 },
+    { label: '{=nature} Nature tokens', share: 0.5 },
   ],
 
   ref: {
-    title: 'Scoring (first game: “A” cards)',
+    title: 'Tokens, tiles and the display',
     rows: [
-      ['Bear', 'pairs of exactly 2 bears'],
-      ['Elk', 'straight lines of elk'],
-      ['Salmon', 'single-file runs of salmon'],
-      ['Hawk', 'hawks not next to other hawks'],
-      ['Fox', 'different animals next to each fox'],
-      ['Habitats', '1 per tile in largest area; +3 most, +1 second'],
+      ['Wildlife', '{bear} {elk} {salmon} {hawk} {fox}'],
+      ['Habitats', '{mountain} {forest} {prairie} {wetland} {river}'],
+      ['{=nature} Unpair', 'take any display tile with any display token'],
+      ['{=nature} Wipe', 'return any number of display tokens; draw new ones'],
     ],
   },
 
-  example: 'The display offers a **forest/river tile with a bear**. You place the tile beside your forest, growing that area to 6 tiles, then set the bear next to your lone bear, completing a pair for the Bear card.',
+  example: 'The display offers a forest/river tile with a {=bear}. You place the tile beside your forest, growing it to 6 tiles, then set the bear next to your lone bear: a pair for the Bear card.',
 
   setup: [
     'Each player takes a random 3-tile starter habitat.',
-    'Pick one scoring card per animal (all “A” cards for a first game) and stack 20 tiles per player + 3 face down.',
-    'Reveal 4 tiles and pair each with a token drawn from the bag.',
+    'Choose one scoring card per animal (all “A” cards for a first game). Stack 20 tiles per player + 3 face down.',
+    'Reveal 4 tiles; pair each with a token drawn from the bag.',
   ],
 
   terms: [
-    ['Pair', 'A habitat tile with the wildlife token drawn beside it.'],
-    ['Nature token', 'Pinecone earned by putting an animal on a keystone tile; spend for flexibility or keep for 1 point.'],
-    ['Keystone tile', 'A single-habitat tile showing one animal.'],
-    ['Overpopulation', 'When 4 (or optionally 3) display tokens match, they are swapped out.'],
+    ['Pair', 'A display tile with the token beside it.'],
+    ['{=nature} Nature token', 'Earned by placing a token on a keystone tile. Spend it (table) or keep it for 1 point.'],
+    ['Keystone tile', 'Single-habitat tile showing one animal.'],
+    ['Overpopulation', '3 or 4 matching tokens in the display.'],
   ],
 
   gotchas: [
-    'Each tile holds **one** animal, and only an animal pictured on that tile.',
-    'Tiles don’t have to match their neighbours; mismatched edges just don’t join habitat areas.',
-    'If all 4 displayed tokens are the same animal they are replaced automatically; if **3** match, you may replace those 3 for free before your turn.',
+    'Each tile holds **one** token, and only an animal pictured on that tile. Placed tokens never move.',
+    'The token may go on any of your tiles, not only the one you just placed.',
+    'Edges needn’t match; mismatched edges just don’t join habitat areas.',
+    'If all 4 display tokens match, replace them automatically. If **3** match, you may replace those 3 for free before your turn.',
+    'You may spend several nature tokens in one turn.',
   ],
 
   tips: [
-    'Pick 2–3 animals to focus on; you can’t score all five well.',
+    'Focus on 2–3 animals; you can’t score all five well.',
     'Grow one or two habitats big rather than all five a little.',
-    'Spend nature tokens when they fix a big play, but each unspent one is still 1 point.',
+    'Spend nature tokens to fix a big play; each unspent one is still 1 point.',
   ],
 
   walk(A) {
@@ -90,7 +110,8 @@ defineGame({
       if (!b) return A.poly(v, H[a], { sw: 1.2 });
       return A.poly([v[0], v[1], v[2], v[3]], H[a], { sw: 0 }) + A.poly([v[3], v[4], v[5], v[0]], H[b], { sw: 0 }) + A.poly(v, 'none', { sw: 1.2 });
     };
-    const token = (x, y, an, r = 9) => A.circle(x + 1, y + 1.5, r, C.shadow, { sw: 0 }) + A.circle(x, y, r, '#f5ecd6', { sw: 1 }) + A.circle(x, y, r * 0.72, W[an][0], { sw: 0 }) + A.text(x, y + 0.5, W[an][1], { size: r * 0.95, weight: 800, fill: C.white });
+    // Wildlife tokens are the inline token icons (radius r).
+    const token = (x, y, an, r = 9) => A.circle(x + 1, y + 1.5, r, C.shadow, { sw: 0 }) + A.use(this.icons[an].draw(A), x - r * 12 / 10.5, y - r * 12 / 10.5, r * 24 / 10.5);
     const hx = (q, r) => A.hexAt(q, r, s, ox, oy);
     const area = [[0, 0, 'f', null, 'bear'], [-1, 0, 'f', null, null], [-1, 1, 'm', 'f', 'hawk'], [0, 1, 'w', 'f', null], [1, -1, 'f', null, null],
       [0, -1, 'm', null, null], [1, 1, 'r', null, 'salmon'], [2, -1, 'p', null, 'elk'], [-2, 1, 'w', null, null], [-1, 2, 'r', 'w', 'salmon']];
@@ -109,11 +130,11 @@ defineGame({
     // Outline of the forest area once the new tile joins it.
     const forest = [[0, 0], [-1, 0], [-1, 1], [0, 1], [1, -1], [1, 0]].map(([q, r]) => A.poly(verts(...hx(q, r), s - 3), 'none', { stroke: '#ffcf3f', sw: 2.5 })).join('');
     return [
-      { step: 0, say: 'Pick one of the 4 pairs. You take the **forest/river tile** with the **bear** token.', svg: board + inDisp + bearDisp + A.glow(276, row(0), 30, 'g-pick') },
+      { step: 0, say: 'Pick one of the 4 pairs: the **forest/river tile** with a {=bear}.', svg: board + inDisp + bearDisp + A.glow(276, row(0), 30, 'g-pick') },
       { step: 1, say: 'Place the tile touching your area, turned so its **forest** side joins your forest.', svg: board + newTile(nx, ny, s) + bearDisp },
-      { step: 1, say: 'Your forest is now one area of **6 tiles**. Largest areas score at the end.', svg: board + newTile(nx, ny, s) + bearDisp + A.k('forest', forest) + A.k('lab', A.tag(56, 186, 'Forest: 6 tiles', { fill: '#2f6b34' })) },
-      { step: 2, say: 'Put the bear on the new tile, next to your lone bear: **a pair** for the Bear scoring card.', svg: board + newTile(nx, ny, s) + bear(nx, ny) + A.glow((bx + nx) / 2, by, 38, 'g-bears') },
-      { step: 3, say: 'Refill the empty slot with a new tile and token from the bag. Next player.', svg: board + newTile(nx, ny, s) + bear(nx, ny) + A.k('t2', hexTile(258, row(0), 15, 'm', 'w')) + A.k('k2', token(294, row(0), 'elk')) },
+      { step: 1, say: 'Your forest is now one area of **6 tiles**. Largest areas score at game end.', svg: board + newTile(nx, ny, s) + bearDisp + A.k('forest', forest) + A.k('lab', A.tag(56, 186, 'Forest: 6 tiles', { fill: '#2f6b34' })) },
+      { step: 2, say: 'Put the bear on the new tile next to your lone bear: **a pair** for the Bear card.', svg: board + newTile(nx, ny, s) + bear(nx, ny) + A.glow((bx + nx) / 2, by, 38, 'g-bears') },
+      { step: 3, say: 'Refill the empty slot with a new tile and a token from the bag. Next player.', svg: board + newTile(nx, ny, s) + bear(nx, ny) + A.k('t2', hexTile(258, row(0), 15, 'm', 'w')) + A.k('k2', token(294, row(0), 'elk')) },
     ];
   },
 
@@ -127,7 +148,7 @@ defineGame({
       if (!b) return A.poly(v, H[a], { sw: 1.2 });
       return A.poly([v[0], v[1], v[2], v[3]], H[a], { sw: 0 }) + A.poly([v[3], v[4], v[5], v[0]], H[b], { sw: 0 }) + A.poly(v, 'none', { sw: 1.2 });
     };
-    const token = (x, y, an, r = 7.5) => A.circle(x + 1, y + 1.5, r, C.shadow, { sw: 0 }) + A.circle(x, y, r, '#f5ecd6', { sw: 1 }) + A.circle(x, y, r * 0.72, W[an][0], { sw: 0 }) + A.text(x, y + 0.5, W[an][1], { size: r * 0.95, weight: 800, fill: C.white });
+    const token = (x, y, an, r = 7.5) => A.circle(x + 1, y + 1.5, r, C.shadow, { sw: 0 }) + A.use(this.icons[an].draw(A), x - r * 12 / 10.5, y - r * 12 / 10.5, r * 24 / 10.5);
     const area = [
       [0, 0, 'f', null, 'bear'], [1, 0, 'f', 'r', 'bear'], [-1, 1, 'f', 'm', null], [0, 1, 'w', 'r', 'salmon'], [1, 1, 'r', null, 'salmon'],
       [2, 0, 'p', 'f', 'fox'], [2, -1, 'p', null, 'elk'], [1, -1, 'm', 'p', 'elk'], [-1, 0, 'f', null, null], [0, -1, 'm', null, 'hawk'],

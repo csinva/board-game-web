@@ -11,126 +11,157 @@ defineGame({
   profile: { complexity: 4, luck: 2, interaction: 4, conflict: 1, talk: 4, planning: 5 },
   color: '#3f7a3a',
 
-  pitch: 'Play island spirits who grow, gain strange powers, and work together with the native Dahan to scare colonising invaders off the island.',
-  theme: 'You are ancient spirits of an island, and invaders from overseas are spreading across your land and blighting it.',
+  // Pieces, tokens and elements, drawn once and reused inline ({town}) and in art / walk.
+  icons: {
+    explorer: { name: 'explorer', draw: A => A.line(12, 10, 12, 2.5, { sw: 2 }) + A.circle(12, 15.5, 6.5, '#d9d2c3', { sw: 1.4 }) },
+    town: { name: 'town', draw: A => A.house(12, 21.5, 19, '#c8423b') },
+    city: { name: 'city', draw: A => A.city(13.2, 21.5, 18, '#c8423b') },
+    dahan: { name: 'Dahan', draw: A => A.person(12, 10.5, 19, '#a0603a') },
+    blight: { name: 'blight', draw: A => A.star(12, 12.5, 11.5, '#3b2b3e', { stroke: '#d9c6e8', sw: 1 }) },
+    presence: { name: 'presence', draw: A => A.circle(12, 12, 10, '#fff', { sw: 1 }) + A.circle(12, 12, 7.5, '#3d8ee0', { sw: 0 }) },
+    fear: { name: 'Fear', draw: A => A.circle(12, 12, 10, '#9a6fd6', { sw: 1.3 }) + A.circle(8.6, 10, 2, '#2a1d3a', { sw: 0 }) + A.circle(15.4, 10, 2, '#2a1d3a', { sw: 0 }) + A.path('M8.2 17 q3.8 -3.6 7.6 0', { stroke: '#2a1d3a', sw: 1.6 }) },
+    energy: { name: 'energy', draw: A => A.circle(12, 12, 10, '#e2b33c', { sw: 1.3 }) + A.path('M12 6.5 a5.5 5.5 0 1 1 -5.5 5.5 a2.8 2.8 0 0 1 5.5 0', { stroke: '#7a5a10', sw: 1.5 }) },
+    fast: { name: 'Fast', draw: A => A.circle(12, 12, 10, '#e07b2e', { sw: 1.3 }) + A.poly([[13.5, 3.8], [7, 13.5], [11.4, 13.5], [10, 20.2], [17, 10.4], [12.6, 10.4]], '#fff', { sw: 0.7 }) },
+    slow: { name: 'Slow', draw: A => A.circle(12, 12, 10, '#2f6db5', { sw: 1.3 }) + A.poly([[8, 6.5], [16, 6.5], [12, 12], [16, 17.5], [8, 17.5], [12, 12]], '#fff', { sw: 0.7 }) },
+    sun: { name: 'Sun', draw: A => [0, 45, 90, 135, 180, 225, 270, 315].map(d => { const r = d * Math.PI / 180; return A.line(+(12 + 7.5 * Math.cos(r)).toFixed(2), +(12 + 7.5 * Math.sin(r)).toFixed(2), +(12 + 10.8 * Math.cos(r)).toFixed(2), +(12 + 10.8 * Math.sin(r)).toFixed(2), { stroke: '#d99a12', sw: 2 }); }).join('') + A.circle(12, 12, 5.6, '#f5c732', { sw: 1.2 }) },
+    moon: { name: 'Moon', draw: A => A.path('M15 2.8 A9.6 9.6 0 1 0 21.4 16.2 A7.4 7.4 0 0 1 15 2.8z', { fill: '#aab3dd', sw: 1.2 }) },
+    fire: { name: 'Fire', draw: A => A.path('M12 22 C6.5 22 4.5 17 7.2 12.2 C8 14.8 9.6 15.2 10 14 C9 10 11 6 14.6 2.5 C14.4 7.4 19.6 10.4 19 16.2 C18.6 19.8 15.6 22 12 22z', { fill: '#e2552b', sw: 1.2 }) + A.path('M12 21 C9.6 21 8.6 18.6 10 16.4 C10.6 17.6 11.6 17.6 11.6 16.6 C11.4 14.6 12.4 13 14 11.6 C14 14.2 16 15.6 15.6 18 C15.2 20 13.8 21 12 21z', { fill: '#f7c843', sw: 0 }) },
+    air: { name: 'Air', draw: A => A.path('M2.5 9 h11.5 a3.2 3.2 0 1 0 -3.2 -3.2', { stroke: '#8f7cc4', sw: 2.2 }) + A.path('M2.5 14 h15.5 a3.2 3.2 0 1 1 -3.2 3.2', { stroke: '#8f7cc4', sw: 2.2 }) + A.path('M4.5 19 h6', { stroke: '#8f7cc4', sw: 2.2 }) },
+    water: { name: 'Water', draw: A => A.path('M12 2.5 C12 2.5 5 11.2 5 15.5 a7 7 0 0 0 14 0 C19 11.2 12 2.5 12 2.5z', { fill: '#3a8fd6', sw: 1.2 }) + A.path('M8.6 15.6 a3.4 3.4 0 0 0 3 3.4', { stroke: '#cfe6f8', sw: 1.4 }) },
+    earth: { name: 'Earth', draw: A => A.poly([[2.5, 20.5], [8, 9], [11, 13], [15, 4.5], [21.5, 20.5]], '#8c7a62', { sw: 1.2 }) + A.poly([[15, 4.5], [17, 9.5], [13.8, 7.4]], '#d8cdb8', { sw: 0 }) },
+    plant: { name: 'Plant', draw: A => A.path('M4.5 19.5 C4.5 9.5 11 3.5 20.5 3.5 C20.5 13 14 19.5 4.5 19.5z', { fill: '#4f9a3c', sw: 1.2 }) + A.line(4.5, 19.5, 15.5, 8.5, { stroke: '#d6ecc8', sw: 1.2 }) },
+    animal: { name: 'Animal', draw: A => A.circle(12, 16.5, 4.8, '#c0473a', { sw: 1.1 }) + [[5.8, 11], [9.6, 6.4], [14.4, 6.4], [18.2, 11]].map(([x, y]) => A.circle(x, y, 2.4, '#c0473a', { sw: 1 })).join('') },
+  },
 
-  goal: { big: 'Drive them out', text: 'Generate **Fear** until the invaders flee. Early on you must clear every invader; as Terror rises, the bar drops until you only need to remove the cities.' },
+  pitch: 'Co-op: play power cards to destroy invaders and earn Fear until they leave, before blight overruns the island.',
+
+  goal: { big: 'Drive them out', text: 'Destroy invaders and earn **Fear**. Each Terror level lowers the bar, from "no invaders at all" down to "no cities".' },
 
   turn: {
     type: 'round',
-    intro: 'Every round, all spirits act at once, then the invaders respond:',
-    outro: 'Then start a new round.',
+    intro: 'Each round, all spirits act together, then the invaders:',
+    outro: 'Then a new round starts.',
     steps: [
-      { verb: 'Grow', text: 'Each spirit picks one **Growth** option (add presence, gain cards, reclaim), gains Energy, then pays for the Power cards it will play.' },
-      { verb: 'Fast powers', text: 'Resolve **Fast** powers, before the invaders act.' },
-      { verb: 'Invaders', text: 'Resolve earned Fear cards, then invaders **Ravage**, **Build** and **Explore** in the lands on their cards; the cards slide one step.' },
-      { verb: 'Slow powers', text: 'Resolve **Slow** powers, after the invaders have acted.' },
-      { verb: 'Time passes', text: 'Discard played cards; all damage on invaders and Dahan heals.' },
+      { verb: 'Grow', text: 'Each spirit picks 1 **Growth** option (add {=presence}, gain cards, reclaim), gains {energy}, and pays for the Power cards it plays.' },
+      { verb: 'Fast powers', text: 'Resolve {fast} powers **before** the invaders act.' },
+      { verb: 'Invaders', text: 'Resolve earned {=fear} Fear cards; invaders **Ravage**, **Build** and **Explore** in the lands shown; each card slides 1 slot.' },
+      { verb: 'Slow powers', text: 'Resolve {slow} powers **after** the invaders act.' },
+      { verb: 'Time passes', text: 'Discard played cards; damage on invaders and {=dahan} heals.' },
     ],
   },
 
-  tension: 'Every round you choose between growing your spirit for a bigger future or spending everything to stop the Ravage that is coming next turn.',
+  tension: 'Each round: grow your spirit for later, or spend everything now to stop the next Ravage.',
 
-  flow: [
-    { label: 'Grow', items: ['Add presence', 'Unlock energy & card plays', 'Gain new powers'] },
-    { label: 'Defend', items: ['Fast powers stop Ravage', 'Push and destroy invaders', 'Empower the Dahan'] },
-    { label: 'Terrify', items: ['Destroy towns & cities', 'Earn Fear cards', 'Raise the Terror level'] },
+  structure: [
+    { label: 'Setup', text: 'Island boards, starting pieces, Blight card, Fear pool, invader and Fear decks. Flip the first invader card and **Explore**.' },
+    { label: 'Spirits', repeat: 'round', text: 'All at once: 1 Growth option; gain {=energy} = highest uncovered Energy track number; choose up to your Card Plays in Power cards and pay their costs.' },
+    { label: 'Fast', repeat: 'round', text: '{fast} cards and innate powers, in any order the players like.' },
+    { label: 'Invaders', repeat: 'round', text: 'Blighted Island effect (if flipped) → earned {=fear} Fear cards → **Ravage** → **Build** → **Explore** → invader cards slide 1 slot left.' },
+    { label: 'Slow, cleanup', repeat: 'round', text: '{slow} cards and innates. Time passes: discard played cards; all damage heals.' },
+    { label: 'Game end', text: 'Win or lose the **moment** a condition below is met, even mid-round.' },
   ],
 
   end: {
     trigger: 'the invaders are driven off, or the island falls',
-    detail: 'Each player adds 4 to the Fear pool; filling it earns a Fear card. Every few Fear cards the Terror level rises and the win condition gets easier.',
+    detail: 'The Fear pool holds 4 {=fear} per player; emptying it earns a Fear card. Every 3 Fear cards the Terror level rises.',
     results: [
-      { side: 'Spirits win', text: 'Terror 1: no invaders on the island. Terror 2: no towns or cities. Terror 3: no cities. Or earn every Fear card.' },
-      { side: 'Spirits lose', text: 'if **Blight runs out**, any spirit loses all its presence, or the invader deck runs out.' },
+      { side: 'Spirits win', text: 'at Terror 1 with no invaders on the island; Terror 2 with no {=town} or {=city}; Terror 3 with no {=city}; or on earning the last Fear card.' },
+      { side: 'Spirits lose', text: 'if **{=blight} runs out** on the flipped Blight card, any spirit loses all its {=presence}, or the invader deck runs out.' },
     ],
   },
 
   ref: {
-    title: 'Invaders',
+    title: 'Pieces',
     rows: [
-      ['Explorer', '1 health, deals 1 damage'],
-      ['Town', '2 health, deals 2; destroying it = 1 Fear'],
-      ['City', '3 health, deals 3; destroying it = 2 Fear'],
-      ['Dahan', '2 health; survivors strike back for 2 each'],
-      ['Blight', 'added when a Ravage deals 2+ damage to a land'],
+      ['{explorer}', '1 health · deals 1 damage'],
+      ['{town}', '2 health · deals 2 · destroyed = {=fear}'],
+      ['{city}', '3 health · deals 3 · destroyed = {=fear}{=fear}'],
+      ['{dahan}', '2 health · survivors strike back for 2 each'],
+      ['{blight}', 'added when a Ravage deals 2+ damage to a land'],
+      ['Elements', '{=sun}{=moon}{=fire}{=air}{=water}{=earth}{=plant}{=animal}'],
     ],
   },
 
-  example: 'The Ravage card shows Wetlands, where 1 explorer, 1 town and 2 Dahan stand. River plays a Fast power for 2 damage on that coastal wetland, destroying the **town** (1 Fear). In the Ravage the lone explorer deals only 1 damage, so **no blight**, and both Dahan survive to strike back for 4, wiping out the explorer.',
+  example: 'The Ravage card shows Wetland, where {=explorer}, {=town} and {=dahan}{=dahan} stand. A spirit plays a {=fast} power: 2 damage destroys the **town** (+1 {=fear}). The Ravage then deals only 1 damage, so **no blight**; both Dahan survive and strike back for 4, destroying the explorer.',
 
   setup: [
-    'Pick spirits (start with the four marked low complexity) and lay out one island board per player.',
-    'Place the starting invaders, Dahan and blight printed on the boards; put 2 blight per player +1 on the Blight card and 4 Fear per player in the pool.',
-    'Build the invader deck (stage I, II, III) and Fear deck, then do the first **Explore** before round 1.',
+    'Pick spirits (first game: Lightning’s Swift Strike, River Surges in Sunlight, Vital Strength of the Earth or Shadows Flicker Like Flame); lay out 1 island board per player. Each spirit takes its 4 unique Power cards, follows the setup on the back of its panel (starting {=presence}), and fills its tracks with the rest.',
+    'Place the invaders, {=dahan} and {=blight} shown on each land. Put the {=blight} amount printed on the Blight card onto it, and 4 {=fear} per player in the Fear pool.',
+    'Build the invader deck (3 stage I on top, 4 stage II, 5 stage III) and the Fear deck (9 cards, Terror dividers after 3 and 6); flip 1 invader card, **Explore**, and move it to Build.',
   ],
 
   terms: [
-    ['Presence', 'Your spirit’s discs on the island. Powers reach out from them; removing them from your tracks gives more energy and card plays.'],
-    ['Dahan', 'The island’s native people. They fight back when invaders ravage.'],
-    ['Fear', 'Earned by destroying towns and cities and by some powers. Fear cards weaken the invaders.'],
-    ['Blight', 'Damage to the land. Too much and the island is lost.'],
-    ['Elements', 'Symbols on power cards; enough of them unlock your spirit’s Innate powers.'],
+    ['{=presence} Presence', 'Your discs on the island. Powers target lands within range of them; each disc taken off a track uncovers more energy or card plays.'],
+    ['{=dahan} Dahan', 'Neutral pieces that strike back at invaders after a Ravage in their land.'],
+    ['{=fear} Fear', 'Earned from destroyed towns, cities and some powers. Each Fear card weakens the invaders once.'],
+    ['{=blight} Blight', 'Added to a land that takes 2+ Ravage damage. Run out and you lose.'],
+    ['Elements', 'Symbols on Power cards ({=sun}{=water}{=plant}…). Enough of them unlock your spirit’s **innate** powers.'],
   ],
 
   gotchas: [
-    'Ravage, Build and Explore resolve in that order, and each card **moves one step** left every round, so you can see what is coming next round.',
-    'Blight added to a land that already has blight **cascades** to an adjacent land, and blight destroys one presence where it lands.',
-    'Unplayed or discarded cards do not come back on their own; you must choose a **Reclaim** growth option.',
+    'Ravage, Build, Explore resolve in that order, and each card **slides 1 slot** per round, so you see next round’s targets.',
+    'Blight added to a land that already has blight **cascades** to an adjacent land; each blight added also destroys 1 {=presence} of each spirit there.',
+    'Discarded cards stay discarded until you pick a **Reclaim** Growth option.',
   ],
 
   tips: [
-    'Spend the first rounds mostly **growing**; your spirit starts weak and gets much stronger.',
-    'Look one card ahead: the Build card shows where the next Ravage will hit.',
-    'Let the Dahan fight for you; pushing a few invaders into Dahan lands is often cheaper than destroying them yourself.',
+    'Spend the first 2–3 rounds mostly **growing**; spirits start weak.',
+    'The Build card shows where next round’s Ravage will hit.',
+    'Push invaders into lands with {=dahan}; it is often cheaper than destroying them yourself.',
   ],
 
   extended: [
     { title: 'Invader cards and the Explore → Build → Ravage cycle', items: [
-      'The invader deck is built in stages: **3 stage I**, **4 stage II**, **5 stage III** cards. Stage I and II cards name one terrain (stage II adds an **escalation** effect); stage III cards name two terrains, and one stage II card names coastal lands.',
-      '**Explore**: flip the top card into the Explore slot. One explorer goes into each matching land that is **coastal**, or has or is next to a town or city.',
-      '**Build**: in each matching land that already has **any** invaders, add a town if it has no towns or as many cities as towns; otherwise add a city.',
-      '**Ravage**: in each matching land with invaders, they deal damage equal to their total (explorer 1, town 2, city 3) to the **land** and to the **Dahan** there.',
-      'After Explore, every card **slides one slot left** (Explore → Build → Ravage → discard), so you always see one round ahead.',
+      'The invader deck has **3 stage I**, **4 stage II** and **5 stage III** cards, 1 of each stage removed at random. Stage I and II cards name 1 terrain (stage II also includes a Coastal Lands card); stage III cards name 2 terrains. Ignore escalation flags unless playing an adversary.',
+      '**Explore**: flip the top card into the Explore slot. 1 {=explorer} goes into each matching land that is **coastal**, or has or is next to a {=town} or {=city}.',
+      '**Build**: in each matching land with **any** invaders, add a {=city} if it has more towns than cities; otherwise add a {=town}.',
+      '**Ravage**: in each matching land with invaders, they deal their total damage ({=explorer} 1, {=town} 2, {=city} 3) to the **land** and to the {=dahan} there.',
+      'After Explore, every card **slides 1 slot left** (Explore → Build → Ravage → discard), so you always see 1 round ahead.',
     ] },
     { title: 'Ravage in detail', items: [
-      'If the land takes **2 or more** damage, add 1 blight. Defend reduces the damage dealt by invaders in that land, which can stop the blight.',
-      'Invader damage to Dahan kills as many as possible; each Dahan has **2 health**.',
-      'Surviving Dahan then **strike back**: each deals 2 damage to invaders in that land, split as the players choose.',
-      'Damage lasts until Time Passes: a Fast power that deals 1 damage to a town leaves it only 1 health for the Dahan to finish.',
+      'If the land takes **2 or more** damage, add 1 {=blight}. Defend reduces the invaders’ damage in that land and can prevent the blight.',
+      'Invader damage to {=dahan} kills as many as possible; each has **2 health**.',
+      'Surviving Dahan then **strike back**: 2 damage each to invaders in that land, split as the players choose.',
+      'Damage lasts until Time Passes: a {=fast} power that deals 1 damage to a {=town} leaves 1 health for the Dahan to finish.',
     ] },
     { title: 'Fear and Terror levels', items: [
-      'The Fear pool holds **4 Fear per player**. Destroying a town gives **1 Fear**, a city **2**, and many powers generate Fear directly.',
+      'The Fear pool holds **4 {=fear} per player**. A destroyed {=town} gives **1**, a {=city} **2**; many powers give Fear directly.',
       'Each time the pool empties, take the top Fear card face down into the **earned** pile and refill the pool. Earned cards resolve at the start of the next invader phase.',
-      'The Fear deck has 9 cards split by dividers into **Terror levels 1–3** (3 / 3 / 3 by default). Each Fear card has a stronger effect at higher Terror.',
-      'Victory gets easier with Terror: TL1 no invaders at all, TL2 no towns or cities, TL3 no cities. Earning the last Fear card wins at once.',
+      'The Fear deck has 9 cards, split into **Terror levels 1–3** (3 / 3 / 3 by default). Each Fear card has a stronger effect at higher Terror.',
+      'Victory: TL1 no invaders, TL2 no {=town} or {=city}, TL3 no {=city}. Earning the last Fear card wins at once.',
     ] },
     { title: 'Blight and the Blighted Island', items: [
-      'The Blight card starts with **2 blight per player + 1**. Each time blight is added to a land, also **destroy one presence** there.',
-      'Adding blight to a land that already has blight **cascades**: add one more blight to an adjacent land of your choice (which can cascade again).',
-      'When the Blight card empties, **flip it**: the island becomes Blighted and the card refills with more blight (printed on its back), sometimes with a harsher rule. If it empties again, the spirits lose.',
-      'Removing blight from the island returns it to the Blight card, buying back time.',
+      'The Blight card starts with the amount printed on it. Each time blight is added to a land, also **destroy 1 {=presence}** of each spirit there.',
+      'Adding blight to a land that already has blight **cascades**: add 1 more to an adjacent land of your choice (which can cascade again).',
+      'When the Blight card empties, follow it: usually **flip it** to Blighted Island, which refills it (amount printed on its back) and may add a harsher rule. If it empties again, the spirits lose.',
+      'Blight removed from the island returns to the Blight card.',
     ] },
     { title: 'Presence, tracks and Growth', items: [
-      'Each spirit has two **presence tracks**: Energy (gain the highest uncovered value each round) and Card Plays (how many Power cards you may play this round).',
-      'Placing presence uncovers track spaces, so growing on the island makes you stronger. Some spaces grant an **element** every round or a one-time Reclaim.',
-      'Two or more presence in one land make it a **sacred site**, which some powers require or reward.',
-      'Pick **one** Growth option per round (some spirits pick two). Reclaim returns discarded Power cards to hand; gaining a Power card means choosing 1 of 4 minor or 4 major powers (taking a major makes you forget a card).',
+      'Each spirit has 2 **presence tracks**: Energy (gain the highest uncovered {=energy} value each round) and Card Plays (how many Power cards you may play).',
+      'Placing {=presence} uncovers track spaces. Some spaces grant an **element** every round or a one-time Reclaim.',
+      '2+ presence in one land make it a **sacred site**, which some powers require or reward.',
+      'Pick **1** Growth option per round (some spirits pick 2). Reclaim returns discarded Power cards to hand. Gaining a power: choose 1 of 4 minor or 4 major powers; a major makes you forget a card.',
     ] },
     { title: 'Elements and innate powers', items: [
-      'Each Power card shows **elements** (Sun, Moon, Fire, Air, Water, Earth, Plant, Animal). Count the elements on the cards you played this round plus any from your tracks.',
-      'Your spirit board’s **innate powers** list thresholds such as "2 Water, 1 Plant". Meeting a threshold unlocks that tier for free this round.',
-      'Innates have their own speed and resolve once per round, using every tier you have unlocked.',
+      'Power cards show **elements**: {sun}, {moon}, {fire}, {air}, {water}, {earth}, {plant}, {animal}. Count those on the cards you played this round plus any from your tracks.',
+      'Your spirit board’s **innate powers** list thresholds such as "2 {=water} 1 {=plant}". Meeting one unlocks that tier for free this round.',
+      'Innates have their own speed and resolve once per round, using every tier you unlocked.',
     ] },
     { title: 'Fast vs Slow, range and targeting', items: [
-      'Fast powers resolve **before** the invaders (stop the coming Ravage); Slow powers resolve **after** (set-up and clean-up). Pay for all cards at once, then resolve by speed.',
-      'Range counts land by land from one of your **presence** (or a sacred site if the power says so). Oceans are not lands unless a spirit says otherwise.',
+      '{fast} powers resolve **before** the invaders (stop the coming Ravage); {slow} powers resolve **after** (set-up and clean-up). Pay for all cards at once, then resolve by speed.',
+      'Range counts lands from one of your **{=presence}** (or a sacred site if the power says so). Oceans are not lands unless a spirit says otherwise.',
       'Push moves pieces to an adjacent land of your choice; Gather pulls them in. Pushing the only invader out of a land stops next round’s Build there.',
+    ] },
+    { title: 'Optional score (to compare games)', items: [
+      'Win: 5 × difficulty + 10 + 2 per card left in the invader deck. Loss: 2 × difficulty + 1 per invader card out of the deck (discarded or face up in the slots).',
+      'Either way, with X = number of players: +1 per X {=dahan} on the island, −1 per X {=blight} on the island.',
     ] },
   ],
 
   walk(A) {
-    const C = A.C;
+    const C = A.C, I = this.icons;
+    // Icon centred at (x, y), `s` px wide: same drawings as the inline icons.
+    const at = (k, x, y, s) => A.use(I[k].draw(A), x - s / 2, y - s / 2, s);
     const T = { wet: '#5aa8a0', jun: '#3f7a3a', mtn: '#9a9389' };
     let base = A.bg('#4f8fb8');
     base += A.poly([[12, 18], [96, 10], [104, 82], [18, 92]], T.wet, { stroke: '#f3ead2', sw: 2 });
@@ -140,16 +171,16 @@ defineGame({
     base += lab(34, 24, 'Wetland') + lab(168, 30, 'Jungle') + lab(60, 132, 'Mountain');
     // Invader board + fear + blight (right panel).
     base += A.rect(200, 4, 116, 142, '#2a3d4f', { rx: 6, sw: 1.2 });
-    const pl = (x, y, s, o = {}) => A.text(x, y, s, { size: o.size || 6.5, fill: '#e8eef4', weight: 700 });
+    const pl = (x, y, s, o = {}) => A.text(x, y, s, { size: o.size || 6.5, fill: '#e8eef4', weight: 700, anchor: o.anchor });
     base += pl(220, 13, 'Ravage') + pl(258, 13, 'Build') + pl(296, 13, 'Explore');
     base += A.rect(279, 21, 34, 38, '#3c4c5c', { rx: 4, sw: 1, stroke: '#7d8c99' }) + pl(296, 40, 'deck', { size: 6 });
     base += A.line(204, 67, 312, 67, { stroke: '#4d6175', sw: 1 });
-    base += pl(222, 76, 'Fear pool') + pl(292, 76, 'Earned');
+    base += pl(222, 76, 'Fear pool') + pl(292, 76, 'Generated');
     base += A.line(204, 110, 312, 110, { stroke: '#4d6175', sw: 1 });
-    base += A.star(218, 128, 8, '#3b2b3e', { stroke: '#d9c6e8', sw: 0.8 }) + pl(264, 128, 'Blight left: 5', { size: 7.5 });
+    base += at('blight', 220, 128, 18) + pl(234, 128, 'Blight left: 5', { size: 7.5, anchor: 'start' });
     // Spirit panel (bottom).
     base += A.rect(0, 148, 320, 52, '#f3ead2', { rx: 0, sw: 0 }) + A.line(0, 148, 320, 148, { sw: 1.5 });
-    base += A.tag(32, 158, 'River (you)', { fill: C.blue });
+    base += A.tag(32, 158, 'Your spirit', { fill: C.blue });
     base += A.text(14, 175, 'Energy', { size: 6, anchor: 'start' }) + A.text(14, 191, 'Plays', { size: 6, anchor: 'start' });
     const tr = (i, row) => [44 + i * 15, row ? 191 : 175];
     for (let i = 0; i < 4; i++) {
@@ -158,20 +189,22 @@ defineGame({
     }
     base += A.text(124, 160, 'Energy', { size: 6 });
 
-    const pres = (x, y) => A.circle(x, y, 5.5, '#3d8ee0', { stroke: '#fff', sw: 1.8 });
-    const explorer = (x, y) => A.circle(x, y, 4.5, '#d9d2c3', { stroke: C.ink, sw: 1 }) + A.line(x, y - 4.5, x, y - 10, { sw: 1.3 });
-    const town = (x, y) => A.house(x, y, 15, '#c8423b');
-    const dahan = (x, y) => A.person(x, y, 14, '#a0603a');
-    const fear = (x, y) => A.circle(x, y, 5, '#9a6fd6', { stroke: '#fff', sw: 1 });
+    const pres = (x, y) => at('presence', x, y, 13);
+    const explorer = (x, y) => at('explorer', x, y - 3.5, 16);
+    const town = (x, y) => at('town', x, y - 7, 18);
+    const dahan = (x, y) => at('dahan', x, y, 18);
+    const fear = (x, y) => at('fear', x, y, 12);
     const inv = (x, fill, s) => A.card(x - 2, 21, 34, 38, fill, { label: s, size: 5.2, labelFill: '#fff' });
     const dmg = (x, y, s) => A.rect(x - 17, y - 6, 34, 12, '#ffcf3f', { rx: 6, sw: 1 }) + A.text(x, y, s, { size: 7, weight: 800 });
     const coin = (n) => A.circle(124, 177, 10, '#e2b33c', { sw: 1.2 }) + A.text(124, 177.5, n, { size: 10, weight: 800 });
     const power = (x, fast) => {
       const y = 153, col = fast ? '#e07b2e' : '#2f6db5';
       return A.rect(x + 1.5, y + 2, 40, 42, C.shadow, { sw: 0, rx: 4 }) + A.rect(x, y, 40, 42, '#fbf6ec', { rx: 4, sw: 1.2 }) +
-        A.rect(x + 2, y + 2, 36, 11, col, { rx: 3, sw: 0 }) + A.text(x + 23, y + 7.5, fast ? 'FAST' : 'SLOW', { size: 6, fill: '#fff', weight: 800 }) +
+        A.rect(x + 2, y + 2, 36, 11, col, { rx: 3, sw: 0 }) + A.text(x + 20, y + 7.5, fast ? 'FAST' : 'SLOW', { size: 5.6, fill: '#fff', weight: 800 }) +
         A.circle(x + 8, y + 7.5, 4.5, '#e2b33c', { sw: 0.8 }) + A.text(x + 8, y + 8, fast ? 1 : 2, { size: 6, weight: 800 }) +
-        A.text(x + 20, y + 24, fast ? '2 Damage' : 'Push 1', { size: 6, weight: 800 }) + A.text(x + 20, y + 33, fast ? 'range 1' : 'explorer', { size: 6, weight: 600 });
+        at(fast ? 'fast' : 'slow', x + 33, y + 7.5, 9) +
+        A.text(x + 20, y + 22, fast ? '2 Damage' : 'Push 1', { size: 6, weight: 800 }) + A.text(x + 20, y + 30, fast ? 'range 1' : 'explorer', { size: 6, weight: 600 }) +
+        at(fast ? 'fire' : 'air', x + 14, y + 37, 8) + at(fast ? 'water' : 'moon', x + 26, y + 37, 8);
     };
     const hand = (i) => 228 + i * 46, played = (i) => 146 + i * 44;
 
@@ -190,25 +223,26 @@ defineGame({
     const after = base + presOld + pC1land + wetland;
 
     return [
-      { step: 0, say: 'Round start. River can play only **1** card, and the Wetland card sits in the **Ravage** slot: trouble is coming there.',
+      { step: 0, say: 'Round start. You can play **1** card. Wetland sits in the **Ravage** slot: it gets attacked this round.',
         svg: base + presOld + pC1track + wetland + wTown + wExp + mExp + pool(4) + cardsStart + handCards + A.k('coin', coin(2)) + A.glow(220, 40, 20, 'g-card') },
-      { step: 0, say: '**Grow:** add a presence. The disc leaves the Card Plays track for the Jungle, so River can now play **2** cards, and gains 1 energy.',
+      { step: 0, say: '**Grow:** move a {=presence} from the Card Plays track to the Jungle. You can now play **2** cards; gain 1 {=energy} (highest uncovered energy space).',
         svg: after + wTown + wExp + mExp + pool(4) + cardsStart + handCards + A.k('coin', coin(3)) + A.glow(148, 64, 11, 'g-pres') + A.glow(...tr(1, 1), 8, 'g-track') },
-      { step: 0, say: 'Pay for both cards at once: a **Fast** 2-damage power (cost 1) and a **Slow** push (cost 2).',
+      { step: 0, say: 'Pay for both cards at once: a {=fast} 2-damage power (cost 1) and a {=slow} push (cost 2).',
         svg: after + wTown + wExp + mExp + pool(4) + cardsStart + playCards + A.k('coin', coin(0)) + A.glow(124, 177, 13, 'g-coin') },
-      { step: 1, say: '**Fast powers** hit before the invaders. 2 damage on the Wetland destroys the **town**: 1 Fear moves to the earned pile.',
+      { step: 1, say: '{=fast} powers resolve before the invaders. 2 damage destroys the Wetland {=town}: 1 {=fear} leaves the pool.',
         svg: after + wExp + mExp + pool(3) + earned + cardsStart + playCards + A.k('coin', coin(0)) + A.k('dmg', dmg(66, 40, '2 dmg')) + A.glow(60, 52, 26, 'g-wet') + A.glow(292, 92, 9, 'g-fear') },
-      { step: 2, say: '**Ravage** the Wetland: the lone explorer deals just 1 damage, so **no blight**. Both Dahan survive and strike back for 4.',
+      { step: 2, say: '**Ravage** the Wetland: 1 {=explorer} deals 1 damage, so **no blight**. Both {=dahan} survive and strike back for 4.',
         svg: after + mExp + pool(3) + earned + cardsStart + playCards + A.k('coin', coin(0)) + A.k('dmg2', dmg(62, 38, 'Dahan: 4')) + A.glow(220, 40, 20, 'g-card') + A.glow(62, 70, 22, 'g-wet') },
-      { step: 2, say: '**Build** in the Mountain (it has an explorer, so add a town). Flip the next card and **Explore** the Jungle. Then the cards slide left.',
+      { step: 2, say: '**Build** in the Mountain: it has an {=explorer}, so add a {=town}. Flip the next card: **Explore** the Jungle. Cards slide left.',
         svg: after + mExp + A.k('mtown', town(108, 122)) + A.k('jexp', explorer(162, 76)) + pool(3) + earned + cardsNext + playCards + A.k('coin', coin(0)) + A.glow(116, 118, 20, 'g-mtn') + A.glow(162, 72, 13, 'g-jun') },
-      { step: 3, say: '**Slow:** River pushes the Jungle explorer into the Wetland, so next round’s Jungle **Build** finds no invaders. Time passes; cards are discarded.',
+      { step: 3, say: '{=slow} You push the Jungle explorer into the Wetland, so next round’s Jungle **Build** finds no invaders. Time passes.',
         svg: after + mExp + A.k('mtown', town(108, 122)) + A.k('jexp', explorer(84, 46)) + pool(3) + earned + cardsNext + A.k('coin', coin(0)) + A.glow(84, 44, 14, 'g-push') + A.glow(258, 40, 20, 'g-card2') },
     ];
   },
 
   art(A) {
-    const C = A.C;
+    const C = A.C, I = this.icons;
+    const at = (k, x, y, s) => A.use(I[k].draw(A), x - s / 2, y - s / 2, s);
     const T = { mtn: '#9a9389', jun: '#3f7a3a', wet: '#5aa8a0', snd: '#e3cf9a' };
     let o = A.bg('#4f8fb8');
     // waves
@@ -224,21 +258,22 @@ defineGame({
       [T.wet, [[80, 142], [150, 112], [212, 136], [184, 162], [100, 168]]],
     ];
     for (const [f, pts] of L) o += A.poly(pts, f, { stroke: '#f3ead2', sw: 2 });
-    // pieces
-    const explorer = (x, y) => A.circle(x, y, 4, '#d9d2c3', { stroke: C.ink, sw: 1 }) + A.line(x, y - 4, x, y - 9, { sw: 1.2 });
-    const blight = (x, y) => A.star(x, y, 7, '#3b2b3e', { stroke: '#d9c6e8', sw: 0.8 });
-    const dahan = (x, y) => A.person(x, y, 13, '#a0603a');
-    const pres = (x, y) => A.circle(x, y, 6, '#3d8ee0', { stroke: '#fff', sw: 2 });
+    // pieces (same drawings as the inline icons)
+    const explorer = (x, y) => at('explorer', x, y - 3, 14);
+    const blight = (x, y) => at('blight', x, y, 16);
+    const dahan = (x, y) => at('dahan', x, y, 16);
+    const pres = (x, y) => at('presence', x, y, 14);
+    const town = (x, y, s) => at('town', x, y - s / 2, s * 1.2);
     // wetland top-right: ravage target
-    o += explorer(190, 46) + A.house(206, 58, 13, '#c8423b') + dahan(196, 66) + dahan(212, 70);
+    o += explorer(190, 46) + town(206, 58, 13) + dahan(196, 66) + dahan(212, 70);
     // jungle centre: presence + sacred site
     o += pres(118, 88) + pres(130, 92) + pres(150, 30);
     // mountain right: city + blight
-    o += A.city(196, 112, 16, '#c8423b') + blight(178, 102);
+    o += at('city', 196, 104, 20) + blight(178, 102);
     // sands: dahan + explorer
-    o += dahan(52, 108) + explorer(60, 122);
+    o += dahan(52, 108) + explorer(60, 124);
     // mountain left: town
-    o += A.house(64, 56, 12, '#c8423b') + explorer(48, 54);
+    o += town(64, 56, 12) + explorer(48, 54);
     // lower wetland: blight
     o += blight(122, 148) + explorer(150, 140);
     // invader board
@@ -252,12 +287,12 @@ defineGame({
     for (let i = 0; i < 7; i++) {
       const x = 176 + i * 15;
       o += A.circle(x, 185.5, 5.5, '#e2b33c', { stroke: C.ink, sw: 0.8 });
-      if (i >= 2) o += pres(x, 185.5);
+      if (i >= 2) o += at('presence', x, 185.5, 12);
     }
     o += A.text(292, 185.5, 'energy', { size: 8, fill: C.gray, weight: 700 });
     o += A.note(206, 58, 150, 9, 'Invaders ravage here');
     o += A.note(124, 90, 50, 162, 'Your presence');
-    o += A.note(212, 74, 214, 154, 'Dahan fight back');
+    o += A.note(212, 74, 214, 154, 'Dahan strike back');
     o += A.note(126, 150, 70, 186, 'Blight');
     return o;
   },

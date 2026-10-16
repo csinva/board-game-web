@@ -10,79 +10,98 @@ defineGame({
   mechanics: ['drafting', 'set-collection', 'simultaneous', 'hand-management'],
   profile: { complexity: 1, luck: 3, interaction: 3, conflict: 2, talk: 2, planning: 2 },
 
-  pitch: 'Grab one dish from the hand of cards, pass the rest along like a conveyor belt, and build the tastiest-scoring combos.',
-  theme: 'You are diners at a sushi conveyor-belt restaurant, grabbing the best dishes as they go by.',
+  // Each dish drawn once: `food` is the dish alone (reused on the cards in art + walk), `draw` adds the card colour.
+  icons: (() => {
+    const F = {
+      tempura: ['Tempura', '#9b74c9', A => A.path('M3.5 18 q4 -15 8.5 -10 q4.5 -5 8.5 10 z', { fill: '#e8b04a', sw: 1.2 })],
+      sashimi: ['Sashimi', '#93c45e', A => A.rect(3, 9, 18, 9, '#f08a6a', { rx: 3, sw: 1.2 }) + A.line(8, 10.5, 6.5, 16.5, { stroke: '#fbe0d4', sw: 1.2 }) + A.line(13, 10.5, 11.5, 16.5, { stroke: '#fbe0d4', sw: 1.2 }) + A.line(18, 10.5, 16.5, 16.5, { stroke: '#fbe0d4', sw: 1.2 })],
+      dumpling: ['Dumpling', '#4aa3d8', A => A.path('M2.5 18 q9.5 -17 19 0 z', { fill: '#fbf6ec', sw: 1.2 }) + A.path('M9 11 l1 3 M12 9.5 v3.5 M15 11 l-1 3', { sw: 0.9 })],
+      maki: ['Maki roll', '#e0524a', A => A.circle(12, 13, 9, '#2b2b2b', { sw: 1.2 }) + A.circle(12, 13, 5.8, '#fbf6ec', { sw: 0 }) + A.circle(12, 13, 2.4, '#e85d3a', { sw: 0 })],
+      egg: ['Egg Nigiri', '#f2c14e', A => A.rect(4, 13, 16, 7, '#fbf6ec', { rx: 3, sw: 1.2 }) + A.rect(3, 7.5, 18, 6.5, '#f6dc5a', { rx: 3, sw: 1.2 }) + A.rect(10, 7, 4, 13.5, '#2b2b2b', { rx: 0.5, sw: 0 })],
+      salmon: ['Salmon Nigiri', '#f2c14e', A => A.rect(4, 13, 16, 7, '#fbf6ec', { rx: 3, sw: 1.2 }) + A.rect(3, 7.5, 18, 6.5, '#e85d3a', { rx: 3, sw: 1.2 })],
+      squid: ['Squid Nigiri', '#f2c14e', A => A.rect(4, 13, 16, 7, '#fbf6ec', { rx: 3, sw: 1.2 }) + A.rect(3, 7.5, 18, 6.5, '#f4efe6', { rx: 3, sw: 1.2 }) + A.line(7, 10.7, 17, 10.7, { stroke: '#b8b0a2', sw: 1 })],
+      wasabi: ['Wasabi', '#86b84a', A => A.path('M4.5 18 q7.5 -16 15 0 z', { fill: '#b7dc6a', sw: 1.2 })],
+      chopsticks: ['Chopsticks', '#4fbfae', A => A.line(4, 20, 17, 5, { sw: 2.4, stroke: '#8a5a33' }) + A.line(8, 21, 20, 7, { sw: 2.4, stroke: '#8a5a33' })],
+      pudding: ['Pudding', '#f19bb4', A => A.path('M5.5 20 l3 -12 h7 l3 12 z', { fill: '#f6d27a', sw: 1.2 }) + A.rect(8, 5, 8, 4, '#8a5a33', { rx: 2, sw: 0.9 })],
+    };
+    const o = {};
+    for (const k in F) {
+      const [name, fill, food] = F[k];
+      o[k] = { name, food, draw: A => A.rect(1, 1, 22, 22, fill, { rx: 5, sw: 1.2 }) + A.use(food(A), 0.5, 0.5, 23) };
+    }
+    return o;
+  })(),
 
-  goal: { big: 'Most points', text: 'After **3 rounds**, the player with the most points wins. Each dish scores in its own way, mostly in sets.' },
+  pitch: 'Pick one card, pass the rest; after 3 rounds, the most points from dish sets and combos wins.',
+
+  goal: { big: 'Most points', text: 'Most points after **3 rounds**. Each dish scores its own way, mostly in sets.' },
 
   turn: {
     type: 'simultaneous',
-    intro: 'Everyone does this at the same time:',
+    intro: 'Everyone at once:',
     steps: [
-      { verb: 'Pick', text: 'Choose **one** card from your hand and place it face-down in front of you.' },
-      { verb: 'Reveal', text: 'Everyone flips their chosen card face-up at once, next to their earlier picks.' },
-      { verb: 'Pass', text: 'Pass the rest of your hand to the **left**.' },
+      { verb: 'Pick', text: 'Choose **one** card from your hand; lay it face-down.' },
+      { verb: 'Reveal', text: 'Flip it face-up with everyone else, beside your earlier picks.' },
+      { verb: 'Pass', text: 'Pass the rest of your hand **left**.' },
     ],
-    outro: 'Repeat until all cards are played, then score the round.',
+    outro: 'Repeat until hands are empty, then score the round.',
   },
 
-  tension: 'You see exactly which cards are heading to your neighbour, so each pick is a choice between finishing your own set and taking the card someone else needs.',
+  tension: 'You see which cards go to your neighbour, so each pick is a choice between finishing your own set and taking the card they need.',
 
-  flow: [
-    { label: 'Draft', items: ['Pick 1, pass the rest', 'Hands shrink each turn'] },
-    { label: 'Combine', items: ['Pairs and triples', 'Wasabi under Nigiri', 'Chopsticks for 2 picks'] },
-    { label: 'Score', items: ['Score each round', 'Discard all but Pudding', 'Pudding at game end'] },
+  structure: [
+    { label: 'Setup', text: 'Shuffle the deck. Deal 10 / 9 / 8 / 7 cards each for 2 / 3 / 4 / 5 players.' },
+    { label: 'Rounds 1–3', repeat: '3 rounds', text: 'Pick, reveal, pass left, until every card is played.' },
+    { label: 'End of each round', text: 'Score every dish except {=pudding}, then discard them. Keep {=pudding} in front of you. Deal new hands.' },
+    { label: 'Game end', text: 'After round 3, score {=pudding}. Most points wins.' },
   ],
 
-  end: { trigger: 'the third round has been scored', detail: 'Then score Pudding: most Pudding cards gain 6, fewest lose 6 (no loss in a 2-player game). Ties go to whoever has more Pudding.' },
+  points: [
+    ['{=tempura} Tempura', '5 per pair'],
+    ['{=sashimi} Sashimi', '10 per set of 3'],
+    ['{=dumpling} Dumplings', '1 / 3 / 6 / 10 / 15 for 1 / 2 / 3 / 4 / 5+'],
+    ['Nigiri', '{=egg} 1 · {=salmon} 2 · {=squid} 3; ×3 on a {=wasabi}'],
+    ['{=maki} Maki', 'Each round: most rolls 6, second most 3. Ties split (rounded down); a tie for most skips second.'],
+    ['{=pudding} Pudding', 'Game end: most +6, fewest −6 (ties split, rounded down; no −6 with 2 players; all tied: no one scores)'],
+  ],
+
+  end: { trigger: 'round 3 and {pudding} are scored', detail: 'Tie: most {=pudding} wins.' },
   scoring: [
-    { label: 'Nigiri + Wasabi', share: 3 },
-    { label: 'Sets (Tempura, Sashimi, Dumplings)', share: 4 },
-    { label: 'Maki rolls', share: 2 },
-    { label: 'Pudding', share: 1 },
+    { label: '{=squid}{=wasabi} Nigiri + Wasabi', share: 3 },
+    { label: '{=tempura}{=sashimi}{=dumpling} Sets', share: 4 },
+    { label: '{=maki} Maki rolls', share: 2 },
+    { label: '{=pudding} Pudding', share: 1 },
   ],
 
-  ref: {
-    title: 'How dishes score',
-    rows: [
-      ['Tempura', '5 per pair'],
-      ['Sashimi', '10 per set of 3'],
-      ['Dumplings', '1 / 3 / 6 / 10 / 15 for 1–5+'],
-      ['Maki rolls', 'Most icons 6, second 3'],
-      ['Nigiri', 'Egg 1, Salmon 2, Squid 3 (×3 on Wasabi)'],
-      ['Pudding', 'End of game: most +6, fewest −6'],
-    ],
-  },
-
-  example: 'You hold a **Squid Nigiri** and already have an empty **Wasabi** in front of you. You take the Squid and put it on the Wasabi: 3 × 3 = **9 points**. You pass the rest left, including a Tempura that would have completed your neighbour’s pair.',
+  example: 'You hold a {squid} and have an empty {wasabi} in front of you. Take the Squid and put it on the Wasabi: 3 × 3 = **9 points**. Pass the rest left, including a {=tempura} that would complete your neighbour’s pair.',
 
   setup: [
     'Shuffle the whole deck.',
-    'Deal hands: 10 cards each with 2 players, 9 with 3, 8 with 4, 7 with 5.',
-    'Keep a scorepad handy; deal a fresh hand at the start of each round.',
+    'Deal 10 cards each with 2 players, 9 with 3, 8 with 4, 7 with 5.',
+    'Keep score on paper; deal a fresh hand each round.',
   ],
 
   terms: [
     ['Draft', 'Pick a card, then pass the hand on.'],
-    ['Wasabi', 'Triples the next Nigiri you put on it.'],
-    ['Chopsticks', 'On a later turn, swap them back into the hand to take 2 cards.'],
-    ['Maki', 'Rolls with 1–3 icons; compete for the most each round.'],
+    ['{=wasabi} Wasabi', 'Triples the next nigiri you put on it.'],
+    ['{=chopsticks} Chopsticks', 'On a later turn, take 2 cards from your hand, then put the Chopsticks into the hand you pass.'],
+    ['{=maki} Maki', 'Each Maki card shows 1–3 rolls; count rolls, not cards.'],
   ],
 
   gotchas: [
-    'Incomplete sets score **nothing**: one Tempura or two Sashimi are worth 0.',
-    'Wasabi only boosts a Nigiri played **after** it; an empty Wasabi scores 0.',
-    'Pudding cards stay out all game; everything else is discarded after each round.',
+    'Incomplete sets score **0**: a lone {=tempura} or {=sashimi}{=sashimi} is worth nothing.',
+    '{wasabi} only boosts nigiri played **after** it; an empty Wasabi scores 0.',
+    '{pudding} stays out all game; every other card is discarded after each round.',
   ],
 
   tips: [
-    'Sashimi is a gamble: only start it early in the round when there’s time to finish.',
-    'Dumplings scale fast and nobody can block a set you have started.',
-    'Look at what your left neighbour has collected before you pass.',
+    '{sashimi} is a gamble: start it only early in a round, with time to finish.',
+    'Every {dumpling} adds points (up to 5), so they never go to waste.',
+    'Before you pass, check what your left neighbour is collecting.',
   ],
 
   walk(A) {
-    const C = A.C, W = 34, H = 46;
+    const C = A.C, I = this.icons, W = 34, H = 46;
     const D = {
       tempura: ['#9b74c9', 'Tempura'], dumpling: ['#4aa3d8', 'Dumpling'], maki: ['#e0524a', 'Maki'], squid: ['#f2c14e', 'Squid Nigiri'],
       salmon: ['#f2c14e', 'Salmon Nigiri'], wasabi: ['#86b84a', 'Wasabi'], pudding: ['#f19bb4', 'Pudding'], sashimi: ['#93c45e', 'Sashimi'], chop: ['#4fbfae', 'Chopsticks'],
@@ -91,14 +110,7 @@ defineGame({
       const [f, t] = D[k];
       let s = A.card(x, y, W, H, f, {}) + A.rect(x + 3, y + 3, W - 6, 10, C.white, { rx: 2, sw: 0, opacity: 0.9 }) + A.text(x + W / 2, y + 8, t, { size: Math.min(5.5, 46 / t.length), weight: 800 });
       const cx = x + W / 2, cy = y + H / 2 + 6;
-      if (k === 'squid' || k === 'salmon') s += A.rect(cx - 9, cy, 18, 7, '#fbf6ec', { rx: 3, sw: 1 }) + A.rect(cx - 10, cy - 5, 20, 6, k === 'squid' ? '#f4efe6' : '#e85d3a', { rx: 3, sw: 1 });
-      else if (k === 'maki') s += A.circle(cx, cy, 8, '#2b2b2b', { sw: 1 }) + A.circle(cx, cy, 5, '#fbf6ec', { sw: 0 }) + A.circle(cx, cy, 2, '#e85d3a', { sw: 0 });
-      else if (k === 'dumpling') s += A.path(`M${cx - 9} ${cy + 4} q9 -15 18 0 z`, { fill: '#fbf6ec', sw: 1 });
-      else if (k === 'tempura') s += A.path(`M${cx - 8} ${cy + 5} q4 -13 8 -9 q4 -4 8 9 z`, { fill: '#e8b04a', sw: 1 });
-      else if (k === 'sashimi') s += A.rect(cx - 9, cy - 4, 18, 8, '#f08a6a', { rx: 3, sw: 1 });
-      else if (k === 'pudding') s += A.path(`M${cx - 7} ${cy + 6} l3 -11 h8 l3 11 z`, { fill: '#f6d27a', sw: 1 }) + A.rect(cx - 4, cy - 7, 8, 4, '#8a5a33', { rx: 2, sw: 0.8 });
-      else if (k === 'wasabi') s += A.path(`M${cx - 7} ${cy + 5} q7 -14 14 0 z`, { fill: '#b7dc6a', sw: 1 });
-      else s += A.line(cx - 7, cy + 6, cx + 5, cy - 7, { sw: 2, stroke: '#8a5a33' }) + A.line(cx - 3, cy + 7, cx + 8, cy - 5, { sw: 2, stroke: '#8a5a33' });
+      s += A.use(I[k === 'chop' ? 'chopsticks' : k].food(A), cx - 13, cy - 14, 26);
       return s;
     };
     const back = (x, y) => A.card(x, y, W, H, '#d9503f', {}) + A.circle(x + W / 2, y + H / 2, 8, '#fbf6ec', { sw: 1 }) + A.text(x + W / 2, y + H / 2, '?', { size: 6, weight: 800 });
@@ -112,23 +124,23 @@ defineGame({
     const YR = (i) => YH(i + 1), KR = (i) => [96 + i * 40, 8];
     const squidOn = A.k('squid', dish(14, 86, 'squid'));
     return [
-      { step: 0, say: 'You hold Squid Nigiri, Tempura, Maki and Pudding. An empty **Wasabi** waits in front of you.', svg: base + kaiHand + moHand +
+      { step: 0, say: 'You hold Squid Nigiri, Tempura, Maki and Pudding. An empty **Wasabi** sits in front of you.', svg: base + kaiHand + moHand + A.k('mp', back(...MH(3))) +
         A.k('kp', back(...KH(3))) + A.k('squid', dish(...YH(0), 'squid')) + rest(YR) + A.glow(27, 167, 26, 'g1') + A.glow(27, 93, 26, 'g2') },
-      { step: 0, say: 'Everyone picks one card at the same time and lays it face-down. You take the **Squid**.', svg: base + kaiHand + moHand +
+      { step: 0, say: 'Everyone lays one card face-down at once. You take the **Squid**.', svg: base + kaiHand + moHand +
         A.k('kp', back(96, 8)) + A.k('squid', back(96, 70)) + rest(YR) },
-      { step: 1, say: 'Reveal together. Your Squid goes on the Wasabi: 3 × 3 = **9 points**. Kai revealed a Dumpling.', svg: base + kaiHand + moHand +
+      { step: 1, say: 'Reveal. {=squid} on {=wasabi}: 3 × 3 = **9 points**. Kai revealed a Dumpling.', svg: base + kaiHand + moHand +
         A.k('kp', dish(96, 8, 'dumpling')) + squidOn + rest(YR) + A.k('pts', A.bubble(60, 104, 66, 24, '3 × 3 = 9', { size: 9 })) },
-      { step: 2, say: 'Pass the rest **left** to Kai (top), including a Tempura that completes Kai’s pair. You couldn’t take both.', svg: base + moHand +
+      { step: 2, say: 'Pass the rest **left** to Kai (top), including a {=tempura} that would complete Kai’s pair.', svg: base + moHand +
         A.k('kp', dish(96, 8, 'dumpling')) + squidOn + A.k('tem', dish(146, 8, 'tempura')) + A.k('mak', dish(184, 8, 'maki')) + A.k('pud', dish(222, 8, 'pudding')) +
         A.glow(27, 31, 24, 'g3') + A.glow(163, 31, 24, 'g4') },
-      { step: 2, say: 'At the same time Mo, on your right, passes you 3 cards. Pick again: Salmon now scores just 2, as your Wasabi is used.', svg: base +
+      { step: 2, say: 'Mo, on your right, passes you 3 cards. Pick again: {=salmon} now scores only 2, since your Wasabi is used.', svg: base +
         A.k('kp', dish(96, 8, 'dumpling')) + squidOn + A.k('tem', dish(146, 8, 'tempura')) + A.k('mak', dish(184, 8, 'maki')) + A.k('pud', dish(222, 8, 'pudding')) +
         A.k('m0', dish(...YH(0), 'salmon')) + A.k('m1', dish(...YH(1), 'sashimi')) + A.k('m2', dish(...YH(2), 'chop')) },
     ];
   },
 
   art(A) {
-    const C = A.C;
+    const C = A.C, I = this.icons;
     let o = A.bg('#f7e3cf');
     // conveyor belt
     o += A.rect(-4, 10, 328, 74, '#5b5f6b', { rx: 0, sw: 0 });
@@ -142,14 +154,7 @@ defineGame({
       const [f, t] = D[k];
       let s = A.card(x, y, w, h, f, { title: t });
       const cx = x + w / 2, cy = y + h / 2 + 6;
-      if (k === 'nigiri') s += A.rect(cx - 10, cy - 1, 20, 9, '#fbf6ec', { rx: 4, sw: 1 }) + A.rect(cx - 11, cy - 6, 22, 7, '#e85d3a', { rx: 3, sw: 1 });
-      else if (k === 'maki') s += A.circle(cx, cy, 9, '#2b2b2b', { sw: 1 }) + A.circle(cx, cy, 6, '#fbf6ec', { sw: 0 }) + A.circle(cx, cy, 2.5, '#e85d3a', { sw: 0 });
-      else if (k === 'dumpling') s += A.path(`M${cx - 10} ${cy + 4} q10 -16 20 0 z`, { fill: '#fbf6ec', sw: 1 });
-      else if (k === 'tempura') s += A.path(`M${cx - 9} ${cy + 5} q4 -14 9 -10 q5 -4 9 10 z`, { fill: '#e8b04a', sw: 1 });
-      else if (k === 'sashimi') s += A.rect(cx - 10, cy - 4, 20, 9, '#f08a6a', { rx: 3, sw: 1 });
-      else if (k === 'pudding') s += A.path(`M${cx - 8} ${cy + 6} l3 -12 h10 l3 12 z`, { fill: '#f6d27a', sw: 1 }) + A.rect(cx - 5, cy - 8, 10, 4, '#8a5a33', { rx: 2, sw: 0.8 });
-      else if (k === 'wasabi') s += A.path(`M${cx - 8} ${cy + 5} q8 -16 16 0 z`, { fill: '#b7dc6a', sw: 1 });
-      else s += A.line(cx - 8, cy + 6, cx + 6, cy - 8, { sw: 2.2, stroke: '#8a5a33' }) + A.line(cx - 4, cy + 7, cx + 9, cy - 6, { sw: 2.2, stroke: '#8a5a33' });
+      s += A.use(I[{ nigiri: 'salmon', chop: 'chopsticks' }[k] || k].food(A), cx - 14, cy - 15, 28);
       return s;
     };
     // hand passing along the belt

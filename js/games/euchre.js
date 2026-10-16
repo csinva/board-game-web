@@ -1,7 +1,16 @@
+{
+// Mini playing card in a 24×24 icon box: rank on top, suit below. o.gold frames a bower.
+const mini = (A, r, s, o = {}) => {
+  const col = (s === '♥' || s === '♦') ? '#c8423b' : '#2a2420';
+  return A.rect(3.5, 0.5, 17, 23, '#fffaf0', { rx: 2.5, sw: o.gold ? 2.2 : 1.3, stroke: o.gold ? '#d9a514' : undefined }) +
+    A.text(12, 7.2, r, { size: 12.5, weight: 800, fill: col }) + A.text(12, 17.2, s + '︎', { size: 14, weight: 400, fill: col });
+};
+const back = (A, x, y, w, h) => A.rect(x, y, w, h, '#2f5d50', { rx: 2, sw: 1.1, stroke: '#2a2420' }) + A.poly([[x + w / 2, y + 3], [x + w - 3, y + h / 2], [x + w / 2, y + h - 3], [x + 3, y + h / 2]], 'none', { sw: 0.9, stroke: '#a8cbb8' });
+
 defineGame({
   id: 'euchre',
   name: 'Euchre',
-  year: 1820,
+  year: 'Early 1800s',
   designer: 'Traditional',
   family: 'trick',
   players: [4, 4], best: '4',
@@ -10,81 +19,91 @@ defineGame({
   mechanics: ['trick-taking', 'team', 'auction', 'hand-management', 'press-your-luck'],
   profile: { complexity: 2, luck: 3, interaction: 4, conflict: 3, talk: 3, planning: 2 },
 
-  pitch: 'A fast partnership game with a tiny 24-card deck where two jacks become the top trumps and one bold call can win the hand.',
-  theme: 'You and your partner across the table decide which suit is trump, then try to win at least 3 of the 5 tricks.',
+  icons: {
+    right: { name: 'right bower', draw: A => mini(A, 'J', '♥', { gold: true }) },
+    left: { name: 'left bower', draw: A => mini(A, 'J', '♦', { gold: true }) },
+    upcard: { name: 'upcard', draw: A => back(A, 2, 6, 13, 17) + A.group(mini(A, '9', '♥'), 'translate(4 0) scale(0.85)') },
+    alone: { name: 'go alone', draw: A => A.circle(12, 12, 10.5, '#f3ead6', { sw: 1.3 }) + A.person(12, 12.5, 15, '#7a4a26') + A.text(19, 5.5, '1', { size: 8, weight: 800 }) },
+  },
 
-  goal: { big: '10 points', text: 'First team to **10** points wins. The team that chose trump (the **makers**) must take at least 3 of the 5 tricks.' },
+  pitch: 'Partners name trump and try to win 3 of 5 tricks with a 24-card deck. First team to 10 points wins.',
+
+  goal: { big: '10 points', text: 'First team to **10** wins. The team that names trump (the **makers**) must take at least 3 of the 5 tricks.' },
 
   turn: {
     type: 'round',
     intro: 'Each hand goes through these phases:',
     steps: [
-      { verb: 'Deal', text: 'Deal **5 cards** each. Turn the top card of the 4 left over face up.' },
-      { verb: 'Make trump', text: 'Round 1: each player may **order up** that card (dealer takes it and discards one) or pass. Round 2: name a different suit or pass.' },
-      { verb: 'Go alone?', text: 'The maker may play **alone**: partner lays their cards down for a bigger reward.' },
-      { verb: 'Play tricks', text: 'Left of dealer leads. Follow suit if you can; the highest trump wins, otherwise the highest card of the suit led.' },
-      { verb: 'Score', text: 'Makers take 3–4 tricks: 1 point; all 5: 2; alone and all 5: 4. Fewer than 3: defenders score 2.' },
+      { verb: 'Deal', text: 'Deal **5** each. Turn up the top card of the 4 left over: the {upcard}.' },
+      { verb: 'Make trump', text: 'Round 1, from dealer’s left: **order up** the {=upcard} (dealer adds it to hand and discards 1) or pass. If all 4 pass, turn it down. Round 2: name another suit or pass.' },
+      { verb: 'Go alone?', text: 'The maker may play {=alone} **alone**: partner sits out for a bigger reward.' },
+      { verb: 'Play tricks', text: 'Dealer’s left leads; if someone is alone, the player on the loner’s left leads. Clockwise, follow suit if you can. Highest trump wins, else highest card of the suit led.' },
+      { verb: 'Score', text: 'Makers with 3+ tricks score 1, 2 or 4 (table below); with fewer, defenders score 2.' },
     ],
   },
 
-  tension: 'You must decide on trump with just 5 cards and a partner’s hand you can’t see: pass and the opponents may pick a suit you’re weak in, call too boldly and you get euchred for 2.',
+  tension: 'You choose trump seeing only 5 cards: pass and the opponents may pick a suit you are weak in; call too boldly and you get euchred for 2.',
 
-  flow: [
-    { label: 'Call', items: ['Order up the upcard', 'Or name another suit', 'Or go alone'] },
-    { label: 'Play', items: ['Bowers on top', 'Follow suit', 'Lead trump as maker'] },
-    { label: 'Score', items: ['3–4 tricks: 1', 'March (5): 2', 'Alone march: 4', 'Euchre: 2 to defenders'] },
+  structure: [
+    { label: 'Hand', repeat: 'until 10', text: 'Deal 5 each → make trump (up to 2 rounds) → play 5 tricks → score. Deal passes left.' },
+    { label: 'Game end', text: 'First team to **10** wins.' },
   ],
 
-  end: { trigger: 'a team reaches 10 points', detail: 'Hands are quick (about 3 minutes), so a game is usually 10–15 hands.' },
+  points: [
+    ['Makers take 3–4', '1'],
+    ['Makers take 5 (march)', '2'],
+    ['{=alone} Alone, take 5', '4'],
+    ['{=alone} Alone, take 3–4', '1'],
+    ['Makers take 0–2 (euchred)', 'defenders get 2'],
+  ],
+
+  end: { trigger: 'a team reaches 10 points' },
   scoring: [
     { label: 'Making trump (1)', share: 5 },
     { label: 'Marches (2)', share: 2 },
     { label: 'Euchres (2)', share: 2 },
-    { label: 'Loners (4)', share: 1 },
+    { label: '{=alone} Loners (4)', share: 1 },
   ],
 
   ref: {
-    title: 'Trump order & scoring',
+    title: 'Card order (hearts trump)',
     rows: [
-      ['Trump, high to low', 'J of trump, J of same colour, A K Q 10 9'],
-      ['Other suits', 'A K Q J 10 9'],
-      ['Makers take 3–4', '1 point'],
-      ['Makers take all 5', '2 points (a march)'],
-      ['Alone, takes all 5', '4 points (alone 3–4: 1)'],
-      ['Makers take 0–2', 'euchred: defenders get 2'],
+      ['{=heart} trump', '{=right} {=left} A K Q 10 9'],
+      ['{=diamond} (same colour)', 'A K Q 10 9 (its J is the {=left})'],
+      ['{=spade} {=club}', 'A K Q J 10 9'],
     ],
   },
 
-  example: 'Sam deals and turns up the **9♥**. Kim, on his left, holds J♥, J♦ and A♥, so she orders it up; Sam adds the 9♥ to his hand and discards a club. With hearts as trump, Kim’s two jacks are the top two cards. Her team takes 4 tricks for **1 point**.',
+  example: 'Sam deals and turns up **9{=heart}**. Kim holds J{=heart} J{=diamond} A{=heart}, so she orders it up; Sam takes the 9{=heart} and discards a club. With {=heart} trump, Kim’s jacks are the top two cards. Her team takes 4 tricks: **1 point**.',
 
   setup: [
-    'Use only the 9, 10, J, Q, K and A of each suit: 24 cards. Partners sit across.',
-    'Deal 5 each in packets of 3 and 2; put the last 4 face down and turn the top one up.',
+    'Use only 9, 10, J, Q, K, A of each suit: 24 cards. Partners sit across.',
+    'Deal 5 each in packets of 3 and 2. Put the last 4 face down and turn the top one up.',
     'Each team keeps score with a spare 6 and 4, sliding one over the other to show pips.',
   ],
 
   terms: [
     ['Trump', 'The suit that beats all others this hand.'],
-    ['Right bower', 'The jack of trump: the highest card.'],
-    ['Left bower', 'The other jack of the same colour: second highest, and it counts as a trump.'],
-    ['Order up', 'Tell the dealer to pick up the turned card, making its suit trump.'],
-    ['Euchred', 'The makers took fewer than 3 tricks; defenders score 2.'],
+    ['{=right} Right bower', 'Jack of trump: the highest card.'],
+    ['{=left} Left bower', 'Other jack of the same colour: second highest, and it counts as trump.'],
+    ['Order up', 'Tell the dealer to pick up the {=upcard}, making its suit trump.'],
+    ['Euchred', 'Makers took fewer than 3 tricks; defenders score 2.'],
   ],
 
   gotchas: [
-    'The left bower **changes suit**: with hearts trump, the J♦ is a heart, so it must follow a heart lead and can’t follow diamonds.',
+    'The {=left} left bower **changes suit**: with {=heart} trump, J{=diamond} is a heart. It must follow a heart lead and can’t follow diamonds.',
     'In round 2 you **can’t** name the suit that was turned down.',
-    'If everyone passes twice, the hand is thrown in and the deal moves on (or play “stick the dealer”: the dealer must name a suit).',
+    'If all 4 pass twice, the hand is thrown in and the deal passes left. Common variant, “stick the dealer”: in round 2 the dealer can’t pass and must name a suit.',
   ],
 
   tips: [
-    'Two bowers plus an ace is a strong call; three trumps with an off-suit ace usually makes 3 tricks.',
-    'As the maker, lead trump early to pull the opponents’ trumps.',
-    'Ordering up the **opponents’** dealer hands them a trump, so you need a stronger hand than when partner deals.',
+    'Both bowers plus an ace is a strong call; 3 trumps and an off-suit ace usually make 3 tricks.',
+    'As maker, lead trump early to pull the opponents’ trumps.',
+    'Ordering up for an **opponent** dealer hands them a trump: you need a stronger hand than when partner deals.',
   ],
 
   walk(A) {
-    const C = A.C, R = '#c8423b', W = 30, H = 42, gold = '#ffcf3f';
+    const C = A.C, R = '#c8423b', W = 30, H = 42, gold = '#ffcf3f', ic = this.icons;
     const face = (x, y, r, s, hi) => {
       const col = (s === '♥' || s === '♦') ? R : C.ink;
       return A.rect(x + 1.5, y + 2, W, H, C.shadow, { sw: 0, rx: 4 }) + A.rect(x, y, W, H, '#fffaf0', { rx: 4, sw: hi ? 2.4 : 1.2, stroke: hi ? gold : C.ink }) +
@@ -102,18 +121,21 @@ defineGame({
     const discard = A.k('disc', back(149, 67, 26, 36));
     const played = A.k('pat', face(145, 50, 'Q', '♥')) + A.k('lee', face(110, 80, '10', '♥')) + A.k('up', face(180, 80, '9', '♥')) + A.k('hJ♥', face(145, 100, 'J', '♥', true));
     const tricks = A.k('won', [0, 1, 2, 3].map(i => back(206 + i * 18, 140, 22, 30)).join('') + A.text(242, 186, '4 tricks', { size: 9, weight: 800, fill: '#fff' }));
+    // Bower badges above the two jacks, drawn from the same icons as the text.
+    const bowers = A.k('bw', A.use(ic.right.draw(A), 100, 118, 22) + A.use(ic.left.draw(A), 134, 118, 22));
+    const alone = A.k('alone', A.use(ic.alone.draw(A), 18, 118, 30) + A.text(56, 133, '?', { size: 18, weight: 800, fill: '#fff' }));
     return [
-      { step: 0, say: 'Sam deals 5 cards each and turns up the **9♥** on the 4 left-over cards.', svg: board + mine() + kitty + up + A.glow(179, 87, 28) },
-      { step: 1, say: 'Kim speaks first. With hearts as trump, her **J♥ and J♦** would be the top two cards, so she **orders it up**.', svg: board + mine('', true) + kitty + up },
-      { step: 1, say: 'Sam takes the 9♥ into his hand and discards one card face down. **Hearts** are trump.', svg: board + mine() + kitty + discard + A.k('up', face(274, 110, '9', '♥')) },
-      { step: 2, say: 'Kim could go **alone** for 4 points, but she keeps her partner Pat in the hand.', svg: board + mine() + kitty + discard + A.k('up', face(274, 110, '9', '♥')) + A.glow(153, 25, 24) },
-      { step: 3, say: 'Kim leads the J♥, the **right bower**. Everyone must follow with hearts, and nothing can beat it.', svg: board + mine('J♥') + kitty + discard + played + A.glow(160, 121, 28) },
-      { step: 4, say: 'Kim and Pat take **4** of the 5 tricks: **1 point**. All 5 would have scored 2.', svg: board + A.k('hJ♦', face(96, 150, 'J', '♦')) + kitty + discard + tricks + A.glow(244, 155, 28) },
+      { step: 0, say: 'Sam deals 5 each and turns up the {=upcard} **9{=heart}** on the 4 left-over cards.', svg: board + mine() + kitty + up + A.glow(179, 87, 28) },
+      { step: 1, say: 'Kim speaks first. With {=heart} trump, J{=heart} and J{=diamond} become the top two cards ({=right} {=left}), so she **orders it up**.', svg: board + mine('', true) + kitty + up + bowers },
+      { step: 1, say: 'Sam takes 9{=heart} into his hand and discards one face down. **Hearts** are trump.', svg: board + mine() + kitty + discard + A.k('up', face(274, 110, '9', '♥')) },
+      { step: 2, say: 'Kim could go {=alone} **alone** for 4 points, but keeps partner Pat in.', svg: board + mine() + kitty + discard + A.k('up', face(274, 110, '9', '♥')) + alone + A.glow(153, 25, 24) },
+      { step: 3, say: 'Kim leads J{=heart}, the {right}. Everyone must follow with hearts; nothing beats it.', svg: board + mine('J♥') + kitty + discard + played + A.glow(160, 121, 28) },
+      { step: 4, say: 'Kim and Pat take **4** of 5 tricks: **1 point**. All 5 would score 2.', svg: board + A.k('hJ♦', face(96, 150, 'J', '♦')) + kitty + discard + tricks + A.glow(244, 155, 28) },
     ];
   },
 
   art(A) {
-    const C = A.C, R = '#c8423b', gold = '#ffcf3f';
+    const C = A.C, R = '#c8423b', gold = '#ffcf3f', ic = this.icons;
     const pc = (x, y, r, s, o = {}) => {
       const w = o.w || 22, h = o.h || 31, col = (s === '♥' || s === '♦') ? R : C.ink;
       const g = A.rect(x + 1.5, y + 2, w, h, C.shadow, { sw: 0, rx: 3 }) + A.rect(x, y, w, h, '#fffaf0', { rx: 3, sw: o.hi ? 2.4 : 1, stroke: o.hi ? gold : C.ink }) +
@@ -134,8 +156,12 @@ defineGame({
     o += A.circle(110, 20, 8, '#f3ead6', { sw: 1.2 }) + A.text(110, 20.5, 'D', { size: 9, weight: 800 });
     // kitty with upcard
     o += bk(128, 66, 26, 36, -6) + bk(131, 64, 26, 36, -2) + pc(150, 60, '9', '♥', { w: 26, h: 36, rot: 10 });
-    // my hand with the two bowers
-    [['J', '♥', 1], ['J', '♦', 1], ['A', '♥'], ['K', '♠'], ['10', '♣']].forEach(([r, s, hi], i) => { o += pc(112 + i * 28, 148 + Math.abs(i - 2) * 2, r, s, { w: 26, h: 38, rot: (i - 2) * 4, hi }); });
+    // my hand: the two bowers are the bower icons, the rest plain cards
+    const rot = (i) => (i - 2) * 4;
+    [['J', '♥', 'right'], ['J', '♦', 'left'], ['A', '♥'], ['K', '♠'], ['10', '♣']].forEach(([r, s, b], i) => {
+      const x = 112 + i * 28, y = 148 + Math.abs(i - 2) * 2;
+      o += b ? A.group(A.use(ic[b].draw(A), x - 5.6, y - 0.8, 38.4), `rotate(${rot(i)} ${x + 13} ${y + 19})`) : pc(x, y, r, s, { w: 26, h: 38, rot: rot(i) });
+    });
     // score cards: a 6 partly covered by a face-down 4
     o += pc(16, 148, '6', '♣', { w: 24, h: 34, rot: -4 }) + bk(26, 156, 24, 34, 70);
     o += A.note(166, 74, 250, 36, 'Order up this card?', { w: 112 });
@@ -145,3 +171,4 @@ defineGame({
     return o;
   },
 });
+}

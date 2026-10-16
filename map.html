@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Find Similar Games · Board Game Field Guide</title>
+<title>Find Similar Games · Board Game Web</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -34,7 +34,7 @@
 <script src="js/sheet.js"></script>
 <script>
 // Short labels for long names so the map stays readable.
-const SHORT = { 'the-crew': 'The Crew', 'magic-the-gathering': 'Magic', 'brass-birmingham': 'Brass', 'avalon': 'Avalon', 'werewolf': 'One Night Werewolf', 'blood-on-the-clocktower': 'Clocktower', 'bridge': 'Bridge', 'clue': 'Clue', 'twilight-imperium': 'Twilight Imperium' };
+const SHORT = { 'the-crew': 'The Crew', 'magic-the-gathering': 'Magic', 'brass-birmingham': 'Brass', 'avalon': 'Avalon', 'werewolf': 'One Night Werewolf', 'blood-on-the-clocktower': 'Clocktower', 'bridge': 'Bridge', 'clue': 'Clue', 'twilight-imperium': 'Twilight Imperium', 'capitalism': 'Capitalism', 'egyptian-ratscrew': 'Ratscrew' };
 const SCATTER_AXES = [
   ...PROFILE_AXES.map(a => ({ key: a.key, label: a.label + ' (1–5)', get: g => g.profile[a.key], lo: a.lo, hi: a.hi })),
   { key: 'time', label: 'Play time (min)', get: g => (g.time[0] + g.time[1]) / 2 },
@@ -195,7 +195,7 @@ loadGames().then(games => {
   const side = document.getElementById('side');
   function overview() {
     side.innerHTML = `<h2>Find similar games</h2>
-      <p>Click a game you know to see its closest matches. Lines join games that genuinely play alike (hover a line for why). Ringed dots are heavy games.</p>
+      <p>Click a game to see its closest matches. Lines join games that play alike; hover a line for why. Ringed dots are heavy games.</p>
       <h3>Families</h3>
       <ul class="fam-list">${famKeys.map(k => `<li style="--fam:${FAMILIES[k].color}"><b>${FAMILIES[k].label}</b>${FAMILIES[k].blurb}<br><span class="small">${games.filter(g => g.family === k).map(g => g.name).join(' · ')}</span></li>`).join('')}</ul>`;
   }

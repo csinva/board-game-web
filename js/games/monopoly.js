@@ -10,71 +10,85 @@ defineGame({
   mechanics: ['roll-and-move', 'dice', 'trading', 'negotiation', 'auction', 'set-collection', 'player-elimination'],
   profile: { complexity: 1, luck: 5, interaction: 4, conflict: 4, talk: 4, planning: 2 },
 
-  pitch: 'Roll around the board buying streets, trade to complete colour sets, then build houses and charge rent until rivals go broke.',
-  theme: 'You are a property speculator buying up a city one street at a time.',
+  // Money, deeds, buildings and the two card decks: used inline and drawn the same way in art + walk.
+  icons: {
+    cash: { name: 'cash', draw: A => A.rect(2, 4, 20, 11, '#f0c27a', { rx: 1.5, sw: 1.1 }) + A.rect(1, 8, 21, 12, '#9fd2f2', { rx: 1.5, sw: 1.3 }) + A.circle(11.5, 14, 4.2, '#fff', { sw: 0.8 }) + A.text(11.5, 14.4, '$', { size: 7.5, weight: 800 }) },
+    deed: { name: 'title deed', draw: A => A.rect(4, 1, 16, 22, '#fff', { rx: 2, sw: 1.3 }) + A.rect(6, 3, 12, 6, '#f29a1e', { rx: 0.8, sw: 0.8 }) + A.line(8, 13, 16, 13, { sw: 1.2, stroke: '#8c877f' }) + A.line(8, 16.5, 16, 16.5, { sw: 1.2, stroke: '#8c877f' }) + A.line(8, 20, 14, 20, { sw: 1.2, stroke: '#8c877f' }) },
+    house: { name: 'house', draw: A => A.house(12, 20, 16, '#2fa84f') },
+    hotel: { name: 'hotel', draw: A => A.rect(2, 10, 20, 10, '#e0312c', { rx: 1, sw: 1.3 }) + A.poly([[1.5, 10.5], [12, 4], [22.5, 10.5]], '#e0312c', { sw: 1.3 }) },
+    chance: { name: 'Chance', draw: A => A.rect(1, 5, 22, 14, '#f29a1e', { rx: 2, sw: 1.3 }) + A.text(12, 12.5, '?', { size: 12, weight: 800, fill: '#fff' }) },
+    chest: { name: 'Community Chest', draw: A => A.rect(1, 5, 22, 14, '#f4df2f', { rx: 2, sw: 1.3 }) + A.rect(7.5, 11, 9, 6, '#a0602f', { rx: 0.8, sw: 0.9 }) + A.path('M7.5 11 v-1.5 q4.5 -3.5 9 0 v1.5 z', { fill: '#c07a3c', sw: 0.9 }) + A.rect(11, 12, 2, 2, '#f4df2f', { rx: 0.3, sw: 0 }) },
+  },
 
-  goal: { big: 'Last one solvent', text: 'Be the **last player** not bankrupt. You win by collecting so much rent that everyone else runs out of money and property.' },
+  pitch: 'Roll and move, buy streets, trade for colour sets and build houses; the last player not bankrupt wins.',
+
+  goal: { big: 'Last one solvent', text: 'Be the **last player** not bankrupt. Rent from your properties drains everyone else.' },
 
   turn: {
     type: 'sequence',
     steps: [
-      { verb: 'Roll', text: 'Roll 2 dice and move clockwise. Passing **GO** pays you $200. Doubles mean you roll again after this move.' },
-      { verb: 'Resolve', text: 'Unowned property: **buy** it at the printed price or the bank auctions it. Owned: pay rent. Otherwise follow the space (card, tax, Go to Jail).' },
-      { verb: 'Deal', text: 'Trade, mortgage, or build houses evenly on colour sets you fully own.' },
+      { verb: 'Roll', text: 'Roll {=die}{=die} and move clockwise. Landing on or passing **GO** pays $200. Doubles: roll again after this move.' },
+      { verb: 'Resolve', text: 'Unowned property: **buy** its {deed} at the printed price, or the bank auctions it. Owned: pay the rent on its deed. Other spaces: draw a {=chance}{=chest} card, pay the tax shown or go to jail.' },
+      { verb: 'Deal', text: 'Any time: trade, mortgage, or build {house}s evenly on colour sets you fully own.' },
     ],
   },
 
-  tension: 'Cash in hand keeps you safe from rent, but only property and houses earn money, so you must decide how close to broke you dare to build.',
+  tension: 'Cash protects you from rent, but only property and houses earn, so you decide how close to broke you dare to build.',
 
-  flow: [
-    { label: 'Collect', items: ['$200 for passing GO', 'Rent from others', 'Cards & trades'] },
-    { label: 'Spend', items: ['Buy property', 'Win auctions', 'Houses & hotels'] },
-    { label: 'Squeeze', items: ['Complete colour sets', 'Rent doubles, then climbs', 'Rivals mortgage & sell'] },
+  structure: [
+    { label: 'Setup', text: '$1,500 each; all tokens on GO.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Roll, move, resolve the space, then trade or build. Doubles: go again. Third doubles in a row: go to jail.' },
+    { label: 'Bankruptcy', text: 'Owe more than you can raise: you are out. Owed to a player: they get your cash, deeds and half the cost of your buildings. Owed to the bank: it auctions your deeds.' },
+    { label: 'Game end', text: 'The last player not bankrupt wins.' },
   ],
 
   end: {
-    trigger: 'all but one player have gone bankrupt',
-    detail: 'You are bankrupt when you owe more than you can raise by selling buildings and mortgaging. The official rules also give a timed short-game option.',
-    results: [{ side: 'Winner:', text: 'the last player left in the game.' }],
+    trigger: 'all but one player are bankrupt',
+    detail: 'You are bankrupt when you owe more than you can raise by selling buildings and mortgaging.',
+    results: [{ side: 'Winner:', text: 'the last player left.' }],
   },
 
   ref: {
     title: 'Numbers to know',
     rows: [
-      ['Starting cash', '$1,500 each'],
-      ['Passing GO', '+$200'],
-      ['Leave jail', 'pay $50, use a card, or roll doubles'],
-      ['Full colour set', 'double rent before building'],
-      ['Hotel', '4 houses + hotel price'],
-      ['Mortgage', 'get half price; repay +10% interest'],
+      ['Passing GO', '+$200 {=cash}'],
+      ['{=deed} Streets', 'rent, house price and mortgage value printed on the deed'],
+      ['Leave jail', 'pay $50, use a card, or roll doubles {=d3}{=d3} (3 tries, then pay $50 and move)'],
+      ['{=deed}{=deed}{=deed} Full set', 'double rent on streets without buildings; {=hotel} = {=house}{=house}{=house}{=house} + hotel price'],
+      ['Railroads', '$25 / 50 / 100 / 200 rent for 1 / 2 / 3 / 4 owned'],
+      ['Utilities', 'rent = 4× the dice roll, 10× if one owner has both'],
     ],
   },
 
-  example: 'You roll **4 + 4** and land on an orange street nobody owns. You decline to pay $180, so it goes to auction and you win it for $120. Because you rolled doubles you roll again: 7, onto Maya’s B&O Railroad, and you pay her **$50** since she owns two.',
+  example: 'You roll {=d4}{=d4} onto an unowned orange street ($180). You decline, it goes to auction, and you win it for $120. Doubles, so you roll again: 7, onto Maya’s B&O Railroad. She owns two railroads, so you pay **$50**.',
 
   setup: [
-    'Give each player $1,500; one player is the Banker and keeps the rest.',
-    'Shuffle the two card decks and place them face down on their spaces.',
+    'Give each player $1,500 {=cash}; the Banker keeps the rest, the deeds, 32 {house}s and 12 {hotel}s.',
+    'Shuffle the {chance} and {chest} decks face down on their spaces.',
     'Everyone puts a token on GO; highest roll starts.',
   ],
 
   terms: [
-    ['Colour set', 'All streets of one colour. You need the whole set to build.'],
-    ['Mortgage', 'Flip a property for half its price; it collects no rent until repaid.'],
-    ['Auction', 'Any property a player declines goes to the highest bidder, including them.'],
-    ['Jail', 'Stuck up to 3 turns; you still collect rent and can trade.'],
+    ['{=deed} Colour set', 'All streets of one colour. Required to build.'],
+    ['Mortgage', 'Flip a deed to take its mortgage value (half its price); it earns no rent until you repay that plus 10%.'],
+    ['Auction', 'A property the lander declines goes to the highest bidder, the lander included.'],
+    ['Jail', 'Up to 3 turns; you still collect rent, trade and build.'],
   ],
 
   gotchas: [
-    '**Free Parking** pays nothing: putting tax money in the middle is a house rule and makes the game much longer.',
-    'If you don’t buy a property you land on, it must be **auctioned**. Skipping auctions is another house rule.',
-    'Houses go up **evenly** across a set, rent on a full unbuilt set is double, and three doubles in a row send you to jail.',
+    '**Free Parking** pays nothing. Collecting tax money there is a house rule that lengthens the game.',
+    'A property you decline must be **auctioned**; anyone may bid, you included, from any price. Skipping auctions is another house rule.',
+    '{house}s go up and come down **evenly** across a set, at most 4 per street before a {hotel}. No building on a set with a mortgaged street. Buildings sell back to the bank at **half** price.',
+    '**Housing shortage**: when the bank has no {house}s left, nobody can build until some are sold back. If more players want buildings than remain, auction them.',
+    'Three doubles in a row: go straight to jail, no $200. Doubles that free you from jail move you but give no extra roll.',
+    'Buying a mortgaged deed from a player: pay the bank 10% at once; if you lift the mortgage later, pay another 10%.',
+    'Players can’t lend each other money. An owner who forgets to ask for rent before the second player after you rolls loses it.',
   ],
 
   tips: [
     'Buy almost everything early, then trade hard to finish a set.',
-    'Orange and red sets are landed on most (jail sends people there). Three houses per street is the big jump in rent.',
-    'Late in the game, staying in jail is good: you skip landing on rivals’ hotels while still collecting rent.',
+    'Orange and red are landed on most (jail feeds them). The third house is the biggest rent jump.',
+    'Late game, roll for doubles instead of paying to leave jail: you avoid rivals’ hotels and still collect rent.',
   ],
 
   walk(A) {
@@ -101,19 +115,20 @@ defineGame({
     const cash = (who, y, n) => A.k(who + n, A.text(262, y, '$' + n.toLocaleString('en-US'), { size: 11, weight: 800 }));
     const pawn = (i) => { const [x, y] = mid(i); return A.k('pawn', A.pawn(x, y - 2, 16, you)); };
     const dice = (a, b) => A.k('dice' + a + b, A.die(92, 104, 24, a) + A.die(122, 104, 24, b));
-    const deed = (x, y) => A.k('deed', A.rect(x + 2, y + 3, 36, 46, C.shadow, { sw: 0, rx: 3 }) + A.rect(x, y, 36, 46, C.white, { rx: 3, sw: 1.2 }) + A.rect(x + 3, y + 3, 30, 11, col.or, { rx: 1, sw: 0.8 }) +
-      A.text(x + 18, y + 26, 'Orange', { size: 6 }) + A.text(x + 18, y + 36, '$180', { size: 6, weight: 800 }));
+    // The deed is the same drawing as the {deed} icon, with its price written on.
+    const deed = (x, y) => A.k('deed', A.rect(x + 2, y + 3, 36, 49, C.shadow, { sw: 0, rx: 3 }) + A.use(this.icons.deed.draw(A), x - 9, y - 2.25, 54) + A.rect(x + 6, y + 22, 24, 12, C.white, { sw: 0, rx: 1 }) +
+      A.text(x + 18, y + 28, '$180', { size: 8, weight: 800 }));
     const bill = (x, y) => A.k('bill', A.rect(x, y, 34, 16, '#9fd2f2', { rx: 2, sw: 1 }) + A.text(x + 17, y + 8, '$50', { size: 8, weight: 800 }));
     const base = board + cash('m', 42, 1200);
     return [
-      { step: 0, say: 'You sit on Jail (just visiting). Roll: **4 + 4 = 8**.', svg: base + cash('y', 128, 1500) + pawn(0) + dice(4, 4) },
-      { step: 0, say: 'Move 8 spaces clockwise, onto an **orange street** that nobody owns. Price: $180.', svg: base + cash('y', 128, 1500) + pawn(8) + dice(4, 4) + A.glow(...mid(8), 14, 'g8') },
-      { step: 1, say: 'You decline to pay $180, so the bank **auctions** it. Maya bids $110; you bid **$120** and win.', svg: base + cash('y', 128, 1500) + pawn(8) + dice(4, 4) + deed(102, 50) +
+      { step: 0, say: 'You are on Jail (just visiting). Roll {=d4}{=d4}: **8**.', svg: base + cash('y', 128, 1500) + pawn(0) + dice(4, 4) },
+      { step: 0, say: 'Move 8 spaces clockwise onto an unowned **orange street**. Price: $180.', svg: base + cash('y', 128, 1500) + pawn(8) + dice(4, 4) + A.glow(...mid(8), 14, 'g8') },
+      { step: 1, say: 'You decline, so the bank **auctions** it. Maya bids $110; you win at **$120**.', svg: base + cash('y', 128, 1500) + pawn(8) + dice(4, 4) + deed(102, 50) +
         A.bubble(52, 148, 60, 20, 'Maya $110', { size: 8.5 }) + A.bubble(128, 148, 60, 20, 'You $120', { size: 8.5 }) },
-      { step: 1, say: 'Pay $120 and take the deed. It’s yours now, earning rent.', svg: base + cash('y', 128, 1380) + pawn(8) + dice(4, 4) + deed(244, 146) },
-      { step: 0, say: 'You rolled **doubles**, so roll again: **4 + 3 = 7**. Move on 7 spaces, past Free Parking, onto Maya’s **B&O Railroad**.', svg: base + cash('y', 128, 1380) + pawn(15) + dice(4, 3) + deed(244, 146) + A.glow(...mid(15), 15, 'g15') },
-      { step: 1, say: 'Maya owns **two** railroads, so the rent is **$50**.', svg: base + cash('y', 128, 1380) + pawn(15) + dice(4, 3) + deed(244, 146) + bill(280, 160) + A.glow(...mid(15), 15, 'g15') },
-      { step: 1, say: 'You pay Maya $50. No doubles this time, so your turn ends.', svg: board + cash('m', 42, 1250) + cash('y', 128, 1330) + pawn(15) + dice(4, 3) + deed(244, 146) + bill(245, 60) },
+      { step: 1, say: 'Pay $120 and take the {deed}. It now earns you rent.', svg: base + cash('y', 128, 1380) + pawn(8) + dice(4, 4) + deed(244, 146) },
+      { step: 0, say: '**Doubles**, so roll again: {=d4}{=d3} = **7**. Move past Free Parking onto Maya’s **B&O Railroad**.', svg: base + cash('y', 128, 1380) + pawn(15) + dice(4, 3) + deed(244, 146) + A.glow(...mid(15), 15, 'g15') },
+      { step: 1, say: 'Maya owns **two** railroads: rent is **$50**.', svg: base + cash('y', 128, 1380) + pawn(15) + dice(4, 3) + deed(244, 146) + bill(280, 160) + A.glow(...mid(15), 15, 'g15') },
+      { step: 1, say: 'Pay Maya $50 {=cash}. No doubles, so your turn ends.', svg: board + cash('m', 42, 1250) + cash('y', 128, 1330) + pawn(15) + dice(4, 3) + deed(244, 146) + bill(245, 60) },
     ];
   },
 
@@ -153,12 +168,12 @@ defineGame({
     o += A.rect(X, Y, K, K, '#d5ead6', { rx: 0, sw: 1 }) + A.circle(X + K / 2, Y + K / 2, 6, C.red, { sw: 1 });
     o += A.rect(X + S - K, Y, K, K, '#d5ead6', { rx: 0, sw: 1 }) + A.pawn(X + S - K / 2, Y + K / 2 - 2, 14, C.blue);
     // card decks in the middle
-    o += A.card(X + 46, Y + 46, 38, 26, C.orange, { rotate: -25, label: '?', size: 16 });
-    o += A.card(X + S - 84, Y + S - 72, 38, 26, C.yellow, { rotate: -25 });
+    const I = this.icons, deck = (key, x, y) => A.group(A.rect(x + 3, y + 10, 37, 23, C.shadow, { sw: 0, rx: 3 }) + A.use(I[key].draw(A), x, y, 40), `rotate(-25 ${x + 20} ${y + 20})`);
+    o += deck('chance', X + 44, Y + 38) + deck('chest', X + S - 86, Y + S - 82);
     // houses on the green set and a hotel on dark blue
     const rx = X + S - K;
-    for (const i of [0, 1, 3]) for (let h = 0; h < (i === 3 ? 2 : 3); h++) o += A.house(rx + 12 + (h % 2) * 7, Y + K + i * e + 7 + Math.floor(h / 2) * 6, 6, '#2fa84f');
-    o += A.rect(rx + 11, Y + K + 8 * e + 4, 12, 9, C.red, { rx: 1, sw: 1 });
+    for (const i of [0, 1, 3]) for (let h = 0; h < (i === 3 ? 2 : 3); h++) o += A.use(I.house.draw(A), rx + 7.5 + (h % 2) * 7, Y + K + i * e - 1 + Math.floor(h / 2) * 6, 9);
+    for (const i of [6, 8]) o += A.use(I.hotel.draw(A), rx + 9, Y + K + i * e + 0.5, 15);
     // tokens
     o += A.pawn(X + K + 5.5 * e, Y + 13, 16, C.purple);
     o += A.pawn(X + 12, Y + K + 2.5 * e, 16, C.teal);

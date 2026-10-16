@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Game Sheet · Board Game Field Guide</title>
+<title>Game Sheet · Board Game Web</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -32,7 +32,7 @@ loadGames().then(games => {
   const id = params.get('g') || games[0].id;
   const g = GAME_BY_ID[id] || games[0];
   const i = games.indexOf(g);
-  document.title = g.name + ' in one page · Board Game Field Guide';
+  document.title = g.name + ' in one page · Board Game Web';
   const out = document.getElementById('out');
   out.innerHTML = renderSheet(g);
 

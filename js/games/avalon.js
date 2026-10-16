@@ -4,84 +4,96 @@ defineGame({
   year: 2012,
   designer: 'Don Eskridge',
   family: 'hidden',
-  players: [5, 10], best: '7–10',
-  time: [30, 45],
+  players: [5, 10], best: '7–8',
+  time: [30, 30],
   age: 13,
   mechanics: ['hidden-roles', 'voting', 'bluffing', 'deduction', 'team'],
   profile: { complexity: 2, luck: 1, interaction: 5, conflict: 3, talk: 5, planning: 2 },
   color: '#2c4f8a',
 
-  pitch: 'Loyal knights must send the right teams on quests while hidden traitors vote, lie and quietly sabotage from inside.',
-  theme: 'You are knights of Arthur’s court, and some of you secretly serve Mordred.',
+  icons: {
+    success: { name: 'Success', draw: A => A.rect(4, 1, 16, 22, '#2f6db5', { rx: 2.5, sw: 1.3 }) + A.path('M7.5 12.5 l3 3.2 l6 -7', { stroke: '#fff', sw: 2.6 }) },
+    fail: { name: 'Fail', draw: A => A.rect(4, 1, 16, 22, '#c8423b', { rx: 2.5, sw: 1.3 }) + A.path('M8 8 l8 8 M16 8 l-8 8', { stroke: '#fff', sw: 2.6 }) },
+    approve: { name: 'approve', draw: A => A.rect(2, 5, 20, 14, '#fff', { rx: 2.5, sw: 1.4 }) + A.path('M7.5 12 l3 3 l6 -6', { stroke: '#3c8d4f', sw: 2.4 }) },
+    reject: { name: 'reject', draw: A => A.rect(2, 5, 20, 14, '#2b2b2b', { rx: 2.5, sw: 1.4 }) + A.path('M8.5 8.5 l7 7 M15.5 8.5 l-7 7', { stroke: '#f2e6cc', sw: 2.4 }) },
+    team: { name: 'team token', draw: A => A.circle(12, 12, 9.5, '#d4a63a', { sw: 1.4 }) + A.circle(12, 12, 5.5, 'none', { stroke: '#a07a1f', sw: 1.2 }) },
+    leader: { name: 'leader', draw: A => A.crown(12, 19, 20, '#d4a63a') },
+    good: { name: 'loyal servant', draw: A => A.person(12, 10, 22, '#2f6db5', { face: '#e8c9a6' }) },
+    evil: { name: 'minion', draw: A => A.person(12, 10, 22, '#c8423b', { face: '#e8c9a6' }) },
+    merlin: { name: 'Merlin', draw: A => A.person(12, 11.5, 19, '#2f6db5', { face: '#e8c9a6' }) + A.poly([[5.5, 7], [18.5, 7], [12, -1]], '#5a3f9a', { sw: 1.1 }) + A.star(12, 3.6, 1.6, '#e2b33c', { sw: 0 }) },
+    assassin: { name: 'Assassin', draw: A => A.person(11, 10, 22, '#c8423b', { face: '#e8c9a6' }) + A.line(19, 3, 22, 14, { stroke: '#c9ced6', sw: 2.4 }) + A.line(17, 13.5, 22.5, 12, { stroke: '#2b2b2b', sw: 1.8 }) },
+  },
 
-  goal: { big: '3 of 5 quests', text: 'Good wins by succeeding **3 quests**, as long as the Assassin then fails to identify Merlin. Evil wins by failing 3 quests.' },
+  pitch: 'Vote teams onto 5 quests while hidden evil players sabotage them; good wins 3 quests, evil fails 3 or finds Merlin.',
+
+  goal: { big: '3 of 5 quests', text: 'Good wins by succeeding **3 quests**, unless the Assassin then names Merlin. Evil wins by failing 3 quests.' },
 
   turn: {
     type: 'round',
-    intro: 'Each round is one quest. The leader role passes left after every team vote.',
+    intro: 'Each round is one quest. The leader passes left after every team vote.',
     steps: [
-      { verb: 'Propose', text: 'The **leader** picks a team of the size shown for this quest (they may include themselves).' },
-      { verb: 'Vote', text: 'Everyone reveals approve or reject at once. **Majority** approves; a tie rejects and the next leader proposes.' },
-      { verb: 'Quest', text: 'Team members secretly play Success or Fail. Good players **must** play Success.' },
-      { verb: 'Reveal', text: 'Shuffle and reveal: a single Fail sinks the quest (two on quest 4 with 7+ players).' },
+      { verb: 'Propose', text: 'The {leader} hands out {team}s to the number of players shown for this quest (may include themselves).' },
+      { verb: 'Vote', text: 'Everyone reveals {approve} or {reject} at once. A **majority** approves; a tie rejects and the next leader proposes.' },
+      { verb: 'Quest', text: 'Team members each play {success} or {fail} face down. Good players **must** play Success.' },
+      { verb: 'Reveal', text: 'Shuffle and flip: one {=fail} fails the quest (quest 4 with 7+ players needs {=fail}{=fail}).' },
     ],
     outro: 'Next quest',
   },
 
-  tension: 'Merlin knows exactly who is evil, but every hint that steers good to victory also tells the Assassin who to stab.',
+  tension: 'Merlin knows every evil player, but each hint that steers good also shows the Assassin who Merlin is.',
 
-  flow: [
-    { label: 'Talk', items: ['Claim & accuse', 'Read reactions'] },
-    { label: 'Vote', items: ['Approve or reject', 'Votes are public', '5 rejects = evil wins'] },
-    { label: 'Quest', items: ['Secret Success / Fail', 'Count the fails', 'Track who was on it'] },
+  structure: [
+    { label: 'Setup', text: 'Deal roles. Eyes closed, evil see each other; {=merlin} sees the evil players.' },
+    { label: 'Quests', repeat: 'up to 5', text: 'The {=leader} proposes a team; all vote. If approved, the team plays {=success} / {=fail}. If rejected, the next leader proposes.' },
+    { label: 'Assassination', text: 'If good wins 3 quests, the {=assassin} names one player. Naming Merlin wins for evil.' },
   ],
 
   end: {
-    trigger: 'One side has 3 quest results, or 5 team proposals in a row are rejected',
-    detail: 'If good reaches 3 successes, evil players confer and the Assassin names one player as Merlin.',
+    trigger: 'One side has 3 quests, or 5 proposals in a row are rejected',
+    detail: 'If good reaches 3 successes, evil players confer and the {=assassin} names one player as Merlin.',
     results: [
-      { side: 'Good wins', text: 'with 3 successful quests, if the Assassin then names the wrong person as Merlin.' },
-      { side: 'Evil wins', text: 'with 3 failed quests, 5 rejected teams in one round, or by assassinating Merlin.' },
+      { side: 'Good wins', text: 'with 3 successful quests, if the {=assassin} then names the wrong player.' },
+      { side: 'Evil wins', text: 'with 3 failed quests, 5 rejected teams in a row, or by naming {=merlin} Merlin.' },
     ],
   },
 
   ref: {
-    title: 'Team size per quest',
+    title: 'Team size per quest (* needs 2 Fails)',
     rows: [
-      ['5 players (3 good, 2 evil)', '2 · 3 · 2 · 3 · 3'],
-      ['6 players (4 v 2)', '2 · 3 · 4 · 3 · 4'],
-      ['7 players (4 v 3)', '2 · 3 · 3 · 4* · 4'],
-      ['8 players (5 v 3)', '3 · 4 · 4 · 5* · 5'],
-      ['9 players (6 v 3)', '3 · 4 · 4 · 5* · 5'],
-      ['10 players (6 v 4)', '3 · 4 · 4 · 5* · 5'],
+      ['5 players: 3 {=good} 2 {=evil}', '2 · 3 · 2 · 3 · 3'],
+      ['6 players: 4 {=good} 2 {=evil}', '2 · 3 · 4 · 3 · 4'],
+      ['7 players: 4 {=good} 3 {=evil}', '2 · 3 · 3 · 4* · 4'],
+      ['8 players: 5 {=good} 3 {=evil}', '3 · 4 · 4 · 5* · 5'],
+      ['9 players: 6 {=good} 3 {=evil}', '3 · 4 · 4 · 5* · 5'],
+      ['10 players: 6 {=good} 4 {=evil}', '3 · 4 · 4 · 5* · 5'],
     ],
   },
 
-  example: 'With 7 players, leader Sam proposes himself, Jo and Kim for quest 2. The vote is 4 approve, 3 reject, so it goes. One **Fail** comes back. Jo and Kim both swear innocence, and everyone notes that Ray voted to approve a team that failed.',
+  example: 'With 7 players, {=leader} Sam proposes himself, Jo and Kim for quest 2. The vote is 4 {=approve}, 3 {=reject}, so they go. One {=fail} comes back. Jo and Kim both deny it, and the table notes that Ray approved a team that failed.',
 
   setup: [
-    'Deal roles face down: Merlin + loyal servants for good, the Assassin + minions for evil (see table).',
-    'Night: all close eyes; evil open eyes to see each other; then evil raise thumbs and **Merlin** opens eyes to see them.',
-    'Place the quest board for your player count; pick a random first leader.',
+    'Deal roles face down: {merlin} + {good}s for good; {assassin} + {evil}s for evil (counts in table).',
+    'Eyes closed: evil open eyes to see each other. Then evil raise thumbs and {=merlin} opens eyes to see them.',
+    'Use the quest board for your player count. Give each player an {approve} and a {reject} token. Pick a random first {leader}.',
   ],
 
   terms: [
-    ['Merlin', 'Good player who knows the evil players. Must stay hidden.'],
-    ['Assassin', 'Evil player who gets one final guess at Merlin.'],
-    ['Leader', 'Proposes the team this round; passes left each vote.'],
-    ['Vote track', 'Counts rejected proposals. The 5th reject in a row hands evil the game.'],
+    ['{=merlin} Merlin', 'Good. Knows the evil players. Must stay hidden.'],
+    ['{=assassin} Assassin', 'Evil. Gets one guess at Merlin if good wins 3 quests.'],
+    ['{=leader} Leader', 'Proposes the team. Passes left after each vote.'],
+    ['Vote track', 'Counts rejected proposals in a row. The 5th reject wins for evil.'],
   ],
 
   gotchas: [
-    'Evil players **may** play Success to stay hidden; good players can never play Fail.',
-    'Quest 4 in 7+ player games needs **two** Fail cards to fail.',
-    'The reject counter resets after each quest is attempted, not after each vote.',
+    'Evil players **may** play {=success} to stay hidden; good players can never play {=fail}.',
+    'Quest 4 with 7+ players needs **two** {=fail} to fail.',
+    'The reject count resets when a quest goes, not after each vote.',
   ],
 
   tips: [
-    'Remember who sat on each failed team and who voted for it: the **votes** are your best evidence.',
-    'As Merlin, nudge quietly. As good, act a little like Merlin to protect them.',
-    'As evil, fail early quests sparingly; being caught on a team costs you more than one quest.',
+    'Remember who sat on each failed team and who **voted** for it.',
+    'As Merlin, hint quietly. As good, act a little like Merlin to hide them.',
+    'As evil, fail early quests rarely: getting caught on a team costs more than one quest.',
   ],
 
   walk(A) {
@@ -94,30 +106,32 @@ defineGame({
     const sizes = ['2', '3', '3', '4*', '4'];
     for (let i = 0; i < 5; i++) board += A.circle(120 + i * 20, 81, 8, i === 0 ? good : '#e6cf9b', { sw: 1.2 }) + A.text(120 + i * 20, 81, i === 0 ? '✓' : sizes[i], { size: i === 0 ? 10 : 8, weight: 800, fill: i === 0 ? C.white : C.ink });
     names.forEach((n, i) => { const [x, y] = seat(i); board += A.person(x, y, 26, cols[i], { face: '#e8c9a6' }) + A.text(x, y + 22, n, { size: 8, weight: 700, fill: '#f2e6cc' }); });
-    const crown = (i) => { const [x, y] = seat(i); return A.k('crown', A.crown(x - 18, y - 4, 12, gold)); };
-    const tok = (k, i) => { const [x, y] = seat(i); return A.k('t' + k, A.circle(x + 17, y + 4, 5.5, gold, { sw: 1.1 })); };
-    const pile = [0, 1, 2].map(k => A.k('t' + k, A.circle(150 + k * 10, 116, 5.5, gold, { sw: 1.1 }))).join('');
+    // Crown, team tokens, votes and quest cards reuse the inline icon drawings.
+    const I = this.icons, ic = (k, x, y, size) => A.use(I[k].draw(A), x, y, size);
+    const crown = (i) => { const [x, y] = seat(i); return A.k('crown', ic('leader', x - 28, y - 20, 19)); };
+    const tok = (k, i) => { const [x, y] = seat(i); return A.k('t' + k, ic('team', x + 10, y - 3, 14)); };
+    const pile = [0, 1, 2].map(k => A.k('t' + k, ic('team', 143 + k * 10, 109, 14))).join('');
     const team = tok(0, 0) + tok(1, 1) + tok(2, 2);
-    const votes = [1, 1, 1, 1, 0, 0, 0].map((v, i) => { const [x, y] = seat(i, 0.56); return A.k('v' + i, A.rect(x - 7, y - 5, 14, 10, v ? C.white : C.black, { rx: 2, sw: 1, stroke: v ? C.ink : '#cfc6b6' })); }).join('');
-    const qcard = (k, x, y, face) => A.k('q' + k, face ? A.card(x, y, 32, 40, face === 'S' ? good : evil, { label: face === 'S' ? 'SUCCESS' : 'FAIL', size: 5 }) : A.card(x, y, 22, 30, '#3a3a48'));
+    const votes = [1, 1, 1, 1, 0, 0, 0].map((v, i) => { const [x, y] = seat(i, 0.56); return A.k('v' + i, ic(v ? 'approve' : 'reject', x - 9.6, y - 9.6, 19.2)); }).join('');
+    const qcard = (k, x, y, face) => A.k('q' + k, face ? ic(face === 'S' ? 'success' : 'fail', x - 8, y - 2, 48) : A.card(x, y, 22, 30, '#3a3a48'));
     const mark = A.k('mark2', A.circle(140, 81, 8, evil, { sw: 1.2 }) + A.text(140, 81, '✗', { size: 10, weight: 800, fill: C.white }));
     return [
-      { step: 0, say: 'Quest 2 needs a team of **3**. Leader **Sam** takes the team tokens.', svg: board + crown(0) + pile + A.glow(140, 81, 12, 'g-q2') },
-      { step: 0, say: 'Sam proposes himself, **Jo** and **Kim**, then the table argues about it.', svg: board + crown(0) + team },
-      { step: 1, say: 'Everyone reveals a vote at once: **4 approve, 3 reject**. Majority approves; note that Ray approved too.', svg: board + crown(0) + team + votes + A.glow(...seat(3), 18, 'g-ray') },
-      { step: 2, say: 'Sam, Jo and Kim each secretly pick **Success or Fail** and play it face down. Good players must play Success.', svg: board + crown(0) + team +
+      { step: 0, say: 'Quest 2 needs **3** players. {=leader} **Sam** takes the {team}s.', svg: board + crown(0) + pile + A.glow(140, 81, 12, 'g-q2') },
+      { step: 0, say: 'Sam proposes himself, **Jo** and **Kim**. The table debates.', svg: board + crown(0) + team },
+      { step: 1, say: 'Everyone reveals a vote: **4** {=approve}, **3** {=reject}. Majority approves. Ray approved too.', svg: board + crown(0) + team + votes + A.glow(...seat(3), 18, 'g-ray') },
+      { step: 2, say: 'Sam, Jo and Kim each play {=success} or {=fail} face down. Good players must play Success.', svg: board + crown(0) + team +
         qcard(0, 108, 4, null) + qcard(1, 226, 26, null) + qcard(2, 286, 68, null) },
-      { step: 2, say: 'The three cards are gathered and **shuffled**, so no one can tell whose card is whose.', svg: board + crown(0) + team +
+      { step: 2, say: 'The cards are **shuffled**, so no one knows who played which.', svg: board + crown(0) + team +
         qcard(1, 136, 108, null) + qcard(0, 144, 112, null) + qcard(2, 152, 108, null) },
-      { step: 3, say: 'Flip them: **one Fail**. A single Fail sinks the quest, so evil scores quest 2.', svg: board + crown(0) + team +
+      { step: 3, say: 'Flip: {=success}{=fail}{=success}. **One** Fail fails the quest; evil takes quest 2.', svg: board + crown(0) + team +
         qcard(1, 108, 106, 'S') + qcard(0, 144, 106, 'F') + qcard(2, 180, 106, 'S') + mark },
-      { step: 3, say: 'Jo and Kim both swear innocence. Ray approved a failed team: suspicious. Leadership passes to **Jo**.', svg: board + crown(1) + team + mark +
+      { step: 3, say: 'Jo and Kim both deny it. Ray approved a failed team: suspicious. The {=leader} passes to **Jo**.', svg: board + crown(1) + team + mark +
         A.bubble(252, 4, 62, 18, 'Not me!', { size: 8.5 }) + A.bubble(272, 80, 44, 18, 'Me too!', { size: 8 }) + A.glow(...seat(3), 18, 'g-ray') },
     ];
   },
 
   art(A) {
-    const C = A.C, gold = '#d4a63a', good = '#2f6db5', evil = '#c8423b';
+    const C = A.C, gold = '#d4a63a', good = '#2f6db5', evil = '#c8423b', I = this.icons, ic = (k, x, y, size) => A.use(I[k].draw(A), x, y, size);
     let o = A.bg('#273552');
     o += A.star(22, 18, 3, '#f2e6cc', { sw: 0 }) + A.star(300, 60, 2.5, '#f2e6cc', { sw: 0 }) + A.star(40, 186, 2.5, '#f2e6cc', { sw: 0 });
     // Round table.
@@ -146,12 +160,12 @@ defineGame({
     const votes = [1, 1, 0, 1, 1, 0, 0];
     seats.forEach(([, , a], i) => {
       const x = 160 + 100 * Math.cos(a), y = 106 + 50 * Math.sin(a);
-      o += A.rect(x - 7, y - 5, 14, 10, votes[i] ? C.white : C.black, { rx: 2, sw: 1, stroke: votes[i] ? C.ink : '#cfc6b6' });
+      o += ic(votes[i] ? 'approve' : 'reject', x - 9.6, y - 9.6, 19.2);
     });
     // Leader crown and team tokens.
     const [lx, ly] = seats[0];
-    o += A.crown(lx, ly - 15, 13, gold);
-    for (const i of [0, 1, 3]) { const [x, y, a] = seats[i]; o += A.circle(x - 16 * Math.cos(a) + 13, y - 6 * Math.sin(a) + 2, 5.5, gold, { sw: 1.1 }); }
+    o += ic('leader', lx - 10, ly - 31, 20);
+    for (const i of [0, 1, 3]) { const [x, y, a] = seats[i]; o += ic('team', x - 16 * Math.cos(a) + 6, y - 6 * Math.sin(a) - 5, 14); }
     // Quest cards played face down.
     o += A.card(136, 136, 15, 21, '#3a3a48', { rotate: -10 }) + A.card(153, 138, 15, 21, '#3a3a48') + A.card(170, 136, 15, 21, '#3a3a48', { rotate: 10 });
     o += A.note(lx + 6, ly - 12, 266, 56, 'Leader picks team');

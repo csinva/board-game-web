@@ -10,109 +10,137 @@ defineGame({
   mechanics: ['card-driven', 'area-control', 'hand-management', 'dice'],
   profile: { complexity: 4, luck: 3, interaction: 5, conflict: 5, talk: 1, planning: 4 },
 
-  pitch: 'The Cold War as a two-player card duel: spread influence across the world while defusing your opponent’s history that lands in your hand.',
-  theme: 'You are the United States or the Soviet Union, fighting the Cold War from 1945 to 1989 without starting World War III.',
+  // Influence, DEFCON levels (same boxes as the board's track), battlegrounds, Ops stars and key cards.
+  icons: (() => {
+    const W = '#fff', cardf = (A, f) => A.rect(4, 1, 16, 22, f, { rx: 2.5, sw: 1.3 });
+    const DC = { 5: '#3c8d4f', 4: '#9cc04a', 3: '#e2b33c', 2: '#e07b2e', 1: '#c8423b' };
+    const ops = (n) => ({ name: n ? n + ' Ops' : 'Ops', draw: A => n ? A.circle(12, 12, 10, '#2a2420', { sw: 0 }) + A.text(12, 12.8, n, { size: 15, weight: 800, fill: W }) : A.star(12, 12.8, 12, '#f4efe2', { sw: 1.2 }) });
+    const icons = {
+      us: { name: 'US influence', draw: A => A.rect(3, 3, 18, 18, '#2f6db5', { rx: 2.5, sw: 1.3 }) + A.star(12, 12.5, 6.5, W, { sw: 0 }) },
+      ussr: { name: 'USSR influence', draw: A => A.rect(3, 3, 18, 18, '#c8423b', { rx: 2.5, sw: 1.3 }) + A.star(12, 12.5, 6.5, W, { sw: 0 }) },
+      bg: { name: 'battleground', draw: A => A.rect(1.5, 5, 21, 14, '#7d5a9a', { rx: 2, sw: 1.3 }) + A.text(6.5, 12.3, '2', { size: 8.5, weight: 800, fill: W }) + A.line(11, 9.5, 19, 9.5, { stroke: W, sw: 1.2 }) + A.line(11, 14.5, 17, 14.5, { stroke: W, sw: 1.2 }) },
+      score: { name: 'scoring card', draw: A => cardf(A, '#f6e0a6') + A.rect(6.5, 3.5, 11, 4, '#c8423b', { rx: 1, sw: 0 }) + A.rect(7, 16, 2.6, 4, '#2a2420', { rx: 0, sw: 0 }) + A.rect(10.7, 12.5, 2.6, 7.5, '#2a2420', { rx: 0, sw: 0 }) + A.rect(14.4, 9.5, 2.6, 10.5, '#2a2420', { rx: 0, sw: 0 }) },
+      china: { name: 'China Card', draw: A => cardf(A, '#e2b33c') + A.star(12, 12.5, 6, '#c8423b', { sw: 0 }) },
+      space: { name: 'Space Race', draw: A => A.poly([[8, 15], [5, 20], [9, 19]], '#c8423b', { sw: 1 }) + A.poly([[16, 15], [19, 20], [15, 19]], '#c8423b', { sw: 1 }) + A.path('M12 2 q5 5 4 14.5 h-8 q-1 -9.5 4 -14.5z', { fill: W, sw: 1.3 }) + A.circle(12, 9, 2, '#2f6db5', { sw: 0.8 }) + A.poly([[10, 17], [14, 17], [12, 22]], '#e07b2e', { sw: 0 }) },
+      ops: ops(0),
+    };
+    for (let n = 1; n <= 4; n++) icons['ops' + n] = ops(n);
+    for (let n = 1; n <= 5; n++) icons['dc' + n] = { name: 'DEFCON ' + n, draw: A => A.rect(1.5, 1.5, 21, 21, DC[n], { rx: 3, sw: 1.3 }) + A.text(12, 12.5, n, { size: 13, weight: 800, fill: W }) };
+    return icons;
+  })(),
 
-  goal: { big: '20 VP', text: 'Push the shared VP track to **20 on your side** to win at once. Otherwise, whoever is ahead after final scoring at the end of **turn 10** wins.' },
+  pitch: 'Two players play cards for events or Ops to spread influence, stage coups and score regions; reach 20 VP or lead after turn 10.',
+
+  goal: { big: '20 VP', text: 'Push the shared VP track to **20 on your side** to win at once. Otherwise, whoever leads after final scoring at the end of **turn 10** wins.' },
 
   turn: {
     type: 'choose',
-    intro: 'Each turn opens with both players secretly choosing a Headline card. Then you alternate action rounds, playing one card each and using it for one of these:',
+    intro: 'Each turn starts with a Headline: both pick a card in secret and reveal together. Then you alternate action rounds, playing one card each for one of:',
     steps: [
-      { verb: 'Event', text: 'Do the text on the card. Events marked for **your** side, or neutral ones, are yours to trigger.' },
-      { verb: 'Influence', text: 'Place influence equal to the card’s **Ops** in or next to countries where you already have some.' },
-      { verb: 'Coup', text: 'Roll 1 die + Ops − 2 × the country’s **stability**; each point over removes enemy influence, then adds yours.' },
-      { verb: 'Realign', text: 'Each Op is a die-off: both roll, modified by neighbours, and the loser removes influence.' },
-      { verb: 'Space Race', text: 'Discard a card with enough Ops and roll to advance on the space track for VP and perks.' },
+      { verb: 'Event', text: 'Do the card’s text. You may trigger your own side’s events and neutral ones.' },
+      { verb: 'Influence', text: 'Place influence equal to the card’s {=ops} **Ops** in or next to countries where you had some at the start of the round, or next to your superpower (2 per point into enemy-controlled ones).' },
+      { verb: 'Coup', text: 'Roll {=die} + Ops − 2 × the target’s **stability**; each point over 0 removes enemy influence, then adds yours. A {=bg} coup lowers DEFCON.' },
+      { verb: 'Realign', text: 'Per Op, both roll {=die} with modifiers; the loser removes influence equal to the difference.' },
+      { verb: 'Space Race', text: 'Discard a card with enough Ops and roll on the {=space} track for VP and perks; its event doesn’t happen.' },
     ],
-    outro: 'USSR acts first each round; 6 rounds per turn early, 7 from turn 4.',
+    outro: 'USSR acts first each round; 6 action rounds per turn, 7 from turn 4',
   },
 
-  tension: 'Half your hand is your opponent’s history: if you play their card for Ops, their event happens too, so every turn is choosing which disaster you can survive.',
+  tension: 'Half your hand is your opponent’s events: playing them for Ops triggers them anyway, so each turn you choose which harm to accept and when.',
 
-  flow: [
-    { label: 'Spread', items: ['Place influence', 'Control countries', 'Battlegrounds matter most'] },
-    { label: 'Contest', items: ['Coups and realignments', 'Each coup in a battleground lowers DEFCON', 'Meet military ops each turn'] },
-    { label: 'Score', items: ['Play region scoring cards', 'Presence / Domination / Control', 'Final scoring after turn 10'] },
+  structure: [
+    { label: 'Setup', text: 'Starting influence plus free placements (USSR 6, US 7). Deal 8 Early War cards; the USSR holds the {china}.' },
+    { label: 'Turn start', repeat: '10 turns', text: 'DEFCON improves by 1; refill hands to 8 (9 from turn 4, when Mid War is added; Late War on turn 8). **Headline**: both play a card face down for its event; higher Ops resolves first (US on a tie).' },
+    { label: 'Action rounds', repeat: '6, then 7', text: 'Alternate, USSR first, one card each per round.' },
+    { label: 'Turn end', text: 'Military ops below DEFCON: the opponent gains the shortfall in VP. A {=score} may never be held into the next turn. The {=china} turns face up.' },
+    { label: 'Final scoring', text: 'After turn 10: every region scores, the China Card holder gains 1 VP, and the leader wins.' },
+  ],
+
+  points: [
+    ['{=score} Region scoring', 'Presence / Domination / Control VP printed on the card, +1 per {=bg} you control there, +1 per controlled country there next to the enemy superpower'],
+    ['Events', 'Many cards award VP directly'],
+    ['{=space} Space Race', 'VP boxes, worth more to whoever reaches them first'],
+    ['Military ops', 'Opponent’s shortfall below DEFCON at turn end'],
+    ['{=china} China Card', '+1 VP to its holder at final scoring'],
   ],
 
   end: {
     trigger: 'turn 10 ends, or someone wins early',
     results: [
       { side: 'Instant win', text: 'reach 20 VP, or Control Europe when it scores.' },
-      { side: 'Instant loss', text: 'cause DEFCON 1 (nuclear war), or hold a scoring card at the end of a turn.' },
-      { side: 'Final scoring', text: 'after turn 10 every region scores; the player ahead on VP wins.' },
+      { side: 'Instant loss', text: 'cause DEFCON 1 (nuclear war). Tournament rule: hold a scoring card at the end of a turn.' },
+      { side: 'Final scoring', text: 'after turn 10 every region scores (20 VP is not an instant win here); the player ahead on VP wins, 0 is a draw.' },
     ],
   },
 
   ref: {
-    title: 'DEFCON: what each level forbids',
+    title: 'DEFCON: where coups and realignments are banned',
     rows: [
-      ['5', 'Nothing. Peace.'],
-      ['4', 'No coups or realignments in **Europe**.'],
-      ['3', 'Also none in **Asia**.'],
-      ['2', 'Also none in the **Middle East**.'],
-      ['1', 'Nuclear war: the player whose turn it is **loses**.'],
+      ['{=dc5}', 'No restrictions.'],
+      ['{=dc4}', 'Not in **Europe**.'],
+      ['{=dc3}', 'Not in Europe or **Asia**.'],
+      ['{=dc2}', 'Not in Europe, Asia or the **Middle East**.'],
+      ['{=dc1}', 'Nuclear war: the player who caused it **loses**.'],
     ],
   },
 
-  example: 'As the US you play **Decolonization**, a Soviet event worth 2 Ops. You choose to do the Ops first: 1 influence into Nigeria and 1 into Zaire. Then the event fires: the USSR adds **1 influence to 4** African or Southeast Asian countries, but you have already shored up the two you care about.',
+  example: 'As the US you play **Decolonization**, a Soviet event worth {=ops2}. You take the Ops first: 1 {=us} into Nigeria and 1 into Zaire. Then the event fires for the USSR: it adds 1 {=ussr} to each of 4 countries in Africa or Southeast Asia.',
 
   setup: [
-    'Place starting influence printed on the board (USSR in Eastern Europe, US in the West), plus 6 USSR and 7 US free placements.',
-    'Shuffle the Early War cards; deal 8 to each. The USSR takes the China Card.',
-    'DEFCON starts at 5, VP at 0, and the turn marker on turn 1.',
+    'Place the starting influence printed on the board, then free placements: USSR 6 in Eastern Europe, US 7 in Western Europe.',
+    'Shuffle the Early War cards; deal 8 each. The USSR takes the {china}.',
+    'DEFCON at {=dc5}, VP at 0, turn marker on turn 1.',
   ],
 
   terms: [
-    ['Ops', 'Operations value printed on each card (1–4): how much you can do with it.'],
-    ['Control', 'Your influence ≥ stability and beats the enemy’s by at least the stability.'],
-    ['Battleground', 'A key country. Coups there lower DEFCON; scoring counts them heavily.'],
-    ['DEFCON', 'Nuclear tension, 5 (calm) to 1 (war). Coups lower it.'],
-    ['China Card', 'Shared card worth 4 Ops (+1 in Asia) that passes to the opponent after use.'],
+    ['{=ops} Ops', 'The number on each card (1–4): how much you can do with it.'],
+    ['Control', 'Your influence ≥ stability and exceeds the enemy’s by at least the stability.'],
+    ['{=bg} Battleground', 'A key country (purple). Coups there lower DEFCON; scoring rewards them.'],
+    ['{=dc3} DEFCON', 'Nuclear tension, 5 (calm) to 1 (war). Battleground coups lower it.'],
+    ['{=china} China Card', 'Shared card: 4 Ops (+1 if all spent in Asia); passes face down to the opponent after use.'],
   ],
 
   gotchas: [
-    'If you play an **opponent’s event card for Ops, their event still happens**; you only choose whether it goes before or after your Ops.',
-    '**Scoring cards** must be played in the turn you draw them. Holding one at turn end loses the game.',
-    'At turn end, each player must have done **military ops** equal to DEFCON or give the opponent VP for the shortfall.',
+    'Playing an **opponent’s event card for Ops still triggers their event**; you only choose before or after your Ops.',
+    '{=score} **Scoring cards** must be played in the turn you draw them; they can never be held (tournament rule: holding one at turn end loses).',
+    'At turn end, each player needs **military ops** (coups and some events) at least equal to DEFCON, or the opponent gains the shortfall as VP.',
   ],
 
   extended: [
-    { title: 'The Headline phase', text: 'At the start of each turn both players choose a card face down and reveal together. Headlines are played **for the event only**: the higher-Ops card resolves first (US first on a tie). Headlining an opponent’s event triggers it for them, so use it only for your own events or scoring cards. The China Card can never be headlined.' },
+    { title: 'The Headline phase', text: 'Both players choose a card face down and reveal together. Headlines are played **for the event only**: the higher-Ops card resolves first (US first on a tie). Headlining an opponent’s event triggers it for them. Scoring cards may be headlined; they resolve second. The China Card can never be headlined.' },
     { title: 'The China Card', items: [
-      'Starts face up with the USSR. Worth **4 Ops**, +1 if every Op is spent in Asia. It can only be played for Ops, never as an event or in the headline.',
-      'After it is played it passes **face down** to the opponent, who can use it from the next turn.',
-      'It does not count toward hand size and you can never be forced to play it; whoever holds it at the end of turn 10 gets **+1 VP**.',
+      'Starts face up with the USSR. Worth **4 Ops**, +1 if every Op is spent in Asia. Playable only for Ops, never as an event or headline.',
+      'After use it passes **face down** to the opponent, who can use it from the next turn.',
+      'It doesn’t count toward hand size and can’t be forced out of your hand; whoever holds it at the end of turn 10 gains **+1 VP**.',
     ] },
     { title: 'Regions, battlegrounds and scoring', items: [
-      '**Presence**: at least one controlled country. **Domination**: more countries **and** more battlegrounds than the opponent, with at least one battleground and one non-battleground. **Control**: more countries and **every** battleground.',
+      '**Presence**: at least one controlled country. **Domination**: more countries **and** more {=bg} than the opponent, with at least one battleground and one non-battleground. **Control**: more countries and **every** battleground.',
       'VP for presence / domination / control: Europe 3 / 7 / **automatic win**; Asia 3 / 7 / 9; Middle East 3 / 5 / 7; Africa 1 / 4 / 6; Central America 1 / 3 / 5; South America 2 / 5 / 6.',
       'Bonuses: +1 per battleground you control in the region, +1 per controlled country there adjacent to the enemy superpower.',
-      'Southeast Asia scoring (Mid War) is different: 1 VP per controlled country there, 2 for Thailand, and the card is then removed.',
+      'Southeast Asia scoring (Mid War): 1 VP per controlled country there, 2 for Thailand; the card is then removed.',
     ] },
     { title: 'Coups and realignments in detail', items: [
-      'You can only target a country containing enemy influence, and only where DEFCON allows. Coup roll: d6 + Ops − 2 × stability; each point over 0 removes an enemy influence, then excess adds yours.',
-      'Every coup (successful or not) moves your **military ops** marker by the card’s Ops. A coup in a battleground lowers DEFCON by 1.',
+      'Target only a country with enemy influence, and only where DEFCON allows. Coup roll: {=die} + Ops − 2 × stability; each point over 0 removes an enemy influence, then the rest adds yours.',
+      'Every coup (successful or not) advances your **military ops** by the card’s Ops. A coup in a {=bg} lowers DEFCON by 1.',
       'Realignment: each Op is a separate roll-off. Each side adds +1 per adjacent country it controls, +1 if it has more influence in the target, +1 if the target is adjacent to its superpower. The loser removes influence equal to the difference.',
-      'Realignments do not lower DEFCON and do not count as military ops.',
+      'Realignments don’t lower DEFCON and don’t count as military ops.',
     ] },
     { title: 'The Space Race', items: [
-      'Once per turn (twice with the second box’s ability) discard a card instead of using it: its event does **not** happen. The first four boxes need a 2-Ops card, the next three 3 Ops, the last 4 Ops.',
-      'Roll the number printed on the next box (e.g. 1–3) to advance. VP boxes pay more to whoever reaches them first.',
-      'Ability boxes last until the opponent catches up: two attempts per turn, the opponent reveals their headline first, discard a held card at turn end, and eight action rounds per turn.',
+      'Once per turn (twice with the second box’s ability), discard a card instead of using it: its event does **not** happen. Boxes 1–4 need a 2-Ops card, 5–7 need 3 Ops, the last needs 4.',
+      'Roll the range printed on the next box (e.g. 1–3) to advance. VP boxes pay more to whoever reaches them first.',
+      'Ability boxes last until the opponent catches up: two attempts per turn, the opponent reveals their headline first, discard a held card at turn end, eight action rounds per turn.',
     ] },
     { title: 'Turn bookkeeping', items: [
-      'Hands are refilled to **8** cards (9 from turn 4, when the Mid War deck is shuffled in; the Late War joins on turn 8).',
-      'End of turn: check military ops (each side must have done at least DEFCON’s level or the opponent scores the shortfall as VP), then DEFCON improves by 1.',
-      'Starred events are removed after use; underlined events stay in effect. Playing **your own** event card for Ops does nothing extra; it is only the opponent’s that fire.',
+      'Start of turn: DEFCON improves by 1; hands refill to **8** (9 from turn 4, when the Mid War deck is shuffled in; Late War joins on turn 8).',
+      'End of turn: check military ops (each side needs at least the DEFCON level, or the opponent scores the shortfall), flip the China Card face up. Tournament rule: reveal held cards; holding a scoring card loses.',
+      'Starred events are removed after use; underlined events stay in effect. Playing **your own** event card for Ops does nothing extra; only the opponent’s events fire.',
     ] },
   ],
 
   tips: [
-    'Grab battlegrounds in Europe, Asia and the Middle East early; they are worth the most at scoring.',
-    'Use the Space Race to dump an opponent event you cannot afford to trigger.',
-    'Coup in non-battleground countries to meet military ops without dropping DEFCON.',
+    'Take battlegrounds in Europe, Asia and the Middle East early; they score the most.',
+    'Use the Space Race to dump an opponent event you can’t afford to trigger.',
+    'Coup in non-battleground countries to meet military ops without lowering DEFCON.',
   ],
 
   walk(A) {
@@ -123,8 +151,8 @@ defineGame({
     for (let i = 0; i < 21; i++) map += A.rect(12 + i * 11, 8, 10, 12, i === 10 ? '#d9d1b8' : (i < 10 ? '#f1d9d6' : '#d6e0f1'), { rx: 1, sw: 0.6 });
     map += A.text(12, 26, 'USSR VP', { size: 6, anchor: 'start', fill: SU }) + A.text(243, 26, 'US VP', { size: 6, anchor: 'end', fill: US });
     const dc = ['#3c8d4f', '#9cc04a', '#e2b33c', '#e07b2e', '#c8423b'];
-    for (let i = 0; i < 5; i++) map += A.rect(282, 12 + i * 26, 30, 22, dc[i], { rx: 3, sw: 1 }) + A.text(297, 23 + i * 26, 5 - i, { size: 11, weight: 800, fill: '#fff' });
-    map += A.text(297, 6, 'DEFCON', { size: 6 });
+    for (let i = 0; i < 5; i++) map += A.use(this.icons['dc' + (5 - i)].draw(A), 285, 10 + i * 26, 24);
+    map += A.text(297, 4.5, 'DEFCON', { size: 6 });
     const space = [190, 160];
     for (let i = 0; i < 4; i++) map += A.rect(space[0] + i * 20, space[1], 18, 18, '#f4efe2', { rx: 2, sw: 0.8 }) + A.text(space[0] + 9 + i * 20, space[1] + 25, ['start', '2VP', '', '2VP'][i], { size: 5.5 });
     map += A.text(space[0], space[1] - 6, 'Space Race', { size: 7, anchor: 'start' });
@@ -132,26 +160,26 @@ defineGame({
     const BG = { nig: 1, zai: 1, ang: 1 };
     for (const k in B) { const [x, y, n] = B[k]; map += A.rect(x, y, 56, 26, BG[k] ? '#7d5a9a' : '#fbf6ec', { rx: 2, sw: 1 }) + A.text(x + 28, y + 6, n, { size: 6, weight: 700, fill: BG[k] ? '#fff' : C.ink }) + A.text(x + 6, y + 17, 1, { size: 8, weight: 800, fill: BG[k] ? '#fff' : C.ink }); }
     const inf = (k, side, n) => { const [x, y] = B[k]; return A.k(side + '-' + k, A.rect(x + (side === 'us' ? 16 : 34), y + 11, 13, 12, side === 'us' ? US : SU, { rx: 1.5, sw: 0.8, stroke: '#fff' }) + A.text(x + (side === 'us' ? 22.5 : 40.5), y + 17.5, n, { size: 8, weight: 800, fill: '#fff' })); };
-    const defcon = (lvl) => A.k('defcon', A.circle(297, 23 + (5 - lvl) * 26, 14, 'none', { stroke: C.ink, sw: 2.6 }));
+    const defcon = (lvl) => A.k('defcon', A.circle(297, 22 + (5 - lvl) * 26, 13.5, 'none', { stroke: C.ink, sw: 2.6 }));
     const vp = (v) => A.k('vp', A.circle(12 + (10 + v) * 11 + 5, 14, 5, v > 0 ? US : (v < 0 ? SU : C.gray), { stroke: '#fff', sw: 1 }));
-    const smark = (i) => A.k('space', A.circle(space[0] + 9 + i * 20, space[1] + 9, 6, US, { stroke: '#fff', sw: 1 }));
+    const smark = (i) => A.k('space', A.use(this.icons.space.draw(A), space[0] + 1 + i * 20, space[1] + 1, 16));
     const card = (name, ops, side) => A.k('card', A.card(4, 140, 34, 50, '#f4efe2', {}) + A.circle(14, 150, 6, side === 'us' ? US : SU, { sw: 0.8 }) + A.text(14, 150.5, ops, { size: 7, weight: 800, fill: '#fff' }) +
       A.text(21, 168, name[0], { size: 5.5, weight: 700 }) + A.text(21, 175, name[1] || '', { size: 5.5, weight: 700 }));
     const st0 = defcon(5) + vp(0) + smark(0);
     return [
-      { step: 1, say: 'US plays **Decolonization**, a Soviet event worth 2 Ops. Ops first: **1 influence** each into Nigeria and Zaire.',
+      { step: 1, say: 'US plays **Decolonization**, a Soviet event worth {=ops2}. Ops first: 1 {=us} each into Nigeria and Zaire.',
         svg: map + st0 + card(['Decolon-', 'ization'], 2, 'su') + inf('nig', 'us', 1) + inf('zai', 'us', 1) + A.glow(76, 61, 32, 'g-n') },
-      { step: 0, say: 'It’s a Soviet card, so its **event still fires**: the USSR adds 1 influence to 4 countries in Africa or SE Asia.',
+      { step: 0, say: 'It’s a Soviet card, so its **event still fires**: the USSR adds 1 {=ussr} to each of 4 countries in Africa or SE Asia.',
         svg: map + st0 + card(['Decolon-', 'ization'], 2, 'su') + inf('nig', 'us', 1) + inf('zai', 'us', 1) + inf('ang', 'su', 1) + inf('sea', 'su', 1) + inf('vie', 'su', 1) + inf('lao', 'su', 1) },
-      { step: 2, say: 'USSR **coups** Nigeria with a 3-Ops card: roll **4** + 3 − 2×stability 1 = **5**. Remove the US 1, add 4 Soviet.',
+      { step: 2, say: 'USSR **coups** Nigeria with a {=ops3} card: {=d4} + 3 − 2 × stability 1 = **5**. Remove the US 1, add 4 Soviet.',
         svg: map + st0 + card(['Comecon', ''], 3, 'su') + inf('zai', 'us', 1) + inf('nig', 'su', 4) + inf('ang', 'su', 1) + inf('sea', 'su', 1) + inf('vie', 'su', 1) + inf('lao', 'su', 1) +
           A.k('die', A.die(110, 50, 18, 4, '#c8423b', { pip: '#fff' })) + A.glow(76, 61, 32, 'g-n') },
-      { step: 2, say: 'Nigeria is a **battleground**, so the coup drops **DEFCON** to 4: no more coups or realignments in Europe.',
-        svg: map + defcon(4) + vp(0) + smark(0) + card(['Comecon', ''], 3, 'su') + inf('zai', 'us', 1) + inf('nig', 'su', 4) + inf('ang', 'su', 1) + inf('sea', 'su', 1) + inf('vie', 'su', 1) + inf('lao', 'su', 1) + A.glow(297, 49, 18, 'g-dc') },
-      { step: 3, say: 'US **realigns** Angola with 1 Op: US rolls 5, USSR rolls 2 +1 (more influence there). US wins by 2: the Soviet marker goes.',
+      { step: 2, say: 'Nigeria is a {=bg} **battleground**, so DEFCON drops to {=dc4}: no more coups or realignments in Europe.',
+        svg: map + defcon(4) + vp(0) + smark(0) + card(['Comecon', ''], 3, 'su') + inf('zai', 'us', 1) + inf('nig', 'su', 4) + inf('ang', 'su', 1) + inf('sea', 'su', 1) + inf('vie', 'su', 1) + inf('lao', 'su', 1) + A.glow(297, 48, 18, 'g-dc') },
+      { step: 3, say: 'US **realigns** Angola with 1 Op: US rolls {=d5} +1 (controls adjacent Zaire), USSR rolls {=d2} +1 (more influence there). US wins 6–3: the Soviet influence goes.',
         svg: map + defcon(4) + vp(0) + smark(0) + card(['Truman', 'Doctrine'], 1, 'us') + inf('zai', 'us', 1) + inf('nig', 'su', 4) + inf('sea', 'su', 1) + inf('vie', 'su', 1) + inf('lao', 'su', 1) +
           A.k('rd1', A.die(116, 108, 16, 5, '#fff')) + A.k('rd2', A.die(136, 108, 16, 2, '#c8423b', { pip: '#fff' })) + A.glow(80, 119, 32, 'g-a') },
-      { step: 4, say: 'US sends **Fidel**, a Soviet event it doesn’t want, to the **Space Race**: roll 2 (needs 1–3). First box: **+2 VP**, and the event never happens.',
+      { step: 4, say: 'US sends **Fidel**, a Soviet event it doesn’t want, to the {=space}: rolls {=d2} (needs 1–3). First box: **+2 VP**; the event never happens.',
         svg: map + defcon(4) + vp(2) + smark(1) + card(['Fidel', ''], 2, 'su') + inf('zai', 'us', 1) + inf('nig', 'su', 4) + inf('sea', 'su', 1) + inf('vie', 'su', 1) + inf('lao', 'su', 1) +
           A.k('sd', A.die(274, 156, 16, 2, '#fff')) + A.glow(149, 14, 10, 'g-vp') },
     ];
@@ -188,14 +216,12 @@ defineGame({
     o += A.circle(12 + 13 * 11 + 5, 14, 5, US, { stroke: '#fff', sw: 1 });
     // DEFCON track down the right
     const dc = ['#3c8d4f', '#9cc04a', '#e2b33c', '#e07b2e', '#c8423b'];
-    for (let i = 0; i < 5; i++) {
-      o += A.rect(282, 12 + i * 26, 30, 22, dc[i], { rx: 3, sw: 1 }) + A.text(297, 23 + i * 26, 5 - i, { size: 11, weight: 800, fill: '#fff' });
-    }
-    o += A.circle(297, 75, 13, 'none', { stroke: C.ink, sw: 2.4 });
+    for (let i = 0; i < 5; i++) o += A.use(this.icons['dc' + (5 - i)].draw(A), 285, 10 + i * 26, 24);
+    o += A.circle(297, 74, 14.5, 'none', { stroke: C.ink, sw: 2.4 });
     // hand of cards with ops stars
     o += A.card(144, 148, 32, 44, '#f4efe2', { corner: '3', labelFill: SU, label: '★', size: 16 });
     o += A.card(176, 150, 32, 44, '#f4efe2', { corner: '2', labelFill: US, label: '★', size: 16 });
-    o += A.card(208, 152, 32, 44, '#f6e0a6', { title: 'SCORE', label: 'Asia', labelFill: C.ink, size: 9 });
+    o += A.use(this.icons.score.draw(A), 200, 150, 48);
     o += A.note(160, 14, 190, 34, 'VP track: ±20 wins');
     o += A.note(284, 82, 234, 140, 'DEFCON: 1 = war');
     o += A.note(72, 125, 70, 162, 'Influence vs stability');

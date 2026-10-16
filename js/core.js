@@ -23,6 +23,8 @@ window.GAME_IDS = [
   'pandemic', 'hanabi', 'forbidden-island', 'the-crew', 'spirit-island', 'gloomhaven',
   // Trick-taking
   'hearts', 'spades', 'euchre', 'tichu', 'bridge',
+  // Classic card games
+  'capitalism', 'texas-holdem', 'gin-rummy', 'cribbage', 'uno', 'egyptian-ratscrew', 'cheat',
   // Party & communication
   'codenames', 'dixit', 'wavelength',
   // Conflict & area control
@@ -32,17 +34,18 @@ window.GAME_IDS = [
 ];
 
 window.FAMILIES = {
-  build:    { label: 'Trade, build & connect',   color: '#c2562b', blurb: 'Gather resources, then spend them to claim space on a shared map.' },
-  engine:   { label: 'Engine builders',          color: '#2f7a55', blurb: 'Early turns make later turns stronger: you build a machine that makes points.' },
-  cards:    { label: 'Card games',               color: '#7a4fb3', blurb: 'The cards are the whole game: build a deck, draft a hand, or collect sets.' },
-  tile:     { label: 'Tiles & patterns',         color: '#2867b2', blurb: 'Pick a piece, place it well. Spatial puzzles with light interaction.' },
-  classic:  { label: 'Classics',                 color: '#857563', blurb: 'The family-shelf staples most people already half-know.' },
-  hidden:   { label: 'Hidden roles & bluffing',  color: '#b3263e', blurb: 'Someone is lying. The game is the conversation.' },
-  coop:     { label: 'Cooperative',              color: '#16807f', blurb: 'Everyone wins or loses together against the game itself.' },
-  party:    { label: 'Party & communication',    color: '#c98400', blurb: 'Big groups, short rules; the fun is in what people say.' },
-  trick:    { label: 'Trick-taking',             color: '#c2457a', blurb: 'Play a card, highest of the suit led wins the trick. Old games, endless depth.' },
-  conflict: { label: 'Conflict & area control',  color: '#4a4f6a', blurb: 'Fight over territory; attacking other players is the point.' },
-  epic:     { label: 'Epic strategy & negotiation', color: '#9a5a1e', blurb: 'Long, dramatic games of alliances, betrayal and grand plans. Clear an evening.' },
+  build:    { label: 'Trade, build & connect',   color: '#c2562b', blurb: 'Collect resources, spend them to claim spots on a shared map.' },
+  engine:   { label: 'Engine builders',          color: '#2f7a55', blurb: 'Early purchases make later turns stronger.' },
+  cards:    { label: 'Card games',               color: '#7a4fb3', blurb: 'Build a deck, draft a hand, or collect sets.' },
+  tile:     { label: 'Tiles & patterns',         color: '#2867b2', blurb: 'Take a piece, place it on your own board to score patterns.' },
+  classic:  { label: 'Classics',                 color: '#857563', blurb: 'Long-established games most people have played.' },
+  hidden:   { label: 'Hidden roles & bluffing',  color: '#b3263e', blurb: 'Hidden teams; win by deducing who is lying.' },
+  coop:     { label: 'Cooperative',              color: '#16807f', blurb: 'All players win or lose together against the game.' },
+  party:    { label: 'Party & communication',    color: '#c98400', blurb: 'Large groups, few rules; give and guess clues.' },
+  deck:     { label: 'Classic card games',       color: '#6b7a2a', blurb: 'Standard-deck games: empty your hand, make melds, bet, bluff or slap.' },
+  trick:    { label: 'Trick-taking',             color: '#c2457a', blurb: 'Each player plays a card; the highest of the suit led wins the trick.' },
+  conflict: { label: 'Conflict & area control',  color: '#4a4f6a', blurb: 'Attack other players to control territory.' },
+  epic:     { label: 'Epic strategy & negotiation', color: '#9a5a1e', blurb: 'Long games won through alliances, negotiation and conflict.' },
 };
 
 // Controlled vocabulary of mechanics. Similarity is computed over these.
@@ -86,6 +89,10 @@ window.MECHANICS = {
   'card-driven':           'Card-driven events',
   'campaign':              'Campaign / legacy',
   'deck-construction':     'Deck construction (build before play)',
+  'shedding':              'Shedding / climbing (empty your hand)',
+  'melding':               'Melding (sets and runs)',
+  'betting':               'Betting',
+  'speed':                 'Real-time / reflexes',
 };
 
 // Six standardized profile axes, each scored 1–5.
@@ -126,7 +133,7 @@ window.loadGames = function () {
 //     6-axis feel profile and family.
 window.BRIDGES = [];
 window.defineBridge = function (b) { window.BRIDGES.push(b); };
-window.BRIDGE_FILES = ['1', '2', '3'];
+window.BRIDGE_FILES = ['1', '2', '3', '4'];
 
 let IDF = null;
 function idf() {
@@ -150,7 +157,7 @@ function cosine(a, b) {
 }
 window.kinOf = function (id) {
   return (window.KIN || []).filter(k => k[0] === id || k[1] === id)
-    .map(k => ({ id: k[0] === id ? k[1] : k[0], why: k[2] }))
+    .map(k => ({ id: k[0] === id ? k[1] : k[0], why: k[2], teach: k[3] === 'teach' }))
     .filter(k => window.GAME_BY_ID && window.GAME_BY_ID[k.id]);
 };
 window.isKin = (a, b) => (window.KIN || []).some(k => (k[0] === a && k[1] === b) || (k[0] === b && k[1] === a));
@@ -201,4 +208,17 @@ window.knownGames = {
 
 window.esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // Inline emphasis: **bold** only.
-window.md = s => window.esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+// Inline icons: {key} renders a game component's icon followed by its name,
+// {=key} renders the icon alone. Icons come from the game being shown
+// (window.CURRENT_GAME.icons) or the shared set (A.ICONS).
+window.CURRENT_GAME = null;
+window.iconFor = function (k, g) {
+  g = g || window.CURRENT_GAME;
+  const def = (g && g.icons && g.icons[k]) || (window.A && window.A.ICONS[k]);
+  if (!def) return null;
+  if (!def._svg) def._svg = def.draw(window.A);
+  return def;
+};
+window.iconHTML = (def, withName) => `<span class="gi" title="${window.esc(def.name)}"><svg viewBox="0 0 24 24" aria-hidden="true">${def._svg}</svg></span>${withName ? `<span class="gi-l">${window.esc(def.name)}</span>` : ''}`;
+window.md = s => window.esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+  .replace(/\{(=?)([a-z0-9-]+)\}/g, (m, only, k) => { const d = window.iconFor(k); return d ? window.iconHTML(d, !only) : m; });

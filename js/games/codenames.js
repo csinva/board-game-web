@@ -4,81 +4,94 @@ defineGame({
   year: 2015,
   designer: 'Vlaada Chvátil',
   family: 'party',
-  players: [4, 8], best: '6–8',
-  time: [15, 20],
+  players: [2, 8], best: '6–8',
+  time: [15, 15],
   age: 10,
   mechanics: ['word', 'team', 'limited-communication', 'party', 'deduction'],
   profile: { complexity: 1, luck: 2, interaction: 4, conflict: 2, talk: 4, planning: 2 },
   color: '#c8423b',
 
-  pitch: 'Two spymasters give one-word clues to link several words on the grid. Their teams guess which cards are theirs, and dodge the assassin.',
-  theme: 'You are rival spy teams; your spymaster knows the secret identities of 25 agents, but can only speak in codes.',
+  // Cover cards (laid on a word once it is guessed) and the spymasters' key card.
+  icons: (() => {
+    const KEY = ['nrrnb', 'bnbrr', 'rnbbr', 'rbrnk', 'nbnbr'], KEYC = { r: '#e8574f', b: '#2f6db5', n: '#ead9b0', k: '#141414' };
+    const cover = (name, fill, fig) => ({ name, draw: A => A.rect(1.5, 5, 21, 14, fill, { rx: 2, sw: 1.3 }) + A.person(12, 11.5, 11, fig, { face: fig }) });
+    return {
+      red: cover('red agent', '#c8423b', '#f0b4ad'),
+      blue: cover('blue agent', '#2f6db5', '#a9c4e8'),
+      bystander: cover('bystander', '#d9c79c', '#a8946a'),
+      assassin: cover('assassin', '#1f1f1f', '#8c877f'),
+      key: { name: 'key card', draw: A => A.rect(2, 2, 20, 20, '#c8423b', { rx: 2.5, sw: 1.3 }) + A.grid(4.5, 4.5, 5, 5, 3, (i, j) => KEYC[KEY[j][i]], { sw: 0.5 }) },
+    };
+  })(),
 
-  goal: { big: 'Find your agents', text: 'Be the first team to reveal **all your agents** (9 for the starting team, 8 for the other) without touching the assassin.' },
+  pitch: 'Spymasters give one-word clues linking several grid words; teams race to touch all their agents and avoid the assassin.',
+
+  goal: { big: 'Find your agents', text: 'Be the first team to reveal **all your agents**: 9 for the starting team, 8 for the other.' },
 
   turn: {
     type: 'round',
     intro: 'Teams alternate. On your team’s turn:',
     steps: [
-      { verb: 'Clue', text: 'Your spymaster says **one word and one number**, e.g. “Ocean: 2”. Nothing else: no gestures, no faces.' },
-      { verb: 'Guess', text: 'Operatives discuss and touch a card. The spymaster covers it with its true colour.' },
-      { verb: 'Continue', text: 'If it was yours, you may guess again, up to **number + 1** guesses in total. Stop any time after one.' },
+      { verb: 'Clue', text: 'Your spymaster says **one word and one number**, e.g. “Ocean: 2”. No gestures or other hints.' },
+      { verb: 'Guess', text: 'Operatives discuss and touch one word. The spymaster covers it: {red}, {blue}, {bystander} or {assassin}.' },
+      { verb: 'Continue', text: 'Your agent: guess again, up to **number + 1** guesses; you may stop after any correct guess. Anything else ends the turn.' },
     ],
     outro: 'Other team’s turn',
   },
 
-  tension: 'A clue that links more words gets you ahead faster, but every stretch makes it likelier your team picks a wrong card, or the assassin.',
+  tension: 'A clue linking more words gets you ahead faster, but each stretch makes a wrong card, or the assassin, likelier.',
 
-  flow: [
-    { label: 'Clue', items: ['Link 2–4 words', 'Avoid enemy words', 'Steer clear of the assassin'] },
-    { label: 'Guess', items: ['Talk it through', 'Touch one card', 'Stop or push on'] },
-    { label: 'Reveal', items: ['Your agent: keep going', 'Bystander: turn ends', 'Enemy agent: theirs + turn ends'] },
+  structure: [
+    { label: 'Setup', text: '25 word cards in a 5×5 grid. Both spymasters see one secret {=key}.' },
+    { label: 'Turns', repeat: 'teams alternate', text: 'Clue, then guesses until a miss, a stop, or number + 1 guesses.' },
+    { label: 'Game end', text: 'A team’s last agent is covered: that team wins. The {=assassin} is touched: that team loses.' },
   ],
 
   end: {
-    trigger: 'One team has all its agents revealed, or someone touches the assassin',
-    detail: 'If you reveal an enemy agent, it counts for them, so a team can win on the other team’s turn.',
+    trigger: 'One team has all its agents covered, or someone touches the assassin',
+    detail: 'An enemy agent you touch counts for them, so a team can win on the other team’s turn.',
     results: [
-      { side: 'Win', text: 'when every one of your agents is covered.' },
-      { side: 'Lose instantly', text: 'if your operatives touch the **assassin**.' },
+      { side: 'Win', text: 'when all your agents are covered.' },
+      { side: 'Lose instantly', text: 'if your operatives touch the {=assassin}.' },
     ],
   },
 
   ref: {
     title: 'The 25 cards (key card)',
     rows: [
-      ['Starting team', '9 agents'],
-      ['Other team', '8 agents'],
-      ['Innocent bystanders', '7: guessing one ends your turn'],
-      ['Assassin', '1: guessing it loses the game'],
+      ['{=red} {=blue} Agents', '9 for the starting team (the key card’s border colour), 8 for the other'],
+      ['{bystander}', '7: touching one ends your turn'],
+      ['{assassin}', '1: touching it loses the game'],
+      ['Enemy agent', 'covered for the other team; ends your turn'],
     ],
   },
 
-  example: 'Red’s spymaster Zoe says “**Ocean: 2**”, meaning SHARK and PORT. Her team touches SHARK: a red agent, so they keep going. Then they touch BEACH: a bystander, so the turn ends with PORT still hidden.',
+  example: 'Red’s spymaster Zoe says “**Ocean: 2**”, meaning SHARK and PORT. Her team touches SHARK: {=red}, so they continue. Then they touch BEACH: {=bystander}, so the turn ends with PORT still hidden.',
 
   setup: [
     'Split into two teams; each picks a **spymaster**. Spymasters sit together on one side.',
     'Lay out 25 word cards in a 5×5 grid.',
-    'Draw a key card for the stand; its border lights show which team starts (and has 9 agents).',
+    'Put a random {key} in the stand; its border colour shows which team starts and has 9 agents.',
+    '2–3 players: one team guesses and starts; on each enemy turn its spymaster covers 1 enemy agent of their choice. Lose if all enemy agents are covered first.',
   ],
 
   terms: [
-    ['Spymaster', 'Sees the key card; gives clues but never guesses.'],
+    ['Spymaster', 'Sees the key card; gives clues, never guesses.'],
     ['Operatives', 'Everyone else; they guess from the clue.'],
-    ['Key card', 'Secret map of which grid spot is red, blue, bystander or assassin.'],
-    ['Bystander', 'A neutral card; touching it ends your turn.'],
+    ['{=key} Key card', 'Secret map of which grid spot is red, blue, bystander or assassin.'],
+    ['{=bystander} Bystander', 'Neutral card; touching it ends your turn.'],
   ],
 
   gotchas: [
-    'The clue must be about **meaning** and can’t be any word visible on the table (or part of one).',
-    'You must make **at least one** guess, and may stop after any correct one.',
-    'Extra guesses can target words from earlier clues; that is why “+1” exists.',
+    'The clue must be about **meaning** and can’t be any word visible on the table (or part of one). An illegal clue ends the turn, and the other spymaster covers one of their agents.',
+    'You must make **at least one** guess. The “+1” lets you catch a word from an earlier clue.',
+    'Clue numbers **0** and **unlimited** are legal: operatives may then guess with no limit.',
   ],
 
   tips: [
     'As spymaster, a safe 2 beats a risky 4. Check every clue against the assassin.',
-    'As operatives, say your reasoning out loud so teammates catch mistakes.',
-    'Spymasters: keep a poker face. Your reaction is not allowed to be a clue.',
+    'As operatives, reason out loud so teammates catch mistakes.',
+    'Spymasters: keep a poker face. Reactions are illegal clues.',
   ],
 
   walk(A) {
@@ -88,10 +101,8 @@ defineGame({
     const w = 46, h = 30, x0 = 8, y0 = 44;
     const cell = (i, j) => [x0 + i * (w + 5), y0 + j * (h + 5)];
     const ctr = (i, j) => { const [x, y] = cell(i, j); return [x + w / 2, y + h / 2]; };
-    const cover = (x, y, t) => {
-      const f = t === 'r' ? red : t === 'b' ? blue : bys, pf = t === 'n' ? '#a8946a' : 'rgba(255,255,255,.4)';
-      return A.rect(x + 1.5, y + 2, w, h, 'rgba(0,0,0,.35)', { sw: 0, rx: 3 }) + A.rect(x, y, w, h, f, { rx: 3, sw: 1.2 }) + A.person(x + w / 2, y + h / 2 + 1, 15, pf, { face: pf });
-    };
+    // Cover cards are the inline icons scaled to the word-card size.
+    const cover = (x, y, t) => A.rect(x + 1.5, y + 2, w, h, 'rgba(0,0,0,.35)', { sw: 0, rx: 3 }) + A.use(this.icons[{ r: 'red', b: 'blue', n: 'bystander', k: 'assassin' }[t]].draw(A), x - 3.29, y - 10.95, 52.6);
     let board = A.bg('#3c3a44');
     words.forEach((row, j) => row.forEach((wd, i) => {
       const [x, y] = cell(i, j);
@@ -114,17 +125,17 @@ defineGame({
     const sharkCov = (on) => A.k('cov-shark', cover(...(on ? [sx, sy] : [222, 152]), 'r'));
     const beachCov = (on) => A.k('cov-beach', cover(...(on ? [bx, by] : [270, 152]), 'n'));
     return [
-      { step: 0, say: 'Zoe checks the key card: **SHARK** and **PORT** are red. She says one word and one number: “**Ocean: 2**”.',
+      { step: 0, say: 'Zoe checks the {key}: **SHARK** and **PORT** are red. She says “**Ocean: 2**”.',
         svg: board + clue + A.glow(kx + 20, ky + 20, 30, 'g-key') },
-      { step: 1, say: 'Her team talks it over (“sharks live in the ocean…”) and touches **SHARK**.',
+      { step: 1, say: 'Her team talks it over and touches **SHARK**.',
         svg: board + clue + sharkCov(false) + A.glow(...ctr(1, 0), 30, 'g-shark') },
-      { step: 1, say: 'Zoe covers it with its true colour: a **red agent**. Correct!',
+      { step: 1, say: 'Zoe covers it with a {red}. Correct.',
         svg: board + clue + sharkCov(true) + beachCov(false) },
-      { step: 2, say: 'A correct guess lets them keep going (up to 2 + 1 = 3 guesses). Ships dock at a beach… they touch **BEACH**.',
+      { step: 2, say: 'A correct guess lets them continue (up to 2 + 1 = 3 guesses). They touch **BEACH**.',
         svg: board + clue + sharkCov(true) + beachCov(false) + A.glow(...ctr(1, 1), 30, 'g-beach') },
-      { step: 2, say: 'BEACH is an **innocent bystander**, so the turn ends at once. **PORT** stays hidden for a later turn.',
+      { step: 2, say: 'BEACH is a {bystander}, so the turn ends. **PORT** stays hidden.',
         svg: board + clue + sharkCov(true) + beachCov(true) + A.glow(...ctr(1, 2), 30, 'g-port') },
-      { step: 2, say: 'Now Blue’s spymaster gives a clue. Red can still pick up PORT later with a “+1” guess.',
+      { step: 2, say: 'Blue’s spymaster gives a clue. Red can still get PORT later with a “+1” guess.',
         svg: board + sharkCov(true) + beachCov(true) + A.k('turn', A.tag(160, 18, 'Blue’s turn', { fill: blue })) },
     ];
   },
@@ -144,9 +155,8 @@ defineGame({
     grid.forEach((row, j) => row.forEach((v, i) => {
       const [x, y] = cell(i, j);
       if (v === 'r' || v === 'b' || v === 'n') {
-        const f = v === 'r' ? red : v === 'b' ? blue : bys;
-        o += A.rect(x + 1.5, y + 2, w, h, 'rgba(0,0,0,.35)', { sw: 0, rx: 3 }) + A.rect(x, y, w, h, f, { rx: 3, sw: 1.2 });
-        o += A.person(x + w / 2, y + h / 2 + 1, 15, v === 'n' ? '#a8946a' : 'rgba(255,255,255,.35)', { face: v === 'n' ? '#a8946a' : 'rgba(255,255,255,.35)' });
+        const z = w * 24 / 21;
+        o += A.rect(x + 1.5, y + 2, w, h, 'rgba(0,0,0,.35)', { sw: 0, rx: 3 }) + A.use(this.icons[{ r: 'red', b: 'blue', n: 'bystander' }[v]].draw(A), x - 1.5 * z / 24, y - 5 * z / 24 - (14 * z / 24 - h) / 2, z);
       } else {
         o += A.rect(x + 1.5, y + 2, w, h, 'rgba(0,0,0,.35)', { sw: 0, rx: 3 }) + A.rect(x, y, w, h, tan, { rx: 3, sw: 1.2 });
         o += A.rect(x + 3, y + h - 13, w - 6, 10, C.white, { rx: 2, sw: 0.6 });

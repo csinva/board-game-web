@@ -16,8 +16,8 @@ ids.forEach(function (id) {
   if (GAMES.length !== before + 1) { err(id, 'file must call defineGame exactly once'); return; }
   var g = GAMES[GAMES.length - 1];
   if (g.id !== id) err(id, 'id mismatch: ' + g.id);
-  ['name', 'designer', 'family', 'pitch', 'theme', 'tension', 'example'].forEach(function (k) { if (typeof g[k] !== 'string' || !g[k]) err(id, 'missing string ' + k); });
-  if (typeof g.year !== 'number') err(id, 'year must be a number');
+  ['name', 'designer', 'family', 'pitch', 'tension', 'example'].forEach(function (k) { if (typeof g[k] !== 'string' || !g[k]) err(id, 'missing string ' + k); });
+  if (typeof g.year !== 'number' && typeof g.year !== 'string') err(id, 'year must be a number, or text like "Traditional" / "c. 1630" when no exact year is documented');
   if (!FAMILIES[g.family]) err(id, 'unknown family ' + g.family);
   ['players', 'time'].forEach(function (k) { if (!Array.isArray(g[k]) || g[k].length !== 2) err(id, k + ' must be [min, max]'); });
   if (typeof g.age !== 'number') err(id, 'age must be a number');
@@ -29,13 +29,17 @@ ids.forEach(function (id) {
   if (!g.turn || ['sequence', 'choose', 'simultaneous', 'round'].indexOf(g.turn.type) < 0) err(id, 'turn.type invalid');
   if (!g.turn || !g.turn.steps || g.turn.steps.length < 2 || g.turn.steps.length > 5) err(id, 'turn needs 2–5 steps');
   (g.turn && g.turn.steps || []).forEach(function (s) { if (!s.verb || !s.text) err(id, 'turn step needs verb + text'); if (s.verb && s.verb.length > 12) err(id, 'turn verb too long (max 12): ' + s.verb); });
-  if (!g.flow || g.flow.length < 2 || g.flow.length > 4) err(id, 'flow needs 2–4 stages');
+  if (!Array.isArray(g.structure) || g.structure.length < 2 || g.structure.length > 6) err(id, 'structure needs 2–6 stages (game timeline)');
+  (g.structure || []).forEach(function (st, i) { if (!st.label || !st.text) err(id, 'structure[' + i + '] needs label + text'); });
+  if (g.flow) warn(id, 'flow is no longer shown: fold anything needed into structure/points, then delete it');
+  if (g.scoring && !g.points) err(id, 'points game: add points [[source, how it scores], …] listing every way to score');
   if (!g.end || !g.end.trigger) err(id, 'end.trigger missing');
   if (!g.scoring && !(g.end && g.end.results)) err(id, 'need scoring[] or end.results[]');
   if (g.ref && (!g.ref.title || !g.ref.rows)) err(id, 'ref needs title + rows');
-  ['setup', 'gotchas', 'tips'].forEach(function (k) { if (!Array.isArray(g[k]) || g[k].length !== 3) err(id, k + ' must have exactly 3 items'); });
-  if (!Array.isArray(g.terms) || g.terms.length < 3 || g.terms.length > 5) err(id, 'terms needs 3–5 [term, def] pairs');
-  if (g.pitch && g.pitch.length > 150) err(id, 'pitch too long (' + g.pitch.length + ' > 150)');
+  [['setup', 2, 7], ['gotchas', 2, 7], ['tips', 2, 4]].forEach(function (r) { var v = g[r[0]]; if (!Array.isArray(v) || v.length < r[1] || v.length > r[2]) err(id, r[0] + ' needs ' + r[1] + '–' + r[2] + ' items'); });
+  if (!Array.isArray(g.terms) || g.terms.length < 2 || g.terms.length > 8) err(id, 'terms needs 2–8 [term, def] pairs');
+  if (g.pitch && g.pitch.length > 130) err(id, 'pitch too long (' + g.pitch.length + ' > 130)');
+  if (g.theme) warn(id, 'theme field is no longer used: delete it (rules only, no flavor)');
   if (typeof g.walk !== 'function') warn(id, 'walk(A) missing (animated turn walkthrough)');
   else {
     try {
@@ -52,6 +56,23 @@ ids.forEach(function (id) {
   }
   if (g.profile && g.profile.complexity >= 4 && !g.extended) warn(id, 'heavy game: add extended details');
   if (g.extended) g.extended.forEach(function (x) { if (!x.title || !(x.text || x.items)) err(id, 'extended section needs title + text/items'); });
+  // Inline icon tokens: {key} / {=key} must resolve to g.icons or A.ICONS.
+  if (g.icons) Object.keys(g.icons).forEach(function (k) {
+    var ic = g.icons[k];
+    if (!ic.name || typeof ic.draw !== 'function') { err(id, 'icon ' + k + ' needs name + draw(A)'); return; }
+    try { var sv = ic.draw(A); if (sv.indexOf('NaN') >= 0) err(id, 'icon ' + k + ' produced NaN'); } catch (e) { err(id, 'icon ' + k + ' threw: ' + e); }
+  });
+  (function scan(v, path) {
+    if (typeof v === 'string') {
+      (v.match(/\{=?[a-z0-9-]+\}/g) || []).forEach(function (t) {
+        var k = t.replace(/[{}=]/g, '');
+        if (!((g.icons && g.icons[k]) || A.ICONS[k])) err(id, 'unknown icon token ' + t + ' in ' + path);
+        if (/^(pitch|theme|name|goal\.big)$/.test(path)) err(id, 'no icon tokens in ' + path);
+      });
+    } else if (Array.isArray(v)) v.forEach(function (x, i) { scan(x, path + '[' + i + ']'); });
+    else if (v && typeof v === 'object' && path.indexOf('icons') !== 0) Object.keys(v).forEach(function (k) { scan(v[k], path ? path + '.' + k : k); });
+  })(g, '');
+  if (typeof g.walk === 'function') { try { g.walk(A).forEach(function (f, i) { (f.say.match(/\{=?[a-z0-9-]+\}/g) || []).forEach(function (t) { var k = t.replace(/[{}=]/g, ''); if (!((g.icons && g.icons[k]) || A.ICONS[k])) err(id, 'unknown icon token ' + t + ' in walk slide ' + i); }); }); } catch (e) {} }
   if (typeof g.art !== 'function') err(id, 'art(A) missing');
   else { try { var svg = g.art(A); if (svg.indexOf('NaN') >= 0) err(id, 'art produced NaN'); if (svg.length < 400) err(id, 'art suspiciously small'); } catch (e) { err(id, 'art threw: ' + e); } }
 });

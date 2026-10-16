@@ -10,8 +10,23 @@ defineGame({
   mechanics: ['party', 'team', 'deduction', 'limited-communication'],
   profile: { complexity: 1, luck: 2, interaction: 4, conflict: 2, talk: 5, planning: 1 },
 
-  pitch: 'One player gives a single clue to place a hidden target on a spectrum like Hot to Cold, and their team argues where to point the dial.',
-  theme: 'You are trying to read your friends’ minds and find out whether you are on the same wavelength.',
+  // Target bands use the device's colours: blue 4, orange 3, yellow 2.
+  icons: (() => {
+    const band = (n, fill) => ({ name: n + '-point band', draw: A => A.path('M12 22.5 L22.5 4.3 A21 21 0 0 0 1.5 4.3 Z', { fill, sw: 1.3 }) + A.text(12, 10.5, n, { size: 11, weight: 800, fill: '#fff' }) });
+    const fan = (A, cx, cy, r, a1, a2, fill) => { const p = (a) => [+(cx + r * Math.cos(a * Math.PI / 180)).toFixed(2), +(cy - r * Math.sin(a * Math.PI / 180)).toFixed(2)]; const [x1, y1] = p(a1), [x2, y2] = p(a2); return A.path(`M${cx} ${cy} L${x1} ${y1} A${r} ${r} 0 0 0 ${x2} ${y2} Z`, { fill, sw: 0.7 }); };
+    return {
+      band4: band('4', '#3e8fd4'),
+      band3: band('3', '#e86a3a'),
+      band2: band('2', '#f2c230'),
+      target: { name: 'target', draw: A => A.path('M1 19 A11 11 0 0 1 23 19 Z', { fill: '#f3ead6', sw: 1.2 }) +
+        [['#f2c230', 40], ['#e86a3a', 60], ['#3e8fd4', 80], ['#e86a3a', 100], ['#f2c230', 120]].map(([f, a]) => fan(A, 12, 19, 10.5, a, a + 20, f)).join('') },
+      dial: { name: 'dial', draw: A => A.path('M1 19 A11 11 0 0 1 23 19 Z', { fill: '#f3ead6', sw: 1.2 }) + A.line(12, 19, 18, 9.5, { stroke: '#2a2420', sw: 3.2 }) + A.line(12, 19, 18, 9.5, { stroke: '#d8323a', sw: 1.6 }) + A.circle(12, 19, 2.6, '#d8323a', { sw: 1 }) },
+      spectrum: { name: 'spectrum card', draw: A => A.rect(1, 6, 22, 12, '#fff', { rx: 2, sw: 1.3 }) + A.rect(2.5, 7.5, 9.5, 9, '#7fc6e8', { rx: 1, sw: 0 }) + A.rect(12, 7.5, 9.5, 9, '#f08a5a', { rx: 1, sw: 0 }) },
+      psychic: { name: 'Psychic', draw: A => A.person(12, 10, 22, '#7d55b5', { face: '#e6c7a8' }) },
+    };
+  })(),
+
+  pitch: 'A Psychic gives one clue for a hidden spot on a spectrum; their team turns the dial to it. First team to 10 points wins.',
 
   goal: { big: '10 points', text: 'Two teams take turns. The first team to **10 points** wins.' },
 
@@ -19,66 +34,64 @@ defineGame({
     type: 'round',
     intro: 'Each round, the active team does this:',
     steps: [
-      { verb: 'Spin', text: 'The team’s **Psychic** draws a spectrum card (e.g. Cold ↔ Hot), then secretly spins and peeks at the hidden target.' },
-      { verb: 'Clue', text: 'The Psychic says **one clue** that sits where the target is on that spectrum (“coffee”).' },
-      { verb: 'Dial', text: 'The team debates and turns the dial to where they think the target is.' },
-      { verb: 'Left/right', text: 'The **other team** guesses whether the target is left or right of the dial.' },
-      { verb: 'Reveal', text: 'Open the screen. Score 4, 3 or 2 for the bands; the other team scores 1 if their left/right call was right.' },
+      { verb: 'Spin', text: 'The team’s {psychic} draws a {spectrum} (e.g. Cold ↔ Hot), spins the {target} and peeks at it alone.' },
+      { verb: 'Clue', text: 'The Psychic closes the screen and says **one clue** that sits at the target’s spot on that spectrum (“coffee”).' },
+      { verb: 'Dial', text: 'The team debates and turns the {dial} to where they think the target is.' },
+      { verb: 'Left/right', text: 'The **other team** calls whether the target’s centre is left or right of the dial.' },
+      { verb: 'Reveal', text: 'Open the screen and score (see Scoring).' },
     ],
     outro: 'Teams alternate; pick a new Psychic',
   },
 
-  tension: 'The best clue is the one your team will read the way you do, and the right clue depends on who is listening.',
+  tension: 'The best clue is the one your team will read the way you do, and that depends on who is listening.',
 
-  flow: [
-    { label: 'Clue', items: ['Read the spectrum', 'Find the target', 'Pick one idea'] },
-    { label: 'Debate', items: ['Argue the scale', 'Read the Psychic', 'Commit the dial'] },
-    { label: 'Score', items: ['Bullseye 4', 'Near 3 / outer 2', 'Rivals: left/right +1'] },
+  structure: [
+    { label: 'Setup', text: 'Two teams sit on opposite sides. The team going second starts with **1 point**.' },
+    { label: 'Rounds', repeat: 'teams alternate', text: 'Spin, clue, dial, left/right call, reveal and score. A new Psychic each turn.' },
+    { label: 'Game end', text: 'A team reaches **10**: highest score wins. Tied: each team takes one more turn until it breaks.' },
   ],
 
-  end: { trigger: 'a team reaches 10 points', detail: 'If both teams pass 10 on the same round, the higher score wins; a tie goes to a sudden-death round.' },
+  points: [
+    ['{=band4} Centre band', '4 to the Psychic’s team; the other team’s call can’t score'],
+    ['{=band3} Next band out', '3'],
+    ['{=band2} Outer band', '2 (dial on a line between bands: take the higher)'],
+    ['Miss', '0'],
+    ['Left/right call', '+1 to the other team if right'],
+  ],
+
+  end: { trigger: 'a team reaches 10 points', detail: 'Highest score wins. If tied, each team takes a sudden-death turn (left/right calls count); repeat until the tie breaks.' },
   scoring: [
-    { label: 'Bullseyes (4)', share: 4 },
-    { label: 'Near misses (3, 2)', share: 4 },
-    { label: 'Left/right steals', share: 2 },
+    { label: '{=band4} Bullseyes', share: 4 },
+    { label: '{=band3} {=band2} Near misses', share: 4 },
+    { label: 'Left/right calls', share: 2 },
   ],
 
-  ref: {
-    title: 'Points per round',
-    rows: [
-      ['Centre band', '4 to the clue team'],
-      ['Next band out', '3'],
-      ['Outer band', '2'],
-      ['Miss', '0'],
-      ['Left/right call', '+1 to the other team if right'],
-    ],
-  },
-
-  example: 'The card reads **Cold ↔ Hot** and the target sits fairly far toward Hot. Priya says “coffee.” Her team argues about iced coffee, then sets the dial two-thirds toward Hot. The other team calls “right,” the screen opens, and the dial is in the 3 band with the target just to the right: 3 points to Priya’s team, 1 to the rivals.',
+  example: 'The card reads **Cold ↔ Hot**; the target sits two-thirds toward Hot. Priya says “coffee.” Her team argues about iced coffee, then sets the dial two-thirds toward Hot. The rivals call “right.” The dial is in the {=band3} band with the target just to its right: 3 points to Priya’s team, 1 to the rivals.',
 
   setup: [
     'Split into two teams and sit on opposite sides of the device.',
     'The team that goes second starts with **1 point**.',
-    'Hand the first team’s Psychic the spectrum cards and the screened dial.',
+    'Give the first team’s {psychic} the {spectrum}s and the device, screen closed.',
+    '2–3 players: play co-op as one team with 7 {spectrum}s and no left/right call; a bullseye scores 3 and adds 1 card. Aim for the highest total.',
   ],
 
   terms: [
-    ['Psychic', 'The clue-giver this round. Sees the target, says one clue, then stays quiet.'],
-    ['Spectrum', 'The two-ended card that sets the scale (Overrated ↔ Underrated).'],
-    ['Target', 'The hidden 2-3-4-3-2 wedge on the wheel.'],
-    ['Bullseye', 'Dial lands in the centre 4 band.'],
+    ['{=psychic} Psychic', 'The clue-giver this round. Sees the target, says one clue, then stays quiet.'],
+    ['{=spectrum} Spectrum', 'Two-ended card that sets the scale (Overrated ↔ Underrated).'],
+    ['{=target} Target', 'The hidden 2-3-4-3-2 wedge; its spot is random each round.'],
+    ['{=band4} Bullseye', 'Dial in the centre 4 band.'],
   ],
 
   gotchas: [
     'The Psychic gives **only one clue** and can’t react to the debate.',
-    'Catch-up rule: if a team scores a **bullseye and is still behind**, it takes another turn at once.',
-    'The clue has to be on the spectrum’s subject, not a number or a hint about position (“about 70%”).',
+    'Catch-up: if a team scores a {=band4} bullseye and is **still behind**, it takes another turn at once with a new Psychic.',
+    'The clue must be about the spectrum’s subject, not a number or position (“about 70%”).',
   ],
 
   tips: [
     'Pick clues that are **obvious to your team**, not clever to you.',
-    'Use the extremes: for targets near an edge, name something everyone agrees is extreme.',
-    'As the guessing team, argue out loud: it rattles the other team and gets your left/right call right.',
+    'For targets near an edge, name something everyone agrees is extreme.',
+    'As the other team, argue out loud: it rattles them and sharpens your left/right call.',
   ],
 
   walk(A) {
@@ -94,7 +107,7 @@ defineGame({
     board += A.text(121, 174, '← COLD', { size: 10, weight: 800 }) + A.text(199, 174, 'HOT →', { size: 10, weight: 800 });
     // Teams.
     board += A.tag(44, 12, 'Priya’s team', { fill: C.purple }) + A.tag(286, 12, 'Rivals', { fill: C.red });
-    board += A.person(26, 140, 26, C.purple) + A.text(26, 162, 'Priya', { size: 8, fill: C.white });
+    board += A.use(this.icons.psychic.draw(A), 26 - 14.2, 140 - 11.8, 28.4) + A.text(26, 162, 'Priya', { size: 8, fill: C.white });
     board += A.person(294, 140, 26, C.red);
     // Hidden target, centred at 50° (toward Hot).
     const t = 48, w = 11;
@@ -115,17 +128,17 @@ defineGame({
     const arrow = A.k('arrow', A.curve(ax, ay, ...pt(45, R + 26), bx, by, { stroke: '#ffcf3f', sw: 2.5 }));
     const score = (x, y, s, key) => A.k(key, A.rect(x - 14, y - 9, 28, 18, '#fff7d6', { rx: 9, sw: 1.2 }) + A.text(x, y, s, { size: 11, weight: 800 }));
     return [
-      { step: 0, say: 'Priya draws **Cold ↔ Hot**, spins the wheel and peeks: the target sits fairly far toward **Hot**. Only she sees it.',
+      { step: 0, say: 'Priya draws **Cold ↔ Hot**, spins and peeks: the target sits two-thirds toward **Hot**. Only she sees it.',
         svg: board + target + dial(90) + A.k('note', A.note(...pt(t, R - 48), 186, 30, 'Hidden target')) },
-      { step: 1, say: 'She closes the screen and gives one clue: “**Coffee**.” Then she must stay silent.',
+      { step: 1, say: 'She closes the screen and gives one clue: “**Coffee**.” Then she stays silent.',
         svg: board + target + screen + dial(90) + clue },
       { step: 2, say: 'Her team argues about iced coffee, then turns the dial **two-thirds toward Hot**.',
         svg: board + target + screen + dial(60) + debate + A.glow(...pt(60, R - 2), 12, 'g-d') },
-      { step: 3, say: 'The rivals bet the target is to the **right** of the dial.',
+      { step: 3, say: 'The rivals call **right**: the target’s centre is right of the dial.',
         svg: board + target + screen + dial(60) + call + arrow },
-      { step: 4, say: 'The screen opens: the dial is in the **3** band, with the bullseye just to its right.',
+      { step: 4, say: 'The screen opens: the dial is in the {=band3} band, with the bullseye just to its right.',
         svg: board + target + dial(60) + call + A.k('note', A.note(...pt(t, R - 40), 110, 32, 'Bullseye (4)')) },
-      { step: 4, say: '**3 points** to Priya’s team, and **1** to the rivals for calling “right”. Next round, they take a turn.',
+      { step: 4, say: '**3 points** to Priya’s team, **1** to the rivals for calling right. Next, the rivals take a turn.',
         svg: board + target + dial(60) + score(44, 34, '+3', 's1') + score(286, 34, '+1', 's2') },
     ];
   },
@@ -153,7 +166,7 @@ defineGame({
     o += A.rect(73, 163, 87, 26, '#7fc6e8', { rx: 3, sw: 0 }) + A.rect(160, 163, 87, 26, '#f08a5a', { rx: 3, sw: 0 });
     o += A.text(116, 176, 'COLD', { size: 11, weight: 800 }) + A.text(204, 176, 'HOT', { size: 11, weight: 800 });
     // psychic clue
-    o += A.person(290, 150, 26, C.purple);
+    o += A.use(this.icons.psychic.draw(A), 290 - 14.2, 150 - 11.8, 28.4);
     o += A.bubble(248, 104, 64, 26, '“Coffee”', { size: 11 });
     o += A.note(pt(t, R - 50)[0], pt(t, R - 50)[1], 270, 14, 'Hidden target');
     o += A.note(pt(64, 50)[0], pt(64, 50)[1], 80, 14, 'Dial your team turns');

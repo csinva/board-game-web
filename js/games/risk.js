@@ -2,82 +2,99 @@ defineGame({
   id: 'risk',
   name: 'Risk',
   year: 1959,
-  designer: 'Albert Lamorisse',
+  designer: 'Albert Lamorisse, Michael I. Levin',
   family: 'conflict',
-  players: [2, 6], best: '4–5',
+  players: [2, 5], best: '4',
   time: [120, 240],
   age: 10,
   mechanics: ['dice', 'area-control', 'player-elimination', 'take-that', 'set-collection', 'negotiation'],
   profile: { complexity: 2, luck: 4, interaction: 5, conflict: 5, talk: 3, planning: 3 },
 
-  pitch: 'Mass armies, roll dice to invade your neighbours, and grab whole continents for bigger reinforcements, until one player rules the world.',
-  theme: 'You are a general commanding an army in a war to conquer the entire world map.',
+  // Risk card symbols, armies and the two colours of dice. Reused in art and walk.
+  icons: {
+    army: { name: 'army', draw: A => A.circle(12, 12, 10, '#c8423b', { sw: 1.3 }) + A.circle(12, 12, 6.8, 'none', { stroke: '#fff', sw: 1.6 }) },
+    inf: { name: 'infantry', draw: A => A.rect(4, 1, 16, 22, '#f2e6cc', { rx: 2.5, sw: 1.3 }) + A.line(15.5, 15, 17, 5.5, { sw: 1.3, stroke: '#5a4030' }) + A.person(11.5, 13, 13, '#3d5a3a') },
+    cav: { name: 'cavalry', draw: A => A.rect(4, 1, 16, 22, '#f2e6cc', { rx: 2.5, sw: 1.3 }) + A.text(12, 12.5, '\u265E\uFE0E', { size: 20, weight: 400, fill: '#3d5a3a' }) },
+    cannon: { name: 'artillery', draw: A => A.rect(4, 1, 16, 22, '#f2e6cc', { rx: 2.5, sw: 1.3 }) + A.rect(7, 9.5, 12, 3.6, '#3d5a3a', { rx: 1, sw: 1, rotate: -25 }) + A.circle(10, 15.5, 3.6, '#8a5a33', { sw: 1.1 }) + A.circle(10, 15.5, 1, '#2a2420', { sw: 0 }) },
+    wild: { name: 'wild card', draw: A => A.rect(4, 1, 16, 22, '#f2e6cc', { rx: 2.5, sw: 1.3 }) + A.star(12, 12.5, 6.5, '#e2b33c', { sw: 1 }) },
+    att: { name: 'attack die', draw: A => A.die(2.5, 2.5, 19, 5, '#d8403a', { pip: '#fff' }) },
+    def: { name: 'defence die', draw: A => A.die(2.5, 2.5, 19, 5) },
+    ...Object.fromEntries([1, 2, 3, 4, 5, 6].map(v => ['att' + v, { name: String(v), draw: A => A.die(2.5, 2.5, 19, v, '#d8403a', { pip: '#fff' }) }])),
+  },
 
-  goal: { big: 'Conquer world', text: 'Occupy **all 42 territories** by eliminating every other player. (Many groups play the Secret Mission variant to finish sooner.)' },
+  pitch: 'Place armies, roll dice to attack neighbouring territories and hold continents for bonus armies; take all 42 to win.',
+
+  goal: { big: 'Conquer world', text: 'Occupy **all 42 territories** by eliminating every other player. (Secret Mission variant: complete your mission card instead.)' },
 
   turn: {
     type: 'sequence',
     steps: [
-      { verb: 'Reinforce', text: 'Get armies: territories ÷ 3 (min **3**), plus continent bonuses, plus any card set you trade in. Place them on your territories.' },
-      { verb: 'Attack', text: 'Attack adjacent enemy territories as often as you like. Roll up to **3** dice; the defender rolls up to **2**.' },
-      { verb: 'Fortify', text: 'Make **one** move of armies from one territory to another connected through your own territories.' },
+      { verb: 'Reinforce', text: 'Take {=army} armies: territories ÷ 3 (min **3**) + continent bonuses + any card set you trade in. Place them on your territories.' },
+      { verb: 'Attack', text: 'Attack adjacent enemy territories as often as you like. Roll up to {=att}{=att}{=att}; the defender rolls up to {=def}{=def}.' },
+      { verb: 'Fortify', text: 'Make **one** move of armies between two of your territories that connect through your own territories.' },
     ],
-    outro: 'If you conquered at least one territory, draw a card. Next player',
+    outro: 'If you conquered a territory, draw a card. Next player',
   },
 
-  tension: 'Spreading out to grab territory and continents leaves you thin, while turtling up gives your rivals time to grow.',
+  tension: 'Spreading out for territories and continents leaves you thin; turtling gives rivals time to grow.',
 
-  flow: [
-    { label: 'Reinforce', items: ['Territories ÷ 3', 'Continent bonuses', 'Card sets'] },
-    { label: 'Attack', items: ['3 dice vs 2', 'Highest pairs compared', 'Ties go to defender'] },
-    { label: 'Hold', items: ['Fortify one move', 'Guard borders', 'Earn a card'] },
+  structure: [
+    { label: 'Setup', text: 'Claim all 42 territories 1 army at a time, then place the rest of your starting armies.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Each turn: reinforce, attack, fortify. Conquered a territory? Draw a card.' },
+    { label: 'Elimination', text: 'Lose your last territory and you are out; the eliminator takes your cards (at 6+, they trade sets at once).' },
+    { label: 'Game end', text: 'One player holds all 42 territories.' },
   ],
 
   end: {
     trigger: 'one player controls all 42 territories',
-    detail: 'Players are knocked out when they lose their last territory; whoever knocks you out takes your cards.',
+    detail: 'A player with no territories is out; whoever eliminated them takes their cards. With 2 players, eliminating your opponent wins; neutral armies may remain.',
     results: [
-      { side: 'World domination', text: 'the last player standing, holding every territory, wins.' },
-      { side: 'Secret Mission (variant)', text: 'the first player to complete the goal on their secret mission card wins at once.' },
+      { side: 'World domination', text: 'the last player standing wins.' },
+      { side: 'Secret Mission (variant)', text: 'deal each player 1 secret mission card (remove cards naming unused colours); the first to complete theirs and reveal it wins at once, even if someone else made it happen.' },
     ],
   },
 
   ref: {
-    title: 'Continent bonuses',
+    title: 'Dice, cards & bonuses',
     rows: [
-      ['Asia', '+7 armies'],
-      ['North America, Europe', '+5 each'],
-      ['Africa', '+3'],
-      ['South America, Australia', '+2 each'],
-      ['Card sets', '4, 6, 8, 10, 12, 15, then +5 each'],
+      ['{=att} Attack', 'up to {=att}{=att}{=att}, one fewer than the armies there'],
+      ['{=def} Defend', 'up to {=def}{=def}; highest vs highest, ties to defender'],
+      ['Card sets', 'three alike {=cav}{=cav}{=cav} or one each {=inf}{=cav}{=cannon}; a {=wild} is any'],
+      ['Set values', '4, 6, 8, 10, 12, 15, then +5 {=army} each; +2 on a pictured territory you own'],
+      ['Big continents', 'Asia +7 · N. America +5 · Europe +5'],
+      ['Small continents', 'Africa +3 · S. America +2 · Australia +2'],
     ],
   },
 
-  example: 'Ana has 10 armies in Ukraine and attacks Ben’s 3 in Ural. She rolls 6-4-2, Ben rolls 5-4. Her 6 beats his 5, but the 4s tie and **ties go to the defender**: each loses 1 army. She keeps rolling, wins Ural, moves 4 armies in, then fortifies by moving 3 more from Ukraine to Ural.',
+  example: 'Ana has 10 armies in Ukraine and attacks Ben’s 3 in Ural. She rolls {=att6}{=att4}{=att2}, Ben rolls {=d5}{=d4}. 6 beats 5; the 4s tie and **ties go to the defender**, so each loses 1. She keeps rolling, takes Ural, moves 4 armies in, then fortifies 3 more from Ukraine.',
 
   setup: [
-    'Each player takes starting armies: 40 (2 players, plus a neutral), 35 (3), 30 (4), 25 (5), 20 (6).',
-    'Claim territories one army at a time in turn (or deal the territory cards), until all 42 are taken.',
-    'Keep taking turns placing one army at a time until all starting armies are down.',
+    'Rules here are Hasbro’s 2016 edition (unchanged in the 2020 printing), for 2–5 players.',
+    'Starting armies: 35 each (3 players), 30 (4), 25 (5).',
+    'Take turns claiming empty territories with 1 army each until all 42 are taken, then keep placing 1 army per turn until all starting armies are down.',
+    'Shuffle the 42 territory cards and 2 {wild} cards into a face-down deck.',
+    '**2 players**: you, your opponent and a neutral colour get 40 armies each. Remove the wilds, deal the territory cards 14 each and put 1 army on each. Take turns placing 2 of your armies, then take turns placing 1 neutral army each. Shuffle the wilds back in.',
   ],
 
   terms: [
-    ['Army', 'A unit on the map. Larger pieces count as 5 or 10.'],
-    ['Continent bonus', 'Extra armies each turn for owning every territory of a continent.'],
-    ['Card set', '3 cards of one picture, one of each, or with a wild. Trade for growing bonuses.'],
-    ['Fortify', 'Your one free repositioning move at the end of the turn.'],
+    ['{=army} Army', 'One unit on the map. Larger pieces count as 5 or 10.'],
+    ['Continent bonus', 'Extra armies each turn for owning a whole continent.'],
+    ['{=inf} Card set', 'Three alike, one each of {=inf}{=cav}{=cannon}, or any two plus a {wild}. Trade in for armies.'],
+    ['Fortify', 'Your one free army move at the end of your turn.'],
   ],
 
   gotchas: [
-    'You must leave **at least 1 army** behind, so you need 2+ armies to attack, and as many dice as armies minus one (max 3).',
-    'After winning a territory, move in **at least as many armies as dice** you rolled in the last battle.',
-    'You draw **only one card** per turn, and only if you conquered something. Holding 5+ cards at turn start forces a trade.',
+    '**1 army** must always stay behind: attacking needs 2+ armies, and you roll one die per army beyond the first (max 3).',
+    'After taking a territory, move in **at least as many armies as dice** you rolled in the last battle.',
+    'Draw **one card** per turn, only if you conquered a territory. Start a turn with 5+ cards and you must trade a set.',
+    'Dashed sea-lines connect territories: Alaska borders Kamchatka.',
+    '2 players: the neutral army never attacks or gets reinforcements; when you attack it, your opponent rolls its defence.',
   ],
 
   tips: [
-    'Australia or South America are small and easy to hold: a classic first foothold.',
-    'Take one territory every turn just to earn a card.',
-    'Don’t spread out: a big stack on a choke point beats armies sprinkled everywhere.',
+    'Australia and South America are small and easy to hold.',
+    'Take one territory every turn to earn a card.',
+    'Stack armies on choke points instead of spreading them thin.',
   ],
 
   walk(A) {
@@ -101,21 +118,21 @@ defineGame({
     const dice = (r, w) => A.k('rdice', rd(70, r[0]) + rd(94, r[1]) + rd(118, r[2])) + A.text(155, 170, 'vs', { size: 10, weight: 800 }) + A.k('wdice', wd(172, w[0]) + wd(196, w[1]));
     const res = (i, x, y) => A.k('res' + i, army(x, y, '+1', ANA, 7));
     const arrow = A.curve(150, 60, 180, 36, 206, 46, { stroke: ANA, sw: 3, head: 8 });
-    const card = A.k('card', A.card(262, 156, 24, 34, C.cream, { label: '★', labelFill: C.ink, size: 13 }));
+    const card = A.k('card', A.use(this.icons.inf.draw(A), 254, 154, 40));
     return [
-      { step: 0, say: 'Ana owns 11 territories: 11 ÷ 3 = **3 new armies**. She places them all on Ukraine, next to Ben’s Ural.',
+      { step: 0, say: 'Ana owns 11 territories: 11 ÷ 3 = **3 armies**. She puts all 3 on Ukraine, next to Ben’s Ural.',
         svg: land('#a8d39a') + fixed + A.k('ukr', army(...U, 7, ANA)) + A.k('ural', army(...R, 3, BEN)) +
           A.text(10, 175, 'Reinforcements:', { size: 9, anchor: 'start' }) + res(1, 102, 175) + res(2, 120, 175) + res(3, 138, 175) },
-      { step: 0, say: 'Ukraine now holds **10 armies**, ready to strike Ural (3).',
+      { step: 0, say: 'Ukraine now holds **10 armies**; Ural holds 3.',
         svg: land('#a8d39a') + fixed + res(1, U[0] - 3, U[1]) + res(2, U[0], U[1]) + res(3, U[0] + 3, U[1]) + A.k('ukr', army(...U, 10, ANA, 13)) + A.k('ural', army(...R, 3, BEN)) + A.glow(...U, 20, 'g-ukr') },
-      { step: 1, say: 'Attack! Ana rolls **6-4-2**, Ben rolls **5-4**. 6 beats 5, but the 4s tie and **ties go to the defender**: each loses 1.',
+      { step: 1, say: 'Attack: Ana rolls {=att6}{=att4}{=att2}, Ben rolls {=d5}{=d4}. 6 beats 5; the 4s tie and **ties go to the defender**. Each loses 1.',
         svg: land('#a8d39a') + fixed + arrow + A.k('ukr', army(...U, 9, ANA, 13)) + A.k('ural', army(...R, 2, BEN)) + dice([6, 4, 2], [5, 4]) +
           A.text(80, 191, 'win', { size: 7, fill: ANA }) + A.text(104, 191, 'lose', { size: 7, fill: C.gray }) + A.text(182, 191, 'lose', { size: 7, fill: C.gray }) + A.text(206, 191, 'win', { size: 7, fill: BEN }) },
-      { step: 1, say: 'She rolls again: **5-3-1** vs **2-1**. Ben loses both armies and Ural is empty; it becomes Ana’s.',
+      { step: 1, say: 'She rolls again: {=att5}{=att3}{=att1} vs {=d2}{=d1}. Ben loses his last 2 armies; Ural is Ana’s.',
         svg: land('#e9a49c') + fixed + arrow + A.k('ukr', army(...U, 9, ANA, 13)) + dice([5, 3, 1], [2, 1]) + A.glow(R[0], R[1] + 6, 20, 'g-ural') },
       { step: 1, say: 'She must move in at least as many armies as dice rolled (3); she moves **4**.',
         svg: land('#e9a49c') + fixed + A.k('ukr', army(...R, 4, ANA)) + A.k('ukr2', army(...U, 5, ANA)) + A.k('ural-arrow', A.arrow(140, 72, 204, 56, { stroke: ANA, sw: 2, dash: '4 3' })) },
-      { step: 2, say: '**Fortify**: one move, 3 more armies from Ukraine into Ural. She conquered a territory, so she **draws a card**.',
+      { step: 2, say: '**Fortify**: one move of 3 armies from Ukraine to Ural. She conquered a territory, so she **draws a card**.',
         svg: land('#e9a49c') + fixed + A.k('ukr2', army(...R, 7, ANA, 13)) + A.k('ukr3', army(...U, 2, ANA)) + card + A.glow(274, 173, 22, 'g-card') },
     ];
   },
@@ -147,7 +164,7 @@ defineGame({
     o += A.text(184, 167, 'vs', { size: 10, weight: 800 });
     o += A.die(196, 158, 17, 5) + A.die(217, 158, 17, 4);
     // cards
-    o += A.card(10, 150, 26, 38, C.cream, { label: '★', labelFill: C.ink, size: 14 }) + A.card(30, 154, 26, 38, C.cream, { label: '♞', labelFill: C.ink, size: 14 });
+    o += A.use(this.icons.inf.draw(A), 2, 148, 44) + A.use(this.icons.cav.draw(A), 24, 152, 44);
     o += A.note(165, 98, 240, 104, 'Armies on a territory');
     o += A.note(150, 176, 140, 189, 'Attack: 3 dice vs 2');
     o += A.note(288, 150, 262, 186, 'Continent = bonus');
