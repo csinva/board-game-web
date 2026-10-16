@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Board Game Field Guide</title>
-<meta name="description" content="Learn any popular board game from one standardized, illustrated page, and explore how games relate on an interactive similarity map.">
+<meta name="description" content="Learn popular board games from one illustrated page each, and find games like the ones you know.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,73 +13,10 @@
 <body data-page="home">
 <main class="wrap">
 
-  <section class="hero">
-    <div>
-      <h1>Learn any board game from <em>one page</em>.</h1>
-      <p class="lede">Every game here is explained with the same illustrated sheet, laid out in the order a good teacher explains things: the story, the goal, the clock, your turn, then the details. Learn the format once and you can read every game.</p>
-      <div class="cta">
-        <a class="btn primary" href="#games">Browse the games</a>
-        <a class="btn" href="game.html?g=catan">See an example: Catan</a>
-        <a class="btn" href="map.html">Explore the similarity map</a>
-      </div>
-    </div>
-    <div class="hero-art" id="hero-art"></div>
+  <section class="intro" id="games">
+    <h1>Learn any board game from one page.</h1>
+    <p>Pick a game. Not sure what to play? <a href="map.html">Find games like ones you already know →</a></p>
   </section>
-
-  <div class="section-h" id="learn">
-    <div>
-      <h2>How to learn a board game</h2>
-      <p>Rulebooks are written to be complete, and that makes them a poor way to learn. A complete rulebook lists components first and covers every edge case. A learner needs to know the purpose first. These eight questions, in this order, are what every sheet answers.</p>
-    </div>
-  </div>
-  <div class="method" id="method"></div>
-
-  <div class="principles" style="margin-top:22px">
-    <div class="principle"><h3>Purpose before procedure</h3><p>A rule you understand the reason for is a rule you remember. Learn how you win and how the game ends before you learn what to do on a turn.</p></div>
-    <div class="principle"><h3>Learn in layers</h3><p>The 30-second layer gets you playing. The 5-minute layer makes you competent. Save everything else for when it comes up. Every sheet has a toggle for this.</p></div>
-    <div class="principle"><h3>Show one turn, then play</h3><p>A single concrete turn, played face-up and narrated, teaches more than ten minutes of explanation. Every sheet includes one.</p></div>
-    <div class="principle"><h3>Find the key decision</h3><p>Every good game has one core dilemma. Once you see it, the rules stop looking arbitrary: they are what creates that tension.</p></div>
-    <div class="principle"><h3>Anchor to what you know</h3><p>“It’s like Catan, but with cards” is a huge shortcut. The similarity map shows which games share mechanisms, so you can learn new ones by analogy.</p></div>
-    <div class="principle"><h3>The first game is practice</h3><p>Play open-handed, let people take back moves, and don’t count the score too seriously. You are learning a system, not trying to win.</p></div>
-  </div>
-
-  <div class="section-h">
-    <div>
-      <h2>Anatomy of a sheet</h2>
-      <p>Same layout for every game. Numbered panels are the teaching order. The colours show which “learn in layers” setting reveals each panel.</p>
-    </div>
-  </div>
-  <div class="anatomy">
-    <div class="mini-sheet" aria-label="Diagram of the sheet layout">
-      <div class="hd">Name · one-line pitch · players · time · age · rules weight</div>
-      <div class="l1" style="grid-column:span 5;grid-row:span 2">1. What it is<br><span class="small">illustration of the table + the story + setup</span></div>
-      <div class="l1" style="grid-column:span 3">2. How you win</div>
-      <div class="l1" style="grid-column:span 4">3. How it ends<br><span class="small">+ where points come from</span></div>
-      <div class="l1" style="grid-column:span 7">4. Your turn<br><span class="small">sequence, choose-one, or simultaneous diagram</span></div>
-      <div class="l2" style="grid-column:span 7">5. How it flows<br><span class="small">collect → spend → score, + the key decision</span></div>
-      <div class="l2" style="grid-column:span 5">6. One turn, played out</div>
-      <div class="l2" style="grid-column:span 4">Quick reference</div>
-      <div class="l2" style="grid-column:span 4">Key terms</div>
-      <div class="l3" style="grid-column:span 4">7. Rules people miss</div>
-      <div class="l3" style="grid-column:span 4">8. First-game tips</div>
-      <div class="l3" style="grid-column:span 4">What it feels like</div>
-      <div class="l3" style="grid-column:span 4">If you like this, try</div>
-    </div>
-    <div class="legend-layers">
-      <div><i style="background:#fde9df"></i><span><b>30 seconds.</b> Enough to start playing: what it is, how to win, when it ends, what you do on a turn.</span></div>
-      <div><i style="background:#fff4d6"></i><span><b>5 minutes.</b> Enough to play well: the economy, the core dilemma, a worked example, and the lookup tables.</span></div>
-      <div><i style="background:#eef1f6"></i><span><b>Everything.</b> Exceptions, strategy, a six-axis profile of how the game feels, setup, and similar games.</span></div>
-      <div><i style="background:#fff"></i><span><b>Teaching it?</b> Under every sheet is a read-aloud teach script generated from the same panels. Each sheet prints on one landscape page.</span></div>
-      <div><i style="background:#2a2420"></i><span><b>Turn diagrams have three shapes.</b> A chain means do every step in order. A fork means choose one. Stacked steps mean everyone acts at once. Recognizing the shape is half the battle.</span></div>
-    </div>
-  </div>
-
-  <div class="section-h" id="games">
-    <div>
-      <h2>The games</h2>
-      <p id="games-sub">Grouped by family. Filter by what you have tonight.</p>
-    </div>
-  </div>
   <div class="filters">
     <input type="search" id="q" placeholder="Search games or mechanics…" aria-label="Search">
     <select id="np" aria-label="Number of players"><option value="">Any player count</option></select>
@@ -95,31 +32,11 @@
 <script src="js/art.js"></script>
 <script src="js/sheet.js"></script>
 <script>
-const METHOD = [
-  ['Story', 'What are we pretending to be?', 'A theme makes the rules intuitive: robbers steal, trains need tracks.', 'Panel 1'],
-  ['Goal', 'How do I win?', 'Points, a race, a team objective, or survival? Everything else serves this.', 'Panel 2'],
-  ['Clock', 'When does it end?', 'The end trigger tells you how much time you have and when to switch from building to scoring.', 'Panel 3'],
-  ['Turn', 'What can I do?', 'Do everything in order, choose one action, or act all at once? The shape matters.', 'Panel 4'],
-  ['Engine', 'How do I get stronger?', 'What you collect, what you turn it into, and how that becomes points.', 'Panel 5'],
-  ['Dilemma', 'What is the interesting choice?', 'The tension the rules exist to create. Find it and strategy follows.', 'Panel 5'],
-  ['Example', 'Show me one turn.', 'Concrete names and numbers make abstract rules click.', 'Panel 6'],
-  ['Exceptions', 'What will trip me up?', 'The few rules everyone forgets. Learn them last, ideally as they come up.', 'Panel 7'],
-];
-document.getElementById('method').innerHTML = METHOD.map(([k, q, p, w], i) =>
-  `<div class="step"><div class="k"><b>${i + 1}</b>${k}</div><div class="q">${q}</div><p>${p}</p><div class="where">→ ${w} on every sheet</div></div>`).join('');
-
 const ICON_P = '<svg viewBox="0 0 24 24" class="ico"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.5 2.7-6 6-6s6 2.5 6 6z"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 13.3c3 .1 5.5 2.4 5.5 5.7h-4.4"/></svg>';
 const ICON_T = '<svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 7v5.5l3.5 2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
 const rng = r => r[0] === r[1] ? r[0] : r[0] + '–' + r[1];
 
 loadGames().then(games => {
-  // Hero: a 2x2 of illustrations.
-  const pick = ['catan', 'wingspan', 'ticket-to-ride', 'secret-hitler'].map(id => GAME_BY_ID[id]).filter(Boolean);
-  const ha = document.getElementById('hero-art');
-  if (pick.length >= 4) ha.innerHTML = `<svg viewBox="0 0 644 404">${pick.map((g, i) => `<g transform="translate(${2 + (i % 2) * 322} ${2 + Math.floor(i / 2) * 202})"><svg width="320" height="200" viewBox="0 0 320 200">${g.art(A)}</svg></g>`).join('')}<line x1="322" y1="0" x2="322" y2="404" stroke="#2a2420" stroke-width="3"/><line x1="0" y1="202" x2="644" y2="202" stroke="#2a2420" stroke-width="3"/></svg>`;
-  else if (pick.length) ha.innerHTML = `<svg viewBox="0 0 320 200">${pick[0].art(A)}</svg>`;
-
-  document.getElementById('games-sub').textContent = `${games.length} games across ${Object.keys(FAMILIES).length} families. Filter by what you have tonight.`;
   const np = document.getElementById('np');
   for (let n = 1; n <= 10; n++) np.insertAdjacentHTML('beforeend', `<option value="${n}">${n} player${n > 1 ? 's' : ''}</option>`);
 

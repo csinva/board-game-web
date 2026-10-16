@@ -5,10 +5,9 @@
   const link = (href, label, key) => `<a href="${href}" class="${page === key ? 'on' : ''}">${label}</a>`;
   document.body.insertAdjacentHTML('afterbegin', `<header class="topbar">
     <a class="brand" href="index.html">${logo}Board Game Field Guide</a>
-    <nav>${link('index.html#learn', 'How to learn a game', 'home')}${link('index.html#games', 'All games', 'games')}${link('map.html', 'Similarity map', 'map')}</nav>
+    <nav>${link('index.html', 'All games', 'home')}${link('map.html', 'Find similar games', 'map')}</nav>
   </header>`);
   if (page !== 'map') document.body.insertAdjacentHTML('beforeend', `<footer class="site-foot">
-    Every game uses the same one-page format, so once you can read one sheet you can read them all.
-    Rules are summarized for learning; check the rulebook for edge cases. ·
+    Rules are summarized; check the rulebook for edge cases. ·
     <a href="https://github.com/csinva/board-game-web">Source on GitHub</a></footer>`);
 })();

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Similarity Map · Board Game Field Guide</title>
+<title>Find Similar Games · Board Game Field Guide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
   <div class="map-main" id="main">
     <div class="map-toolbar">
       <div class="seg" id="mode">
-        <button data-m="network" class="on">Similarity web</button><button data-m="family">Families</button><button data-m="scatter">Scatter</button>
+        <button data-m="network" class="on">Closest matches</button><button data-m="family">By family</button><button data-m="scatter">Chart</button>
       </div>
       <div class="axis-pick" id="axes">
         <label>X <select id="ax"></select></label>
@@ -24,7 +24,7 @@
     </div>
     <svg id="svg"></svg>
     <div class="map-legend" id="legend"></div>
-    <div class="map-hint" id="hint">Click a game to see its neighbours · drag to move · scroll to zoom</div>
+    <div class="map-hint" id="hint">Click a game · scroll to zoom</div>
   </div>
   <aside class="side" id="side"></aside>
 </div>
@@ -185,10 +185,8 @@ loadGames().then(games => {
   // ---- Side panel ----
   const side = document.getElementById('side');
   function overview() {
-    side.innerHTML = `<h2>Which games are alike?</h2>
-      <p>Each dot is a game, sized by rules weight. Lines join each game to its three nearest neighbours; thicker means more alike. Switch to <b>Families</b> to see the groups, or <b>Scatter</b> to place games on any two axes.</p>
-      <p>Similarity mixes <b>shared mechanisms</b> (50%), a <b>six-axis feel profile</b> (30%: rules, luck, interaction, meanness, table talk, planning), <b>same family</b> (15%) and <b>overlapping player counts</b> (5%).</p>
-      <p>Use it to learn by analogy: if you know one game in a cluster, its neighbours will feel familiar.</p>
+    side.innerHTML = `<h2>Find similar games</h2>
+      <p>Click a game you know to see its closest matches. Nearby dots play alike.</p>
       <h3>Families</h3>
       <ul class="fam-list">${famKeys.map(k => `<li style="--fam:${FAMILIES[k].color}"><b>${FAMILIES[k].label}</b>${FAMILIES[k].blurb}<br><span class="small">${games.filter(g => g.family === k).map(g => g.name).join(' · ')}</span></li>`).join('')}</ul>`;
   }

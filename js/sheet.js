@@ -136,11 +136,10 @@
         ${panel('', 'What it feels like', `<div class="profile">${radar(g)}${profileBars(g)}</div>`, 'p-profile', 3)}
         ${panel('', 'If you like this, try', similarList(g), 'p-similar', 3)}
       </div>
-      <footer class="sheet-foot"><span>${g.mechanics.map(m => `<span class="mech">${esc(window.MECHANICS[m])}</span>`).join('')}</span><span class="foot-brand">Board Game Field Guide · one-page sheet</span></footer>
+      <footer class="sheet-foot"><span>${g.mechanics.map(m => `<span class="mech">${esc(window.MECHANICS[m])}</span>`).join('')}</span><span class="foot-brand">Board Game Field Guide</span></footer>
     </article>
     <section class="teach" data-level="2">
-      <h2>Teaching it? Say this, in this order</h2>
-      <p class="small">A two-minute script built from the sheet: story → goal → clock → turn → heart → one example → play. Save the exceptions for when they come up.</p>
+      <h2>Teaching it? Read this aloud</h2>
       ${teachScript(g)}
     </section>`;
   };
