@@ -1,6 +1,6 @@
 # Board Game Field Guide
 
-**Live site:** https://csinva.github.io/board-game-web/
+**Live site:** https://csinva.io/board-game-web/
 
 Learn popular board games from one standardized, illustrated page each, and explore which games are alike on an interactive similarity map.
 
