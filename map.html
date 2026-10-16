@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Similarity Map · Board Game Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+</head>
+<body data-page="map">
+<div class="map-page">
+  <div class="map-main" id="main">
+    <div class="map-toolbar">
+      <div class="seg" id="mode">
+        <button data-m="network" class="on">Similarity web</button><button data-m="family">Families</button><button data-m="scatter">Scatter</button>
+      </div>
+      <div class="axis-pick" id="axes">
+        <label>X <select id="ax"></select></label>
+        <label>Y <select id="ay"></select></label>
+      </div>
+    </div>
+    <svg id="svg"></svg>
+    <div class="map-legend" id="legend"></div>
+    <div class="map-hint" id="hint">Click a game to see its neighbours · drag to move · scroll to zoom</div>
+  </div>
+  <aside class="side" id="side"></aside>
+</div>
+<script src="js/site.js"></script>
+<script src="js/core.js"></script>
+<script src="js/art.js"></script>
+<script src="js/sheet.js"></script>
+<script>
+const SCATTER_AXES = [
+  ...PROFILE_AXES.map(a => ({ key: a.key, label: a.label + ' (1–5)', get: g => g.profile[a.key], lo: a.lo, hi: a.hi })),
+  { key: 'time', label: 'Play time (min)', get: g => (g.time[0] + g.time[1]) / 2 },
+  { key: 'players', label: 'Max players', get: g => Math.min(g.players[1], 12) },
+];
+
+loadGames().then(games => {
+  const main = document.getElementById('main');
+  const svg = d3.select('#svg');
+  let W = main.clientWidth, H = main.clientHeight;
+  const root = svg.append('g');
+  const zoom = d3.zoom().scaleExtent([0.4, 3]).on('zoom', e => root.attr('transform', e.transform));
+  svg.call(zoom).on('dblclick.zoom', null);
+
+  const nodes = games.map(g => ({ id: g.id, g, r: 9 + g.profile.complexity * 2.6, fam: g.family, x: W / 2 + (Math.random() - .5) * 200, y: H / 2 + (Math.random() - .5) * 200 }));
+  const byId = Object.fromEntries(nodes.map(n => [n.id, n]));
+
+  // Links: each game to its 3 nearest neighbours (deduplicated).
+  const linkMap = new Map();
+  games.forEach(g => mostSimilar(g, 3).forEach(s => {
+    const key = [g.id, s.game.id].sort().join('|');
+    if (!linkMap.has(key)) linkMap.set(key, { source: g.id, target: s.game.id, score: s.score, shared: s.shared });
+  }));
+  const links = [...linkMap.values()];
+  const neighbours = id => new Set(links.filter(l => (l.source.id || l.source) === id || (l.target.id || l.target) === id).flatMap(l => [l.source.id || l.source, l.target.id || l.target]));
+
+  const hullG = root.append('g');
+  const axisG = root.append('g');
+  const linkSel = root.append('g').selectAll('line').data(links).join('line').attr('class', 'link').attr('stroke-width', d => 1 + d.score * 5);
+  const nodeSel = root.append('g').selectAll('g').data(nodes).join('g').attr('class', 'node')
+    .call(d3.drag().on('start', (e, d) => { if (!e.active) sim.alphaTarget(.2).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); if (mode !== 'scatter') { d.fx = null; d.fy = null; } }))
+    .on('click', (e, d) => { e.stopPropagation(); select(d.id); });
+  nodeSel.append('circle').attr('class', 'dot').attr('r', d => d.r).attr('fill', d => FAMILIES[d.fam].color);
+  nodeSel.append('text').attr('text-anchor', 'middle').attr('dy', d => d.r + 13).text(d => d.g.name);
+  nodeSel.append('title').text(d => d.g.name + ' — ' + FAMILIES[d.fam].label);
+  svg.on('click', () => select(null));
+
+  const famKeys = Object.keys(FAMILIES).filter(k => nodes.some(n => n.fam === k));
+  const hidden = new Set();
+  const LEGEND_W = main.clientWidth > 700 ? 200 : 0;
+  const famAnchor = () => Object.fromEntries(famKeys.map((k, i) => {
+    const a = -Math.PI / 2 + i * 2 * Math.PI / famKeys.length, R = Math.min(W, H) * 0.33;
+    return [k, [W / 2 + R * Math.cos(a) * 1.15, H / 2 + R * Math.sin(a)]];
+  }));
+
+  const sim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(l => 40 + (1 - l.score) * 200).strength(l => .1 + l.score * .9))
+    .force('charge', d3.forceManyBody().strength(-420))
+    .force('collide', d3.forceCollide(d => d.r + 18))
+    .force('x', d3.forceX(W / 2).strength(.03))
+    .force('y', d3.forceY(H / 2).strength(.045))
+    .on('tick', tick);
+
+  // Settle the layout before the first paint so the opening view is stable.
+  sim.stop();
+  for (let i = 0; i < 400; i++) sim.tick();
+
+  // Zoom so every visible node (plus its label) fits the viewport.
+  function fit(animate) {
+    if (mode === 'scatter') return;
+    const vis = nodes.filter(n => !hidden.has(n.fam));
+    if (!vis.length) return;
+    const x0 = d3.min(vis, n => n.x - n.r) - 70, x1 = d3.max(vis, n => n.x + n.r) + 70;
+    const y0 = d3.min(vis, n => n.y - n.r) - (mode === 'family' ? 70 : 30), y1 = d3.max(vis, n => n.y + n.r) + 40;
+    const top = 60, w = W - LEGEND_W, k = Math.min(1.4, w / (x1 - x0), (H - top) / (y1 - y0));
+    const t = d3.zoomIdentity.translate((w - k * (x1 + x0)) / 2, top + ((H - top) - k * (y1 + y0)) / 2).scale(k);
+    (animate ? svg.transition().duration(500) : svg).call(zoom.transform, t);
+  }
+
+  function hullPath(pts) {
+    if (pts.length === 1) { const [x, y] = pts[0]; return `M${x - 40},${y}a40,40 0 1,0 80,0a40,40 0 1,0 -80,0`; }
+    const pad = [];
+    pts.forEach(([x, y]) => { for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; pad.push([x + 34 * Math.cos(a), y + 34 * Math.sin(a)]); } });
+    const h = d3.polygonHull(pad);
+    return d3.line().curve(d3.curveCatmullRomClosed.alpha(.6))(h);
+  }
+
+  function tick() {
+    linkSel.attr('x1', d => d.source.x).attr('y1', d => d.source.y).attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    nodeSel.attr('transform', d => `translate(${d.x},${d.y})`);
+    if (mode === 'family') {
+      const data = famKeys.filter(k => !hidden.has(k)).map(k => ({ k, pts: nodes.filter(n => n.fam === k).map(n => [n.x, n.y]) }));
+      hullG.selectAll('path').data(data, d => d.k).join('path').attr('class', 'hull').attr('d', d => hullPath(d.pts))
+        .attr('fill', d => FAMILIES[d.k].color).attr('stroke', d => FAMILIES[d.k].color);
+      hullG.selectAll('text').data(mode === 'family' ? data : [], d => d.k).join('text').attr('class', 'hull-label')
+        .attr('text-anchor', 'middle').attr('fill', d => FAMILIES[d.k].color)
+        .attr('x', d => d3.mean(d.pts, p => p[0])).attr('y', d => d3.min(d.pts, p => p[1]) - 44).text(d => FAMILIES[d.k].label);
+    } else hullG.selectAll('*').remove();
+  }
+
+  // ---- Modes ----
+  let mode = 'network';
+  const ax = document.getElementById('ax'), ay = document.getElementById('ay');
+  SCATTER_AXES.forEach(a => { ax.add(new Option(a.label, a.key)); ay.add(new Option(a.label, a.key)); });
+  ax.value = 'complexity'; ay.value = 'interaction';
+  [ax, ay].forEach(s => s.onchange = () => setMode('scatter'));
+
+  function setMode(m) {
+    mode = m;
+    svg.classed('fam-mode', m === 'family');
+    document.getElementById('hint').style.display = m === 'scatter' ? 'none' : '';
+    document.querySelectorAll('#mode button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+    document.getElementById('axes').classList.toggle('show', m === 'scatter');
+    axisG.selectAll('*').remove();
+    nodes.forEach(n => { n.fx = null; n.fy = null; });
+    linkSel.style('display', m === 'scatter' ? 'none' : null);
+    if (m === 'network') {
+      sim.force('link').strength(l => .1 + l.score * .9);
+      sim.force('x', d3.forceX(W / 2).strength(.03)).force('y', d3.forceY(H / 2).strength(.045)).force('charge').strength(-420);
+    } else if (m === 'family') {
+      const anc = famAnchor();
+      sim.force('link').strength(0);
+      sim.force('x', d3.forceX(d => anc[d.fam][0]).strength(.22)).force('y', d3.forceY(d => anc[d.fam][1]).strength(.22)).force('charge').strength(-170);
+    } else {
+      const X = SCATTER_AXES.find(a => a.key === ax.value), Y = SCATTER_AXES.find(a => a.key === ay.value);
+      const m0 = 70, sx = d3.scaleLinear().domain(d3.extent(games, X.get)).nice().range([m0 + 60, W - LEGEND_W - 20]);
+      const sy = d3.scaleLinear().domain(d3.extent(games, Y.get)).nice().range([H - m0 - 10, m0 + 50]);
+      sim.force('link').strength(0);
+      sim.force('x', d3.forceX(d => sx(X.get(d.g))).strength(.9)).force('y', d3.forceY(d => sy(Y.get(d.g))).strength(.9)).force('charge').strength(-8);
+      axisG.append('g').attr('class', 'axis').attr('transform', `translate(0,${H - m0 + 6})`).call(d3.axisBottom(sx).ticks(5));
+      axisG.append('g').attr('class', 'axis').attr('transform', `translate(${m0},0)`).call(d3.axisLeft(sy).ticks(5));
+      axisG.append('text').attr('class', 'axis-title').attr('x', W - LEGEND_W - 20).attr('y', H - m0 + 40).attr('text-anchor', 'end').text(X.label + (X.hi ? ' → ' + X.hi : ' →'));
+      axisG.append('text').attr('class', 'axis-title').attr('transform', `translate(${m0 - 44},${m0 + 50}) rotate(-90)`).attr('text-anchor', 'end').text(Y.label + (Y.hi ? ' → ' + Y.hi : ' →'));
+    }
+    // Settle synchronously, then animate to the result (stable even in throttled tabs).
+    sim.stop(); sim.alpha(1);
+    for (let i = 0; i < 350; i++) sim.tick();
+    hullG.selectAll('*').remove();
+    const tr = d3.transition().duration(650);
+    nodeSel.transition(tr).attr('transform', d => `translate(${d.x},${d.y})`);
+    linkSel.transition(tr).attr('x1', d => d.source.x).attr('y1', d => d.source.y).attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    tr.end().then(tick, tick);
+    if (m === 'scatter') svg.interrupt().call(zoom.transform, d3.zoomIdentity); else fit(true);
+  }
+  document.querySelectorAll('#mode button').forEach(b => b.onclick = () => setMode(b.dataset.m));
+
+  // ---- Legend (click to hide a family) ----
+  const legend = document.getElementById('legend');
+  legend.innerHTML = famKeys.map(k => `<button data-f="${k}"><i style="background:${FAMILIES[k].color}"></i>${FAMILIES[k].label}</button>`).join('');
+  legend.querySelectorAll('button').forEach(b => b.onclick = () => {
+    const k = b.dataset.f; hidden.has(k) ? hidden.delete(k) : hidden.add(k);
+    b.classList.toggle('off', hidden.has(k));
+    nodeSel.style('display', d => hidden.has(d.fam) ? 'none' : null);
+    linkSel.style('display', d => mode === 'scatter' || hidden.has(d.source.fam) || hidden.has(d.target.fam) ? 'none' : null);
+    tick(); fit(true);
+  });
+
+  // ---- Side panel ----
+  const side = document.getElementById('side');
+  function overview() {
+    side.innerHTML = `<h2>Which games are alike?</h2>
+      <p>Each dot is a game, sized by rules weight. Lines join each game to its three nearest neighbours; thicker means more alike. Switch to <b>Families</b> to see the groups, or <b>Scatter</b> to place games on any two axes.</p>
+      <p>Similarity mixes <b>shared mechanisms</b> (50%), a <b>six-axis feel profile</b> (30%: rules, luck, interaction, meanness, table talk, planning), <b>same family</b> (15%) and <b>overlapping player counts</b> (5%).</p>
+      <p>Use it to learn by analogy: if you know one game in a cluster, its neighbours will feel familiar.</p>
+      <h3>Families</h3>
+      <ul class="fam-list">${famKeys.map(k => `<li style="--fam:${FAMILIES[k].color}"><b>${FAMILIES[k].label}</b>${FAMILIES[k].blurb}<br><span class="small">${games.filter(g => g.family === k).map(g => g.name).join(' · ')}</span></li>`).join('')}</ul>`;
+  }
+
+  function select(id) {
+    nodeSel.classed('sel', d => d.id === id);
+    if (!id) {
+      nodeSel.classed('dim', false); linkSel.classed('dim', false).classed('hot', false); hullG.selectAll('path').classed('dim', false);
+      history.replaceState(null, '', 'map.html'); overview(); return;
+    }
+    const g = GAME_BY_ID[id], nb = neighbours(id);
+    const top = mostSimilar(g, 6);
+    const near = new Set([id, ...nb, ...top.slice(0, 3).map(s => s.game.id)]);
+    nodeSel.classed('dim', d => !near.has(d.id));
+    linkSel.classed('hot', d => d.source.id === id || d.target.id === id).classed('dim', d => d.source.id !== id && d.target.id !== id);
+    history.replaceState(null, '', 'map.html?focus=' + id);
+    const f = FAMILIES[g.family];
+    side.innerHTML = `<div class="fam" style="color:${f.color}">${f.label}</div><h2>${esc(g.name)}</h2>
+      <div class="thumb"><svg viewBox="0 0 320 200">${g.art(A)}</svg></div>
+      <p>${md(g.pitch)}</p>
+      <p class="small"><b>${g.players[0]}–${g.players[1]}</b> players · <b>${g.time[0]}–${g.time[1]}</b> min · ${g.mechanics.map(m => MECHANICS[m]).join(', ')}</p>
+      <a class="btn primary" href="game.html?g=${g.id}">Open the one-page sheet →</a>
+      <h3>Most similar</h3>
+      <ul class="neigh">${top.map(s => `<li><button data-id="${s.game.id}" style="--fam:${FAMILIES[s.game.family].color}"><b>${esc(s.game.name)}</b><span class="pct">${Math.round(s.score * 100)}%</span><span class="why">${s.shared.length ? 'Shares: ' + s.shared.map(m => MECHANICS[m]).join(', ') : 'Similar feel, different mechanisms'}</span></button></li>`).join('')}</ul>
+      <h3>Feel profile</h3><div style="--accent:${f.color};max-width:240px">${radarSVG(g, 220)}</div>`;
+    side.querySelectorAll('.neigh button').forEach(b => b.onclick = () => select(b.dataset.id));
+  }
+
+  window.addEventListener('resize', () => { W = main.clientWidth; H = main.clientHeight; setMode(mode); });
+  const params = new URLSearchParams(location.search);
+  const focus = params.get('focus');
+  if (['family', 'scatter'].includes(params.get('mode'))) setMode(params.get('mode'));
+  tick();
+  fit(false);
+  overview();
+  if (focus && byId[focus]) setTimeout(() => select(focus), 50);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game Sheet · Board Game Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="game">
+<main class="wrap">
+  <div class="sheet-controls">
+    <div class="layers">
+      <span class="lbl">Learn in layers</span>
+      <div class="seg" id="layers">
+        <button data-lv="1">30 seconds</button><button data-lv="2">5 minutes</button><button data-lv="3" class="on">Everything</button>
+      </div>
+    </div>
+    <div class="game-nav">
+      <a class="btn" id="prev" title="Previous game">←</a>
+      <select id="pick" aria-label="Choose a game"></select>
+      <a class="btn" id="next" title="Next game">→</a>
+      <button class="btn" onclick="window.print()" title="Print this sheet on one landscape page">Print</button>
+    </div>
+  </div>
+  <div id="out" class="lv3"></div>
+</main>
+<script src="js/site.js"></script>
+<script src="js/core.js"></script>
+<script src="js/art.js"></script>
+<script src="js/sheet.js"></script>
+<script>
+loadGames().then(games => {
+  const params = new URLSearchParams(location.search);
+  const id = params.get('g') || games[0].id;
+  const g = GAME_BY_ID[id] || games[0];
+  const i = games.indexOf(g);
+  document.title = g.name + ' in one page · Board Game Field Guide';
+  const out = document.getElementById('out');
+  out.innerHTML = renderSheet(g);
+
+  const pick = document.getElementById('pick');
+  pick.innerHTML = Object.entries(FAMILIES).map(([k, f]) => `<optgroup label="${f.label}">${games.filter(x => x.family === k).map(x => `<option value="${x.id}"${x === g ? ' selected' : ''}>${x.name}</option>`).join('')}</optgroup>`).join('');
+  pick.onchange = () => location.search = '?g=' + pick.value;
+  document.getElementById('prev').href = '?g=' + games[(i - 1 + games.length) % games.length].id;
+  document.getElementById('next').href = '?g=' + games[(i + 1) % games.length].id;
+
+  const setLv = lv => {
+    out.className = 'lv' + lv;
+    document.querySelectorAll('#layers button').forEach(b => b.classList.toggle('on', b.dataset.lv == lv));
+    try { localStorage.setItem('bgfg-layer', lv); } catch (e) {}
+  };
+  document.querySelectorAll('#layers button').forEach(b => b.onclick = () => setLv(b.dataset.lv));
+  let saved = null; try { saved = localStorage.getItem('bgfg-layer'); } catch (e) {}
+  setLv(params.get('layer') || saved || 3);
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'SELECT') return;
+    if (e.key === 'ArrowLeft') location.href = document.getElementById('prev').href;
+    if (e.key === 'ArrowRight') location.href = document.getElementById('next').href;
+    if ('123'.includes(e.key)) setLv(e.key);
+  });
+});
+</script>
+</body>
+</html>
