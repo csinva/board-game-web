@@ -30,35 +30,35 @@ defineGame({
 
   turn: {
     type: 'round',
-    intro: 'Each round is one quest. The leader passes left after every team vote.',
+    intro: 'Each round is one quest. It can take several proposals to get a team approved.',
     steps: [
-      { verb: 'Propose', text: 'The {leader} hands out {team}s to the number of players shown for this quest (may include themselves).' },
-      { verb: 'Vote', text: 'Everyone reveals {approve} or {reject} at once. A **majority** approves; a tie rejects and the next leader proposes.' },
-      { verb: 'Quest', text: 'Team members each play {success} or {fail} face down. Good players **must** play Success.' },
-      { verb: 'Reveal', text: 'Shuffle and flip: one {=fail} fails the quest (quest 4 with 7+ players needs {=fail}{=fail}).' },
+      { verb: 'Propose', text: 'The {leader} gives {team}s to exactly as many players as this quest needs (see table). The leader may include themselves.' },
+      { verb: 'Vote', text: 'After discussion, all players reveal {approve} or {reject} at the same time. If **more than half** approve, the team goes on the quest. If not (a tie included), the vote track moves up 1, the leader role passes left, and the new leader proposes a team.' },
+      { verb: 'Quest', text: 'Each team member secretly plays 1 {success} or {fail} card face down. Good players **must** play Success; evil players may play either.' },
+      { verb: 'Reveal', text: 'Shuffle the played cards and flip them all. One {=fail} fails the quest; otherwise it succeeds. Exception: quest 4 with 7+ players fails only with **2 or more** {=fail}.' },
     ],
-    outro: 'Next quest',
+    outro: 'Leader passes left; next quest',
   },
 
   tension: 'Merlin knows every evil player, but each hint that steers good also shows the Assassin who Merlin is.',
 
   structure: [
-    { label: 'Setup', text: 'Deal roles. Eyes closed, evil see each other; {=merlin} sees the evil players.' },
-    { label: 'Quests', repeat: 'up to 5', text: 'The {=leader} proposes a team; all vote. If approved, the team plays {=success} / {=fail}. If rejected, the next leader proposes.' },
-    { label: 'Assassination', text: 'If good wins 3 quests, the {=assassin} names one player. Naming Merlin wins for evil.' },
+    { label: 'Setup', text: 'Deal secret roles. With eyes closed, evil players see each other and {=merlin} sees who is evil (see Setup).' },
+    { label: 'Quests', repeat: 'up to 5', text: 'The {=leader} proposes a team; all players vote. If approved, the team plays {=success} / {=fail}. If rejected, the next leader to the left proposes. Stop as soon as one side has 3 quests.' },
+    { label: 'Assassination', text: 'If good succeeds 3 quests, the evil players may discuss, then the {=assassin} names one good player. If that player is Merlin, evil wins; otherwise good wins.' },
   ],
 
   end: {
-    trigger: 'One side has 3 quests, or 5 proposals in a row are rejected',
-    detail: 'If good reaches 3 successes, evil players confer and the {=assassin} names one player as Merlin.',
+    trigger: 'one side has 3 quests, or 5 team proposals in a row are rejected',
+    detail: 'If good reaches 3 successful quests, the evil players may discuss, then the {=assassin} names one good player as Merlin.',
     results: [
-      { side: 'Good wins', text: 'with 3 successful quests, if the {=assassin} then names the wrong player.' },
-      { side: 'Evil wins', text: 'with 3 failed quests, 5 rejected teams in a row, or by naming {=merlin} Merlin.' },
+      { side: 'Good wins', text: 'with 3 successful quests, if the {=assassin} then names a player who is not Merlin.' },
+      { side: 'Evil wins', text: 'with 3 failed quests, with 5 rejected team proposals in a row, or when the {=assassin} names {=merlin} Merlin correctly.' },
     ],
   },
 
   ref: {
-    title: 'Team size per quest (* needs 2 Fails)',
+    title: 'Team size for quests 1–5 (* fails only with 2+ Fails)',
     rows: [
       ['5 players: 3 {=good} 2 {=evil}', '2 · 3 · 2 · 3 · 3'],
       ['6 players: 4 {=good} 2 {=evil}', '2 · 3 · 4 · 3 · 4'],
@@ -69,25 +69,25 @@ defineGame({
     ],
   },
 
-  example: 'With 7 players, {=leader} Sam proposes himself, Jo and Kim for quest 2. The vote is 4 {=approve}, 3 {=reject}, so they go. One {=fail} comes back. Jo and Kim both deny it, and the table notes that Ray approved a team that failed.',
+  example: 'With 7 players, {=leader} Sam proposes himself, Jo and Kim for quest 2. The vote is 4 {=approve}, 3 {=reject}, so the team is approved. Their 3 cards are shuffled and flipped: one is a {=fail}, so the quest fails. Jo and Kim both deny playing it, and the table notes that Ray approved a team that failed.',
 
   setup: [
-    'Deal roles face down: {merlin} + {good}s for good; {assassin} + {evil}s for evil (counts in table).',
-    'Eyes closed: evil open eyes to see each other. Then evil raise thumbs and {=merlin} opens eyes to see them.',
+    'Deal 1 role card face down to each player. Good team: {merlin} and the rest {good}s. Evil team: {assassin} and the rest {evil}s. Team sizes are in the table.',
+    'Everyone closes their eyes. Evil players (the Assassin included) open their eyes to see each other, then close them. Evil players raise a thumb; {=merlin} opens their eyes to see who is evil, then closes them. Thumbs go down and everyone opens their eyes.',
     'Use the quest board for your player count. Give each player an {approve} and a {reject} token. Pick a random first {leader}.',
   ],
 
   terms: [
-    ['{=merlin} Merlin', 'Good. Knows the evil players. Must stay hidden.'],
-    ['{=assassin} Assassin', 'Evil. Gets one guess at Merlin if good wins 3 quests.'],
-    ['{=leader} Leader', 'Proposes the team. Passes left after each vote.'],
-    ['Vote track', 'Counts rejected proposals in a row. The 5th reject wins for evil.'],
+    ['{=merlin} Merlin', 'Good. Knows who is evil. If the Assassin names Merlin at the end, evil wins, so Merlin hints without being obvious.'],
+    ['{=assassin} Assassin', 'Evil. Gets one guess at Merlin, only if good succeeds 3 quests.'],
+    ['{=leader} Leader', 'Proposes the team. The role passes to the player on the left after every team vote, approved or rejected.'],
+    ['Vote track', 'Counts rejected proposals in a row for the current quest. It resets to 0 when a team is approved. The 5th rejection in a row wins for evil.'],
   ],
 
   gotchas: [
     'Evil players **may** play {=success} to stay hidden; good players can never play {=fail}.',
     'Quest 4 with 7+ players needs **two** {=fail} to fail.',
-    'The reject count resets when a quest goes, not after each vote.',
+    'The vote track resets only when a team is **approved**, not when a new leader proposes.',
   ],
 
   tips: [
@@ -118,7 +118,7 @@ defineGame({
     return [
       { step: 0, say: 'Quest 2 needs **3** players. {=leader} **Sam** takes the {team}s.', svg: board + crown(0) + pile + A.glow(140, 81, 12, 'g-q2') },
       { step: 0, say: 'Sam proposes himself, **Jo** and **Kim**. The table debates.', svg: board + crown(0) + team },
-      { step: 1, say: 'Everyone reveals a vote: **4** {=approve}, **3** {=reject}. Majority approves. Ray approved too.', svg: board + crown(0) + team + votes + A.glow(...seat(3), 18, 'g-ray') },
+      { step: 1, say: 'Everyone reveals a vote: **4** {=approve}, **3** {=reject}. More than half approve, so the team goes. Ray approved too.', svg: board + crown(0) + team + votes + A.glow(...seat(3), 18, 'g-ray') },
       { step: 2, say: 'Sam, Jo and Kim each play {=success} or {=fail} face down. Good players must play Success.', svg: board + crown(0) + team +
         qcard(0, 108, 4, null) + qcard(1, 226, 26, null) + qcard(2, 286, 68, null) },
       { step: 2, say: 'The cards are **shuffled**, so no one knows who played which.', svg: board + crown(0) + team +

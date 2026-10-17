@@ -45,27 +45,27 @@ defineGame({
     type: 'sequence',
     intro: 'Every faction has the same three phases; your faction board says what to do in each:',
     steps: [
-      { verb: 'Birdsong', text: 'Start-of-turn upkeep, e.g. Cats place {=wood}, Eyrie add cards to the **Decree**, Alliance revolt.' },
-      { verb: 'Daylight', text: 'Main actions: **craft** cards, then move, battle, recruit and build by your faction’s rules.' },
-      { verb: 'Evening', text: 'Score or clean up, **draw 1** {=card} (more with some bonuses), then discard down to **5**.' },
+      { verb: 'Birdsong', text: 'Do your faction’s start-of-turn steps, e.g. Cats place {=wood} at each {sawmill}, Eyrie add cards to the **Decree**, Alliance may revolt.' },
+      { verb: 'Daylight', text: 'Your main actions, as your faction board lists them: usually **craft** cards first, then move, battle, recruit and build.' },
+      { verb: 'Evening', text: 'Do your faction’s end-of-turn steps (some factions score here), **draw 1** {=card} (more if your faction board shows a draw bonus), then discard down to **5** cards.' },
     ],
   },
 
   tension: 'Each faction grows fastest when left alone, so you must choose when to attack the leader and when to let someone else pay for it.',
 
   structure: [
-    { label: 'Setup', text: 'Set up factions in order (Cats, Eyrie, Alliance, Vagabond); deal 3 cards each.' },
+    { label: 'Setup', text: 'Deal 3 cards to each player. Factions set up one at a time in this order: Cats, Eyrie, Alliance, Vagabond.' },
     { label: 'Turns', repeat: 'clockwise', text: 'Each turn: Birdsong, Daylight, Evening, following your faction board.' },
-    { label: 'Game end', text: 'The moment someone reaches **30 VP**, or a Dominance holder starts their turn meeting its condition.' },
+    { label: 'Game end', text: 'The moment a player reaches **30 VP**, or when a player with an activated Dominance card meets its condition at the start of their Birdsong.' },
   ],
 
   points: [
-    ['Faction track', 'Cats: each building placed. Eyrie: each Evening, by {roost}s on the map. Alliance: each {=sympathy} placed. Vagabond: aiding factions, quests, and +1 per piece of a hostile faction removed in battle.'],
-    ['Removing pieces', '+1 VP per enemy building or token removed (not warriors)'],
-    ['{=item} Crafting', 'VP printed on item cards (Eyrie: 1 each)'],
+    ['Faction track', 'Cats: VP for each building placed. Eyrie: VP each Evening, more for more {roost}s on the map. Alliance: VP for each {=sympathy} placed. Vagabond: VP for aiding factions, completing quests, and 1 VP for each piece of a hostile faction removed in battle.'],
+    ['Removing pieces', 'Any player: +1 VP for each enemy building or token they remove (warriors score nothing)'],
+    ['{=item} Crafting', 'Craft an item card: score the VP printed on it (Eyrie score only 1 VP per item)'],
   ],
 
-  end: { trigger: 'someone reaches 30 VP', detail: 'Alternative: at 10+ VP a player may trade their score for a Dominance card, then win by ruling its clearings at the start of their turn.' },
+  end: { trigger: 'someone reaches 30 VP', detail: 'Alternative: a player with 10+ VP may activate a Dominance card, giving up their score; from then on they win only by ruling the clearings it names at the start of their Birdsong (see Dominance cards).' },
   scoring: [
     { label: 'Faction engine', share: 6 },
     { label: 'Battles', share: 2 },
@@ -75,72 +75,72 @@ defineGame({
   ref: {
     title: 'Suits and base factions',
     rows: [
-      ['Suits', '{=fox} {=rabbit} {=mouse} on clearings and cards; {=bird} cards are wild'],
+      ['Suits', '{=fox} {=rabbit} {=mouse} on clearings and cards; a {=bird} card can be spent as any suit'],
       ['{=cat} Marquise de Cat', 'Spend {wood} to build {=sawmill}{=workshop}{=recruiter}; score per building.'],
-      ['{=eyrie} Eyrie Dynasties', 'Build {roost}s; carry out a growing **Decree** every turn or fall into turmoil.'],
+      ['{=eyrie} Eyrie Dynasties', 'Build {roost}s. Add cards to the **Decree** every turn and carry out all of it; if they can’t, they fall into Turmoil.'],
       ['{=alliance} Woodland Alliance', 'Spread {=sympathy} tokens, then revolt to build {base}s.'],
-      ['{=vagabond} Vagabond', 'One pawn. Spends {=item} items to explore ruins, quest, and aid or attack anyone.'],
+      ['{=vagabond} Vagabond', 'One pawn. Exhausts {=item} items to move, explore ruins, complete quests, and aid or attack any faction.'],
     ],
   },
 
-  example: 'Cats’ Daylight, 3 actions: spend 1 {=wood} to build a 2nd {workshop} (+2 {=vp}); march 4 {=cat} into a {mouse} clearing; battle the Eyrie there. Dice show 3 and 1. The attacker takes the higher, so the Eyrie lose 3 pieces (2 {=eyrie}, then the {roost}) and the Cats lose 1 {=cat}. The roost scores the Cats **1 VP**.',
+  example: 'Cats’ Daylight, 3 actions. 1: spend 1 {=wood} to build a 2nd {workshop} (+2 {=vp}). 2: march, moving 4 {=cat} from a {fox} clearing the Cats rule into a {mouse} clearing. 3: battle the Eyrie there. The dice show 3 and 1. The attacker deals hits equal to the higher die, so the Eyrie lose 3 pieces (2 {=eyrie}, then the {roost}), and the Eyrie deal 1 hit, so the Cats lose 1 {=cat}. Removing the roost scores the Cats **1 VP**.',
 
   setup: [
-    'Lay out the board, ruins and item supply. With 2 players, remove the 4 Dominance cards. Shuffle the deck and deal 3 cards each.',
-    'Suggested factions: Cats vs Eyrie with 2 players; add the Alliance at 3 and the Vagabond at 4. Pick the first player at random.',
-    'Set up in order (Cats, Eyrie, Alliance, Vagabond) as printed on the back of each faction board.',
+    'Lay out the board, ruins and item supply. With 2 players, remove the 4 Dominance cards from the deck. Shuffle the deck and deal 3 cards to each player.',
+    'Suggested factions: Cats vs Eyrie with 2 players; add the Alliance with 3 players and the Vagabond with 4. Pick the first player at random; turns then go clockwise.',
+    'Each faction sets up in this order (Cats, Eyrie, Alliance, Vagabond), following the steps printed on the back of its faction board.',
   ],
 
   terms: [
-    ['Clearing', 'A space on the map, marked {fox}, {rabbit} or {mouse}. {=bird} Bird cards are wild.'],
-    ['Rule', 'Most warriors + buildings in a clearing. Needed to move and to build.'],
-    ['{=item} Craft', 'Play a card by activating crafting pieces ({=workshop}{=roost}{=sympathy}) of its suit. Items score {=vp}.'],
-    ['Defenseless', 'No defending warriors in the clearing: the attacker deals +1 hit.'],
-    ['Decree', 'The Eyrie’s row of required actions; it grows every turn.'],
+    ['Clearing', 'A space on the map, marked {fox}, {rabbit} or {mouse}. A {=bird} bird card can be spent as any suit.'],
+    ['Rule', 'You rule a clearing if you have the most warriors plus buildings there. Tokens and the Vagabond pawn do not count. If players tie, **no one** rules it (Eyrie exception: Lords of the Forest). You need rule to build there, and to move (see Rules people miss).'],
+    ['{=item} Craft', 'Play a card from your hand by activating 1 of your crafting pieces ({=workshop}{=roost}{=sympathy}) in a clearing of each suit shown in its cost. Item cards score {=vp}.'],
+    ['Defenseless', 'The defender has no warriors in the battle clearing, so the attacker deals 1 extra hit.'],
+    ['Decree', 'The Eyrie’s row of cards, each one an action the Eyrie must take every Daylight; it grows every turn.'],
   ],
 
   gotchas: [
-    'To move, you must **rule** the clearing you leave **or** the one you enter.',
-    'Battle: roll 2 dice; the **attacker takes the higher**, the defender the lower. Hits are capped by your warriors in the clearing.',
-    'Removing an enemy building or token scores **1 VP**; removing warriors scores nothing (except the Vagabond vs a hostile faction).',
+    'To move, you must **rule** the clearing you leave, the one you enter, or both.',
+    'Battle: roll 2 dice. The **attacker deals hits equal to the higher** die, the defender hits equal to the lower. Each side deals at most as many hits as it has warriors in the clearing.',
+    'Removing an enemy building or token scores **1 VP**; removing warriors scores nothing (exception: the Vagabond scores for warriors of a hostile faction).',
   ],
 
   extended: [
     { title: 'Marquise de Cat: industry', items: [
-      '**Birdsong**: place 1 {=wood} at every {=sawmill}. Building spends wood from clearings connected to the site through clearings you rule.',
-      '**Daylight**: 3 actions (+1 per bird card spent): battle, march (two moves), recruit (1 warrior per {=recruiter}, once per turn), build, or overwork (spend a card matching a {=sawmill} clearing for 1 extra {=wood} there).',
-      'Each building track costs more {=wood} (0-1-2-3-3-4) and scores more VP. {workshop}s are your crafting pieces; uncovering {=recruiter} spaces adds card draw.',
-      'The **Keep** stops other factions placing pieces in its clearing. **Field hospitals**: when Cat warriors are removed, spend a matching card to return them to the Keep.',
+      '**Birdsong**: place 1 {=wood} at every {=sawmill}. To build, spend wood that is in the building’s clearing or in clearings connected to it through a chain of clearings you rule.',
+      '**Daylight**: first you may craft by activating {workshop}s. Then take up to 3 actions, plus 1 more for each bird card you spend. Each action is one of: battle; march (up to 2 moves); recruit (place 1 warrior at each {=recruiter}; once per turn); build; overwork (spend a card matching a {=sawmill}’s clearing to place 1 extra {=wood} there).',
+      'Each building type has its own track. Building costs rise along it (0, 1, 2, 3, 3, 4 {=wood}) and each later building scores more VP. {workshop}s are your crafting pieces. Building {recruiter}s uncovers track spaces that make you draw extra cards in Evening.',
+      'The **Keep** stops other factions placing pieces in its clearing. **Field hospitals**: whenever Cat warriors are removed, you may spend a card matching their clearing to place them in the Keep’s clearing.',
     ] },
     { title: 'Eyrie Dynasties: the Decree', items: [
-      'Birdsong: add 1–2 cards to the Decree’s four columns (**Recruit, Move, Battle, Build**); at most one may be a {=bird} card. Empty hand: draw 1 first. No roosts on the map: place a {=roost} and 3 warriors in a clearing with the fewest warriors.',
-      'Daylight: resolve every card left to right, each in a clearing of its suit ({=bird} = any). If you can’t, you fall into **Turmoil**: lose 1 VP per bird card in the Decree, discard it (except the leader’s loyal viziers), choose a new leader.',
-      'Evening: score VP from the {=roost} track; more roosts = more VP each turn. Roosts are your only buildings.',
-      'Lords of the Forest: the Eyrie win ties for rule if they have a piece there.',
+      'Birdsong: you must add 1 or 2 cards from your hand to the Decree’s four columns (**Recruit, Move, Battle, Build**); at most 1 of them may be a {=bird} card. If your hand is empty, draw 1 card first. If you have no roosts on the map, place a {=roost} and 3 warriors in a clearing with the fewest warriors where all 4 pieces can be placed.',
+      'Daylight: carry out every Decree card, column by column from left to right; each card’s action must happen in a clearing of that card’s suit (a {=bird} card: any clearing). If you can’t carry out one, you fall into **Turmoil**: lose 1 VP per bird card in the Decree, discard every Decree card except your leader’s 2 loyal viziers (the bird cards it starts with), and choose a new leader.',
+      'Evening: score the VP shown on the {=roost} track; the more roosts you have on the map, the more VP each turn. Roosts are your only buildings.',
+      'Lords of the Forest: when the Eyrie are tied for rule of a clearing, they rule it if they have at least 1 piece there.',
     ] },
     { title: 'Woodland Alliance: sympathy & revolt', items: [
-      'Spread {=sympathy} by paying supporters (cards) matching the clearing; each token scores more VP from the track. It costs 1 more where another faction has 3+ warriors (martial law).',
-      '**Outrage**: anyone who removes {=sympathy} or moves warriors into a sympathetic clearing must add a matching card from hand to your supporters; if they can’t, they show their hand and you add the top deck card to your supporters.',
-      'Birdsong: **revolt** by spending 2 matching supporters at a sympathetic clearing: remove all enemy pieces there, build a {=base}, place warriors.',
-      '**Guerrilla war**: when defending, the Alliance use the higher die. Officers set how many Evening operations (move, battle, recruit, organize) you get.',
+      '**Supporters** are cards in a stack on the Alliance board, separate from its hand. To spread {=sympathy}, spend supporters matching the clearing’s suit (the track shows how many) and place a token there; each token scores the VP shown on the track. **Martial law**: it costs 1 more supporter where another player has 3+ warriors.',
+      '**Outrage**: when another player removes a {=sympathy} token, or moves warriors into a clearing that has one, they must give the Alliance a card from their hand matching that clearing, which goes to the supporters. If they have none, they show the Alliance their hand and the Alliance adds the top card of the deck to its supporters.',
+      'Birdsong: the Alliance may **revolt** in a clearing with a {=sympathy} token by spending 2 supporters of its suit. Remove all enemy pieces there, place the {=base} of that suit, place warriors there equal to the number of {=sympathy} clearings of that suit, and put 1 warrior in the Officers box.',
+      '**Guerrilla war**: when the Alliance defends, it deals hits equal to the higher die and the attacker the lower. **Officers** are warriors kept on the Alliance board; in Evening the Alliance gets 1 operation (move, battle, recruit or organize) per officer.',
     ] },
     { title: 'Vagabond: items & relationships', items: [
-      'Every action exhausts an {=item}: boots move, sword battles, crossbow strikes, torch explores ruins (for items), hammer repairs, tea refreshes more. Damaged items can’t be used.',
-      '**Aid** a faction by giving it a card: relationships climb from indifferent to allied, scoring VP. Once allied, you can move and battle with their warriors.',
-      'Remove a faction’s warrior and it turns **hostile**: from then on +1 extra VP per piece of theirs you remove in battle on your turn (Infamy), but entering a clearing with their warriors costs an extra boot.',
-      '**Quests** need two specific items; complete one for 2 cards or VP.',
+      'Each action **exhausts** (turns face down) 1 {=item} of the right type: boots to move, sword to battle, crossbow to strike (remove 1 enemy piece without dice), torch to explore a ruin (taking the item in it), hammer to repair a damaged item. Birdsong **refresh**: turn 2 exhausted items face up per face-up tea on your track, then 3 more. Damaged items can’t be used until repaired.',
+      '**Aid**: exhaust any 1 item and give a card matching your clearing’s suit to a player with a piece in your clearing; you may then take 1 item from their crafted items. Each aid moves your relationship with them one step up the track, from indifferent toward allied, and scores VP. Once allied, you may move and battle together with their warriors.',
+      'If you remove a faction’s warrior, that faction becomes **hostile** for the rest of the game. **Infamy**: from then on you score 1 extra VP for each of their pieces you remove in battle on your turn. Moving into a clearing with their warriors costs 1 extra boot.',
+      '**Quests**: in a clearing matching a face-up quest’s suit, exhaust the 2 items it shows to complete it. Then either draw 2 cards or score 1 VP per quest of that suit you have completed (this one included).',
     ] },
     { title: 'Crafting & items', items: [
-      'Activate crafting pieces matching the card’s suits: {=workshop} Cats, {=roost} Eyrie, {=sympathy} Alliance, hammers for the Vagabond.',
-      'Item cards score their printed VP and take an {=item} from the shared supply; if that item is gone, you can’t craft the card.',
-      'Persistent effect cards (e.g. Royal Claim, Sappers, Better Burrow Bank) stay in front of you. Eyrie score only 1 VP per crafted item.',
+      'Activate 1 crafting piece in a clearing of each suit in the card’s cost: {=workshop} for Cats, {=roost} for Eyrie, {=sympathy} for Alliance. The Vagabond exhausts 1 hammer per suit symbol in the cost; his hammers count as the suit of his clearing.',
+      'Crafting an item card scores its printed VP and takes the matching {=item} from the shared supply; if that item is gone, you can’t craft the card.',
+      'Persistent effect cards (e.g. Royal Claim, Sappers, Better Burrow Bank) stay face up in front of you after crafting. Eyrie score only 1 VP per crafted item.',
     ] },
     { title: 'Battle in full', items: [
-      'Attacker takes the higher die, defender the lower. Hits are capped by each side’s warriors in the clearing.',
-      '**Defenseless** defender (no warriors) takes +1 hit. An ambush card (matching suit) deals 2 hits before the roll; the attacker can cancel it with their own ambush.',
-      'Each side chooses which of its pieces to remove: warriors first, then buildings or tokens.',
+      'The attacker deals hits equal to the higher die, the defender hits equal to the lower. Each side deals at most as many hits as it has warriors in the clearing.',
+      'A **defenseless** defender (no warriors in the clearing) takes 1 extra hit. Before the roll, the defender may play an ambush card matching the clearing to deal 2 hits at once; the attacker may cancel it by playing a matching ambush card of their own.',
+      'Each player removes their own pieces for hits taken: warriors first, then, once no warriors are left, the buildings or tokens of their choice.',
     ] },
-    { title: 'Dominance cards', text: 'The deck has four suited Dominance cards. A player with **10+ VP** can play one in Daylight and remove their score marker: they now win only by ruling 3 clearings of that suit (bird: 2 opposite corners) at the **start** of their Birdsong. An activated card stays put. A Dominance card spent for its suit goes face up beside the map; in Daylight anyone may take it into hand by spending a matching card. Removed in 2-player games. The Vagabond (4+ players only) instead forms a coalition with the lowest-scoring player and wins with them.' },
+    { title: 'Dominance cards', text: 'The deck has 4 Dominance cards, one per suit. A player with **10+ VP** may play one face up in Daylight and remove their score marker from the track. From then on they win only if they rule 3 clearings of that suit (bird Dominance: 2 clearings in opposite corners of the map) at the **start** of their Birdsong. The activated card stays in front of them for the rest of the game. A Dominance card spent for its suit (instead of activated) goes face up beside the map; in Daylight, any player may take it into hand by spending a card of its suit. Dominance cards are removed in 2-player games. The Vagabond (only with 4+ players) may instead play one to form a coalition with the player with the lowest score, and wins only if that player wins.' },
   ],
 
   tips: [

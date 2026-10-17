@@ -36,32 +36,32 @@ defineGame({
 
   pitch: 'Draft dominoes into a 5×5 kingdom; each terrain area scores squares × crowns, and most points wins.',
 
-  goal: { big: 'Most points', text: 'Each connected area of one terrain scores **squares × {=crown}** in it. Highest total wins.' },
+  goal: { big: 'Most points', text: 'Each area of your kingdom (squares of one terrain joined edge to edge) scores **its squares × its crowns** {=crown}. The highest total wins.' },
 
   turn: {
     type: 'sequence',
-    intro: 'In king order (top domino of the line first), on your turn:',
+    intro: 'Each round, players take turns in the order of their kings in the current line, top domino first. On your turn:',
     steps: [
-      { verb: 'Place', text: 'Add the {domino} under your {king} to your kingdom. It must touch your {=castle} or **match** a touching terrain, and stay inside 5×5.' },
-      { verb: 'Pick', text: 'Move your {=king} onto any free domino in the **next line**. Its position sets your turn order next round.' },
+      { verb: 'Place', text: 'Add the {domino} your {king} is on to your kingdom. At least one of its squares must touch your {castle} or **match** the terrain of a square it touches, and your kingdom must stay within 5×5 squares.' },
+      { verb: 'Pick', text: 'Move your {=king} onto any domino in the **next line** that has no king on it. The higher that domino sits in the line, the earlier you go next round.' },
     ],
   },
 
   tension: 'Dominoes with more crowns have higher numbers and sit lower in the line, so taking one means you choose **last** next round.',
 
   structure: [
-    { label: 'Setup', text: 'Lay out the first line. Draw kings at random; each owner puts theirs on a domino in it.' },
-    { label: 'Rounds', repeat: '12 (6 with 2 players)', text: 'Lay out the next line, lowest number on top. Down the current line: place your domino, then pick from the next line.' },
-    { label: 'Last round', text: 'No new line: just place your domino.' },
+    { label: 'Setup', text: 'Lay out the first line. Draw kings one at a time at random; each king’s owner puts it on a free domino in that line.' },
+    { label: 'Rounds', repeat: '12 (6 with 2 players)', text: 'Lay out the next line face up, lowest number on top. Then, going down the current line from the top, each king’s owner places that domino, then picks one in the next line.' },
+    { label: 'Last round', text: 'When the dominoes have run out, no new line is laid out: going down the line, each player just places their domino.' },
     { label: 'Final scoring', text: 'Each area scores squares × {=crown}, plus any optional bonuses.' },
   ],
 
   points: [
     ['Area', 'squares × {=crown} in it'],
     ['Area with no {=crown}', '0'],
-    ['Middle Kingdom (optional)', '+10 if {=castle} is in the centre'],
-    ['Harmony (optional)', '+5 for a full 5×5 with no discards'],
-    ['Tie', 'largest area wins, then most crowns'],
+    ['Middle Kingdom (optional)', '+10 if your {=castle} is in the centre of your 5×5 kingdom'],
+    ['Harmony (optional)', '+5 if your kingdom is a complete 5×5 and you discarded no dominoes'],
+    ['Tie', 'the player with the largest single area wins; if still tied, the one with the most crowns'],
   ],
 
   end: { trigger: 'the last domino is placed', detail: '12 rounds with 3–4 players. With 2, each player has two kings and plays 6 rounds.' },
@@ -85,24 +85,24 @@ defineGame({
 
   setup: [
     'Each player takes a {castle}, a starting square and their {king}s (table).',
-    'Shuffle the dominoes face down, removing extras for 2–3 players (table).',
-    'Draw one domino per king, sort them lowest number on top, and turn them face up.',
-    'Draw kings at random; each owner puts theirs on a domino in that line. Then lay out the next line.',
+    'Shuffle the dominoes face down. With 2 or 3 players, first remove random dominoes to leave 24 or 36 (table).',
+    'Draw one domino per king in play, put them in a column with the lowest number on top, and turn them face up. This is the first line.',
+    'Draw kings one at a time at random; each king’s owner puts it on a free domino in that line. Then lay out the next line the same way.',
   ],
 
   terms: [
-    ['{=domino} Domino', 'Two-square tile; the number on its back ranks its value.'],
+    ['{=domino} Domino', 'Tile of two squares. The number on its back sets its place in a line; higher numbers are usually stronger.'],
     ['Area', 'Squares of one terrain joined edge to edge.'],
     ['{=crown} Crown', 'Printed on some squares. Multiplies an area’s size.'],
-    ['Line', 'Row of dominoes on offer for the next round.'],
+    ['Line', 'Column of face-up dominoes, lowest number on top. Kings on the current line set this round’s turn order; you pick from the next line.'],
   ],
 
   gotchas: [
-    'Only **one** side of the new domino must match a neighbour (or touch the castle). If it can’t fit anywhere, discard it.',
+    'Only **one** square of the new domino must match a touching square’s terrain (or touch the castle). If it can’t be placed legally anywhere, discard it.',
     'The whole kingdom, castle included, must fit in **5×5**. Plan the edges early.',
     'Areas with **no crowns** score 0, however big.',
     'Turn order each round follows the kings’ places in the line, not seating.',
-    'With 2 players, take both turns for your two kings each round.',
+    'With 2 players, each player has 2 kings, so you take one turn for each of your kings every round.',
   ],
 
   tips: [
@@ -141,7 +141,7 @@ defineGame({
     const [ax, ay] = cell(3, 2);
     return [
       { step: 0, say: 'Your {=king} (pink) is on domino **2**: {=wheat}{=wheat}. Place it in your kingdom.', svg: board + d14(L1, row(1)) + mine(...onLine) + A.glow(L1 + cs, row(1) + 13, 30, 'g14') },
-      { step: 0, say: 'One side must **match** a touching terrain: set it below your wheat, inside the 5×5.', svg: board + d14(...placed) + mine(...onLine) },
+      { step: 0, say: 'One square must **match** the terrain it touches: set it below your wheat, inside the 5×5.', svg: board + d14(...placed) + mine(...onLine) },
       { step: 0, say: 'The wheat area is now **3 squares** with **1** {=crown}: 3 × 1 = 3 points.', svg: board + d14(...placed) + mine(...onLine) + A.k('area', A.path(`M${ax - 1} ${ay - 1} H${ax + cs + 1} V${ay + cs - 1} H${ax + 2 * cs + 1} V${ay + 2 * cs + 1} H${ax - 1} Z`, { fill: 'none', stroke: '#ffcf3f', sw: 3.5 })) + A.k('pts', A.tag(ax + cs, ay + 2 * cs + 14, '3 × 1 = 3', { fill: '#b8932a' })) },
       { step: 1, say: '**Pick** for next round: move your king to **46**, {=swamp} + {=mine} with {=crown}{=crown}.', svg: board + d14(...placed) + mine(...on46) + A.glow(L2 + cs, row(3) + 13, 30, 'g46') },
       { step: 1, say: 'High numbers sit low in the line, so next round you go **last**. Strong dominoes cost turn order.', svg: board + d14(...placed) + mine(...on46) + A.k('order', A.arrow(L2 + 2 * cs + 8, row(0) + 4, L2 + 2 * cs + 8, row(3) + 22, { sw: 1.6, head: 5 })) },

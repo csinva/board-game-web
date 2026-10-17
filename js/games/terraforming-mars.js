@@ -37,34 +37,34 @@ defineGame({
     intro: 'Each generation (round):',
     outro: 'Next generation',
     steps: [
-      { verb: 'Research', text: 'Everyone draws 4 project cards and **buys** any for 3 {=mc} each; discard the rest.' },
-      { verb: 'Act', text: 'In turn order, take **1 or 2 actions** or pass: play a card, use a blue card’s action, buy a standard project, turn 8 {=plant} into a {greenery}, turn 8 {=heat} into +2°C {=temperature}, claim a milestone or fund an award. Continue until everyone has passed.' },
-      { verb: 'Produce', text: 'Leftover {energy} becomes {heat}. Then everyone collects production; {mc} income = **TR + MC production**.' },
+      { verb: 'Research', text: 'Each player draws 4 project cards, keeps any number of them by paying 3 {=mc} **per card kept**, and discards the rest.' },
+      { verb: 'Act', text: 'Starting with the first player and going clockwise, each player on their turn takes **1 or 2 actions** or passes: play a card from your hand (pay its {=mc} cost), use a blue card’s action, buy a standard project, turn 8 {=plant} into a {greenery}, turn 8 {=heat} into +2°C {=temperature}, claim a milestone or fund an award. Turns keep going around, skipping players who passed, until everyone has passed.' },
+      { verb: 'Produce', text: 'Everyone turns **all** their {energy} into {heat}. Then each player gains each resource equal to its production level; for {mc}, gain **your TR plus your MC production**.' },
     ],
   },
 
   tension: 'Production pays out every generation, but raising temperature, oxygen and oceans scores now and speeds the end: when do you stop investing and start scoring?',
 
   structure: [
-    { label: 'Setup', text: '{=oxygen} 0%, {=temperature} −30°C, 9 {=ocean} beside the map; everyone’s {=tr} at 20. Pick corporations and buy starting cards (below).' },
-    { label: 'Generations', repeat: 'until the end', text: 'Pass the first-player marker 1 seat left, then **research**, **action**, **production** (Your turn). Generation 1 skips the marker and research.' },
-    { label: 'Game end', text: 'Once {=temperature} +8°C, {=oxygen} 14% and all 9 {=ocean} are reached, finish that generation, including production.' },
-    { label: 'Last greenery', text: 'In player order, everyone may turn 8 {=plant} into a {=greenery} (any number of times; no TR).' },
-    { label: 'Final scoring', text: 'Add up every source in Scoring. Most VP wins; tie: most {=mc}.' },
+    { label: 'Setup', text: 'Set {=oxygen} to 0% and {=temperature} to −30°C; put the 9 {=ocean} tiles beside the map; set every player’s {=tr} to 20. Each player picks a corporation and buys starting cards (see Setup).' },
+    { label: 'Generations', repeat: 'until the end', text: 'Each generation: pass the first-player marker 1 seat to the left, then play the **research**, **action** and **production** phases (see Your turn). In generation 1, skip the marker pass and research.' },
+    { label: 'Game end', text: 'When {=temperature} is at +8°C, {=oxygen} at 14% and all 9 {=ocean} are placed, finish the current generation, including production. No new generation starts.' },
+    { label: 'Last greenery', text: 'Starting with the first player and going clockwise, each player may turn 8 {=plant} into a {=greenery}, as many times as they can pay for. These give no TR.' },
+    { label: 'Final scoring', text: 'Add up every source in Scoring. Most VP wins; tie: the tied player with the most {=mc} wins.' },
   ],
 
   points: [
-    ['{=tr} Terraform Rating', '1 VP per step of your TR (start 20; +1 per global step you raise, and from some cards)'],
+    ['{=tr} Terraform Rating', '1 VP per point of your final TR (starts at 20; +1 each time you raise a global parameter 1 step, and from some cards)'],
     ['{=greenery} Greenery', '1 VP per greenery tile you own'],
-    ['{=city} City', '1 VP per greenery next to your city, **whoever owns** it'],
-    ['Cards', 'VP printed on your played cards, incl. per-resource VP (e.g. 1 VP per 2 animals on it) and negative VP'],
-    ['Milestones', '5 VP each you claimed'],
-    ['Awards', 'Each funded award: 1st 5 VP, 2nd 2 VP (2 players: 1st only)'],
+    ['{=city} City', '1 VP per greenery touching your city, **whoever owns** the greenery'],
+    ['Cards', 'VP printed on your played cards, including per-resource VP (e.g. 1 VP per 2 animals on that card) and negative VP'],
+    ['Milestones', '5 VP for each milestone you claimed'],
+    ['Awards', 'For each funded award, 1st place gets 5 VP and 2nd place 2 VP, whoever funded it (2 players: 1st only)'],
   ],
 
   end: {
-    trigger: 'Temperature, oxygen and oceans are **all** maxed out',
-    detail: 'Finish that generation, including production. Then everyone may turn plants into greenery once more before scoring.',
+    trigger: 'temperature (+8°C), oxygen (14%) and oceans (all 9 placed) are **all** at their maximum',
+    detail: 'Finish that generation, including production. Then, starting with the first player, each player may turn 8 plants into a greenery as many times as they can pay for, before scoring.',
   },
   scoring: [
     { label: '{=tr} Terraform Rating', share: 5 },
@@ -77,7 +77,7 @@ defineGame({
     title: 'Standard projects',
     rows: [
       ['Resources', '{mc} {steel} {titanium} {plant} {energy} {heat}'],
-      ['Sell patents', 'discard any cards → +1 {=mc} each'],
+      ['Sell patents', 'discard any number of cards from your hand → +1 {=mc} per card'],
       ['Power plant', '11 {=mc} → +1 {=energy} production'],
       ['Asteroid', '14 {=mc} → {temperature} +2°C'],
       ['Aquifer', '18 {=mc} → place an {ocean}'],
@@ -86,26 +86,28 @@ defineGame({
     ],
   },
 
-  example: 'You turn **8 {=plant}** into a {greenery} next to your {city}: {oxygen} rises 1% and your {=tr} goes 24 → 25. Second action: pay 14 {=mc} for the **Asteroid** project: {temperature} +2°C, TR 26.',
+  example: 'First action: you turn **8 {=plant}** into a {greenery} next to your {city}: {oxygen} rises 1% and your {=tr} goes 24 → 25. Second action: you pay 14 {=mc} for the **Asteroid** standard project: {temperature} rises 2°C and your TR goes to 26.',
 
   setup: [
-    'Set {oxygen} to 0%, {temperature} to −30°C, generation to 1, each {=tr} TR to 20. Standard game: remove **Corporate Era** cards (red-and-white icon); everyone starts with **1 production** of each resource. Corporate Era: all cards, no starting production.',
-    'The most recent winner goes first. Deal each player 2 corporations and 10 project cards. Keep 1 corporation; take its starting {=mc}, resources and production.',
-    'From that money, buy any of your 10 cards for 3 {=mc} each. First game: use the Beginner Corporation (42 {=mc}, keep all 10 cards free).',
+    'Set {oxygen} to 0%, {temperature} to −30°C, the generation marker to 1, and each player’s {=tr} TR to 20.',
+    'Standard game: remove the **Corporate Era** cards (marked with a red-and-white icon) from the deck; each player’s production of **each** of the 6 resources starts at 1. Corporate Era game: use all cards; all production starts at 0.',
+    'The most recent winner goes first. Deal each player 2 corporations and 10 project cards. Each player keeps 1 corporation, discards the other, and takes the starting {=mc}, resources and production printed on it.',
+    'Each player pays 3 {=mc} from that money for each of their 10 cards they keep, and discards the rest. First game: everyone uses the Beginner Corporation instead (start with 42 {=mc} and keep all 10 cards without paying).',
   ],
 
   terms: [
-    ['{=tr} TR', 'Terraform Rating: score and income. Starts at 20; +1 per global step you raise.'],
+    ['Global parameter', 'Temperature, oxygen or oceans. Raising one by 1 step (+2°C, +1% or 1 ocean tile) gives you +1 TR.'],
+    ['{=tr} TR', 'Terraform Rating: counts as VP at the end and adds to your MC income each generation. Starts at 20.'],
     ['{=mc} MC', 'MegaCredits (money).'],
-    ['Production', 'Income levels on your player board, paid each generation.'],
-    ['Tag', 'Icon on a card ({building}, {space}, …). Some cards count or require tags.'],
+    ['Production', 'Your income level of each resource, marked on your player board; you gain that much in every production phase.'],
+    ['Tag', 'Icon on a card ({building}, {space}, …). Some cards count tags or require a number of them.'],
     ['Generation', 'One round.'],
   ],
 
   gotchas: [
     'Each card you keep in research costs **3** {=mc}, even if you never play it.',
-    'At production, unspent {energy} **turns into** {heat} before you collect.',
-    'A card’s requirement (min or max oxygen, temperature, oceans or tags) applies only **when you play it**. Oceans go only on blue reserved spaces; cities can’t touch each other.',
+    'At production, **all** your {energy} turns into {heat} before you gain new resources.',
+    'A card’s requirement (min or max oxygen, temperature, oceans or tags) is checked only **when you play it**; later changes don’t matter. Oceans go only on blue reserved spaces; a city can’t be placed next to another city.',
   ],
 
   tips: [
@@ -117,12 +119,12 @@ defineGame({
   extended: [
     { title: 'The generation, in full', items: [
       '**Player order**: the first-player marker moves 1 seat left each generation. Generation 1 skips research (you bought from your starting 10 cards).',
-      '**Action phase**: take 1 or 2 actions, or pass. Once you pass, you are out until next generation.',
-      '**Production phase**: all {=energy} becomes {=heat}, then collect {=mc} (TR + MC production, which can be as low as −5), {=steel} {=titanium} {=plant} {=energy} {=heat}.',
+      '**Action phase**: on each of your turns, take 1 or 2 actions, or pass. Turns go around the table until everyone has passed; once you pass, you take no more turns this generation.',
+      '**Production phase**: all {=energy} becomes {=heat}. Then gain {=mc} equal to your TR plus your MC production (MC production can be as low as −5), and {=steel} {=titanium} {=plant} {=energy} {=heat} equal to their production levels.',
     ] },
     { title: 'Global parameters', items: [
-      '{=temperature} **Temperature**: −30°C to +8°C in 2° steps (19 steps). Bonuses: +1 {=heat} production at −24 and −20; an ocean at 0°C.',
-      '{=oxygen} **Oxygen**: 0% to 14% (14 steps). At 8%, temperature also rises 1 step.',
+      '{=temperature} **Temperature**: −30°C to +8°C in 2° steps (19 steps). Bonuses for the player who raises it: to −24°C or −20°C, +1 {=heat} production; to 0°C, place an ocean.',
+      '{=oxygen} **Oxygen**: 0% to 14% (14 steps). The player who raises it to 8% also raises temperature 1 step and gains +1 TR for that step too (none if temperature is already at +8°C).',
       '{=ocean} **Oceans**: 9 tiles, only on blue reserved spaces. Placing any tile next to an ocean gives **2** {=mc} per adjacent ocean.',
       'Each step you raise gives **+1** {=tr}. A maxed parameter can’t rise (no TR), but you may still play cards that would raise it.',
     ] },
@@ -130,23 +132,23 @@ defineGame({
       '{=greenery} **Greenery**: must go next to your own tile if possible; raises oxygen 1 step; 1 VP at the end.',
       '{=city} **City**: can’t be next to another city; scores 1 VP per adjacent greenery, **whoever owns** it.',
       'Bonuses printed on a space ({=steel} {=titanium} {=plant} or cards) go to whoever places a tile there.',
-      '8 {=plant} → {=greenery}. 8 {=heat} → +1 {=temperature} step. Each is an action, repeatable.',
+      '8 {=plant} → {=greenery}. 8 {=heat} → +1 {=temperature} step. Each conversion uses 1 action; you may repeat it with later actions.',
     ] },
     { title: 'Cards, tags and requirements', items: [
       '**Green** (automated) cards: production or one-time effects. **Blue** cards: ongoing effects, or actions usable once per generation. **Red** events: played face-down; their tags stop counting.',
       '{steel} pays 2 {=mc} each toward {=building} building-tag cards; {titanium} pays 3 {=mc} each toward {=space} space-tag cards.',
-      'To play a card you must meet its requirement and be able to do **all** its effects, except: raising a maxed parameter, adding resources you have nowhere to put, and removing red-bordered resources (optional; any one player, or partly, or none). A tile that can’t be placed is skipped.',
+      'To play a card you must meet its requirement and be able to do **all** its effects, with 3 exceptions: you may play it even if a parameter it raises is maxed, or if you have nowhere to put resources it adds; and removing resources shown in a red border is optional (choose any one player, yourself included, and remove all, some or none). A tile that can’t be placed is skipped.',
       '**Red border** = any player, including you. A red-bordered **production** decrease is mandatory: if no opponent has that production, lower your own or don’t play the card.',
     ] },
     { title: 'Standard projects and selling', text: 'Always available, one action each (costs in the quick reference). Also **sell patents**: discard any number of cards for 1 {=mc} each. Standard projects are expensive, but they guarantee progress when your hand is weak and finish the last steps of a parameter.' },
     { title: 'Milestones and awards', items: [
-      '**Milestones** (8 {=mc}, 5 {=vp}): claim one as soon as you meet it, e.g. Terraformer (35 TR), Mayor (3 cities), Gardener (3 greeneries), Builder (8 building tags), Planner (16 cards in hand). Only **3** per game.',
-      '**Awards** (no requirement to fund): the 1st funded costs 8 {=mc}, the 2nd 14, the 3rd 20; only 3 of 5 per game. Landlord (most tiles), Banker (highest {=mc} production), Scientist (most science tags), Thermalist (most {=heat}), Miner (most {=steel} + {=titanium}).',
-      'At the end, each funded award gives 1st place 5 {=vp} and 2nd place 2 {=vp}, whoever paid; 2 players: no 2nd place. Tied players all get that place; a tie for 1st means no 2nd place.',
+      '**Milestones**: claiming one is an action that costs 8 {=mc} and is worth 5 {=vp}. You may claim it once you meet its requirement, e.g. Terraformer (35 TR), Mayor (3 cities), Gardener (3 greeneries), Builder (8 building tags), Planner (16 cards in hand). Each milestone can be claimed by only **1** player, and only **3** milestones per game.',
+      '**Awards**: funding one is an action with no requirement, open to any player. The 1st award funded in the game costs 8 {=mc}, the 2nd 14, the 3rd 20; only 3 of the 5 can be funded. Landlord (most tiles), Banker (highest {=mc} production), Scientist (most science tags), Thermalist (most {=heat}), Miner (most {=steel} + {=titanium}).',
+      'At the end, each funded award gives 1st place 5 {=vp} and 2nd place 2 {=vp}, whoever funded it; with 2 players there is no 2nd place. Tied players all get that place; a tie for 1st means no 2nd place.',
     ] },
-    { title: 'Final scoring', text: 'After the last production, everyone may turn plants into greenery once more (no TR, since oxygen is maxed, but they score VP and city adjacency). Score TR, milestones, awards, 1 VP per greenery, city adjacency, and card VP (including animals, microbes and other resources on cards). Most VP wins; tie: most MC.' },
+    { title: 'Final scoring', text: 'After the last production, starting with the first player, each player may turn 8 plants into a greenery as many times as they can pay for (no TR, since oxygen is maxed, but they score VP and city adjacency). Score TR, milestones, awards, 1 VP per greenery, city adjacency, and card VP (including animals, microbes and other resources on cards). Most VP wins; tie: most MC.' },
     { title: 'Variants', items: [
-      '**Draft**: in research (not generation 1), draft the 4 cards: keep 1, pass the rest; repeat until you have 4, then buy as usual. Pass left in even generations, right in odd ones.',
+      '**Draft**: in research (not generation 1), each player keeps 1 of their 4 drawn cards and passes the rest to a neighbour; keep 1 of the cards you receive and pass the rest on, until everyone has kept 4. Then buy as usual. Pass left in even generations, right in odd ones.',
       '**Solo** (Corporate Era): start {=tr} at 14 with no starting production; place 2 neutral cities, each with an adjacent neutral greenery (no oxygen); no milestones or awards. Play exactly 14 generations: you lose unless all 3 parameters are maxed by the end of generation 14; then convert plants and score as usual.',
     ] },
   ],

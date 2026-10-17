@@ -43,39 +43,39 @@ defineGame({
 
   pitch: 'Over 3 Ages, pick a card, pass the rest and build it into your city; most points across 7 categories wins.',
 
-  goal: { big: 'Most points', text: 'Most **points** after Age III, summed from 7 categories on the score pad.' },
+  goal: { big: 'Most points', text: 'Have the most **points** after Age III. Points come from 7 categories, listed under Scoring.' },
 
   turn: {
     type: 'simultaneous',
-    intro: 'Everyone at once:',
+    intro: 'All players do each step at the same time:',
     steps: [
-      { verb: 'Pick', text: 'Choose **one** card from your hand; lay it face-down.' },
-      { verb: 'Reveal', text: 'Reveal together. **Build** the card (pay its cost), tuck it to build a **Wonder stage**, or discard it for **3** {=coin}.' },
-      { verb: 'Pass', text: 'Pass the rest of your hand: **left** in Ages I and III, **right** in Age II.' },
+      { verb: 'Pick', text: 'Choose **1** card from your hand and place it face down in front of you.' },
+      { verb: 'Reveal', text: 'Everyone reveals together. Do **one** thing with your card: **build** it into your city by paying its cost; place it face down under your Wonder board to build your next **Wonder stage** (pay that stage’s cost); or discard it face down and take **3** {=coin} from the bank.' },
+      { verb: 'Pass', text: 'Hand the cards still in your hand to your **left** neighbour in Ages I and III, or to your **right** neighbour in Age II.' },
     ],
-    outro: 'Repeat until 1 card is left; discard it. Resolve military, then start the next Age.',
+    outro: 'Repeat for 6 turns, then discard your last card face down (no coins) and resolve military.',
   },
 
   tension: 'Each pick weighs a card you want against a card your neighbour needs, and you get only 18 picks all game, so you can’t chase every colour.',
 
   structure: [
-    { label: 'Setup', text: 'Each player: a Wonder board and 3 {=coin}. Deal 7 Age I cards each.' },
-    { label: 'Ages I–III', repeat: '3 Ages', text: '6 turns per Age: pick, reveal, pass. Pass **left** in Ages I and III, **right** in Age II. Discard the 7th card.' },
-    { label: 'End of each Age', text: 'Military: compare {=shield} with each neighbour. More wins {=win1} / {=win3} / {=win5} (Age I / II / III); fewer takes {=loss}; a tie takes nothing.' },
+    { label: 'Setup', text: 'Each player takes a Wonder board and 3 {=coin}. Deal 7 Age I cards to each player.' },
+    { label: 'Ages I–III', repeat: '3 Ages', text: '6 turns per Age: pick, reveal, pass. Pass **left** in Ages I and III, **right** in Age II. Each player discards their last (7th) card face down.' },
+    { label: 'End of each Age', text: 'Military: each player compares their total {=shield} with each of their 2 neighbours separately. More shields: take {=win1} / {=win3} / {=win5} (Age I / II / III). Fewer: take {=loss}. Tied: take nothing.' },
     { label: 'Final scoring', text: 'After Age III’s military, add up the 7 categories below.' },
   ],
 
   points: [
     ['{=win3} Military', 'Sum of your victory and defeat tokens'],
-    ['{=coin} Coins', '1 point per 3 coins'],
+    ['{=coin} Coins', '1 point per full set of 3 coins (rounded down)'],
     ['Wonder', 'Points printed on the stages you built'],
     ['{=blue} Civic', 'Points printed on each blue card'],
     ['{=yellow} Commerce', 'Some Age III yellow cards: points per card or stage you own'],
-    ['{=purple} Guilds', 'Points per matching card in your neighbours’ cities (or your own)'],
-    ['{=green} Science', 'Each symbol type: count² ({=tablet}{=tablet}{=tablet} = 9). Plus 7 per full set of {=compass}{=gear}{=tablet}'],
+    ['{=purple} Guilds', 'As printed: most give points for each card of a given colour in your 2 neighbours’ cities; a few count your own city'],
+    ['{=green} Science', 'For each symbol type, the number you have, squared ({=tablet}{=tablet}{=tablet} = 3 × 3 = 9). Plus 7 for each set of 1 {=compass} + 1 {=gear} + 1 {=tablet}'],
   ],
 
-  end: { trigger: 'Age III is played and its military resolved', detail: 'Tie: most coins wins.' },
+  end: { trigger: 'Age III is played and its military resolved', detail: 'Tie: the tied player with the most coins wins.' },
   scoring: [
     { label: '{=blue} Civic', share: 3 },
     { label: '{=green} Science', share: 2 },
@@ -88,7 +88,7 @@ defineGame({
   ref: {
     title: 'Card colours',
     rows: [
-      ['{=brown} {=gray} Brown / gray', 'produce {=wood}{=stone}{=clay}{=ore} / {=glass}{=loom}{=papyrus} each turn'],
+      ['{=brown} {=gray} Brown / gray', 'produce the resource shown ({=wood}{=stone}{=clay}{=ore} / {=glass}{=loom}{=papyrus}), usable every turn to pay costs'],
       ['{=blue} Blue', 'points'],
       ['{=yellow} Yellow', 'coins, cheaper trading, or resources'],
       ['{=red} Red', '{=shield} shields for military'],
@@ -97,32 +97,32 @@ defineGame({
     ],
   },
 
-  example: 'Age II: you pick a {=green} **Laboratory** (cost {=clay}{=clay}{=papyrus}). Your Age I Workshop **chains** to it, so it is free, and you gain a second {gear}. You pass the rest of your hand **right**.',
+  example: 'Age II: you pick a {=green} **Laboratory** (cost {=clay}{=clay}{=papyrus}). You built a Workshop in Age I, and Laboratory names Workshop as its **chain**, so you build it free and gain a second {gear}. You pass the rest of your hand **right**.',
 
   setup: [
     'Each player takes a random Wonder board and 3 {coin}s.',
-    'Use only the cards marked for your player count. Add {=purple} guilds to Age III: players + 2.',
+    'For each Age, use only the cards whose printed player number (3+, 4+ …) is at or below your player count. Shuffle (players + 2) random {=purple} Guild cards into the Age III deck; return the other Guilds to the box.',
     'Deal 7 Age I cards to each player. (Rules here: 1st edition, 2010.)',
   ],
 
   terms: [
     ['Age', 'One of 3 rounds: 7 cards dealt per player, 6 played.'],
-    ['Wonder stage', 'Tuck a card under your board and pay the stage cost to gain its bonus.'],
-    ['Chain', 'A card that is free to build because you own the named earlier card.'],
+    ['Wonder stage', 'A section of your Wonder board. To build the next one, pay its cost and tuck a card from your hand face down under it; you then get its bonus.'],
+    ['Chain', 'Building a card for free because your city already has the earlier card named on it.'],
     ['Neighbours', 'The players to your left and right. You trade and fight only with them.'],
-    ['{=shield} Shields', 'Symbols on {=red} cards. More than a neighbour wins that battle.'],
+    ['{=shield} Shields', 'Military symbols on {=red} cards. Having more than a neighbour wins your battle with that neighbour.'],
   ],
 
   gotchas: [
-    'Buy a resource for 2 {=coin} **only from your 2 neighbours**, and only what their {=brown}{=gray} cards and Wonder’s starting resource produce (not yellow cards or Wonder stages).',
+    'You may buy a resource you lack for 2 {=coin}, paid to the neighbour who produces it. You can buy **only from your 2 neighbours**, and only resources from their {=brown}{=gray} cards and their Wonder’s starting resource (not from their yellow cards or Wonder stages).',
     'You can’t build **two identical** cards (same name). Wonder stages are built in order, left to right.',
-    'Buying doesn’t use up the neighbour’s resource, and they can’t refuse. Coins received this turn can’t be spent until next turn. Resources never carry over between turns.',
+    'Buying a resource doesn’t use it up for its owner, and the owner can’t refuse. Coins you receive from a neighbour can be spent from the next turn on. Each card produces its resource once per turn; unused production is not saved.',
   ],
 
   tips: [
     'Secure {=brown}{=gray} resources in Age I; buying them later drains your coins.',
-    'Watch what your neighbours collect, and discard (or build) the card they need.',
-    '{=green} Science scales fast if you commit, but expect others to hate-draft it.',
+    'Watch what your neighbours collect; take the card they need before passing, then build or discard it.',
+    '{=green} Science scores fast if you commit, but expect neighbours to take or discard green cards to stop you.',
   ],
 
   walk(A) {
@@ -155,9 +155,9 @@ defineGame({
     return [
       { step: 0, say: 'Age II. Everyone looks at their hand at once. You have 4 cards.', svg: base + left3(LH) + right3(RH) +
         A.k('lp', back(...LH(3))) + A.k('rp', back(...RH(3))) + lab(big(...H(0), 'green', 'Laboratory', 1)) + myRest + gears(1) },
-      { step: 0, say: 'Everyone lays **one** card face-down. You pick the **Laboratory**.', svg: base + left3(LH) + right3(RH) +
+      { step: 0, say: 'Everyone places **1** card face down. You pick the **Laboratory**.', svg: base + left3(LH) + right3(RH) +
         A.k('lp', back(...LP)) + A.k('rp', back(...RP)) + lab(back(PICK[0] + 3, PICK[1] + 4)) + myRest + gears(1) },
-      { step: 1, say: 'Reveal. Laboratory costs {=clay}{=clay}{=papyrus}, but your **Workshop** chains to it: **free**.', svg: base + left3(LH) + right3(RH) +
+      { step: 1, say: 'Reveal. Laboratory costs {=clay}{=clay}{=papyrus}, but you own a **Workshop**, its chain card, so you build it **free**.', svg: base + left3(LH) + right3(RH) +
         A.k('lp', big(LP[0] - 3, LP[1] - 4, 'red', 'Walls')) + A.k('rp', big(RP[0] - 3, RP[1] - 4, 'green', 'School', 1)) + lab(big(...PICK, 'green', 'Laboratory', 1)) + myRest +
         A.curve(196, 180, 222, 140, 182, 110, { sw: 1.6 }) + A.text(222, 124, 'chain', { size: 8, weight: 800 }) + A.glow(177, 182, 16, 'g-ws') + gears(1) },
       { step: 1, say: 'Cards join their cities. Your {=green} column now shows **2** {=gear}.', svg: base + left3(LH) + right3(RH) +

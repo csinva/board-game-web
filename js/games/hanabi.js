@@ -27,38 +27,38 @@ defineGame({
 
   pitch: 'Build 5 colour piles from 1 to 5 using cards you can’t see, guided by scarce clues; score up to 25 together.',
 
-  goal: { big: '25 points', text: 'Together, play each of the **5 colours** in order, 1 to 5. Score = top card of each pile; 25 is perfect.' },
+  goal: { big: '25 points', text: 'Together, build one pile per colour (**5 colours**), playing each pile’s cards in order from 1 up to 5. Your shared score is the sum of the top card on each pile; 25 is perfect.' },
 
   turn: {
     type: 'choose',
     intro: 'On your turn, do exactly ONE:',
     steps: [
-      { verb: 'Give a clue', text: 'Spend a {clue} (needs 1 left) to point at **all** of another player’s cards of one colour, or of one number.' },
-      { verb: 'Discard', text: 'Discard a card to regain 1 {=clue}, then draw.' },
-      { verb: 'Play', text: 'Play a card to its colour’s pile. If it isn’t the **next number**, discard it and lose a {fuse}. Playing a {=n5} regains 1 {=clue} (if fewer than 8). Then draw.' },
+      { verb: 'Give a clue', text: 'Only if at least 1 {clue} is available: spend 1, choose one other player, and name one colour or one number. Point at **every** card in their hand that matches (at least 1 must match).' },
+      { verb: 'Discard', text: 'Only if fewer than 8 {=clue} are available: put 1 card from your hand face up on the discard pile, regain 1 {=clue}, then draw 1 card.' },
+      { verb: 'Play', text: 'Put 1 card from your hand face up. If it is the **next number** on its colour’s pile (a {=n1} starts a pile), it joins that pile; if not, discard it and lose 1 {fuse}. Completing a pile with its {=n5} regains 1 {=clue} if fewer than 8 are available. Then draw 1 card.' },
     ],
   },
 
   tension: 'Clues are scarce, so each must imply more than it says, and each discard may lose a card for good.',
 
   structure: [
-    { label: 'Setup', text: 'Deal 5 cards each (4 with 4–5 players), held facing away. 8 {=clue} and 3 {=fuse} in the middle.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Any player starts. Each turn: clue, discard or play. Draw after a discard or play.' },
-    { label: 'Last round', text: 'Once the last card is drawn, each player takes 1 more turn, including the player who drew it.' },
-    { label: 'Score', text: 'Add the top card of each colour pile, 0–25. Completing all five 5s ends the game at once with 25.' },
+    { label: 'Setup', text: 'Deal 5 cards each with 2–3 players, 4 each with 4–5. Hold your cards facing away from you. Put 8 {=clue} and 3 {=fuse} in the middle.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Any player starts; play passes to the left. Each turn: give a clue, discard, or play. After a discard or a play, draw 1 card if the deck has any.' },
+    { label: 'Last round', text: 'Once someone draws the last card, every player takes exactly 1 more turn, starting with the next player and ending with the player who drew it.' },
+    { label: 'Score', text: 'Add up the number on the top card of each colour pile (0–25). Playing all five 5s ends the game at once with 25.' },
   ],
   points: [
-    ['Each colour', 'value of its top played card: {=n1}–{=n5}, 0 if none'],
+    ['Each colour', 'the number on its pile’s top card: {=n1}–{=n5}; 0 if the pile is empty'],
     ['Total', 'sum of the 5 piles; 25 is perfect'],
     ['Rating', '0–5 horrible, 6–10 mediocre, 11–15 honourable, 16–20 excellent, 21–24 amazing, 25 legendary'],
-    ['3rd {=fuse} lost', 'game over at once: the team loses, no score'],
+    ['3rd {=fuse} lost', 'the game ends at once and the team loses; nothing is scored'],
   ],
 
   end: {
-    trigger: 'the 3rd fuse is lost, all five 5s are played, or the deck runs out',
-    detail: 'After the last card is drawn, each player takes 1 more turn.',
+    trigger: 'the 3rd fuse is lost, all five 5s are played, or the last round after the deck runs out is over',
+    detail: 'Once someone draws the last card, every player takes exactly 1 more turn, ending with the player who drew it.',
     results: [
-      { side: 'Game ends', text: 'Score the top card of each colour, 0–25.' },
+      { side: 'Five 5s played or last round over', text: 'add up the top card of each colour pile, 0–25.' },
       { side: 'Everyone loses', text: 'at once when the 3rd {fuse} is lost; the piles are not scored.' },
     ],
   },
@@ -67,38 +67,38 @@ defineGame({
     title: 'Each colour (10 cards)',
     rows: [
       ['Colours', '{=red} {=yellow} {=green} {=blue} {=white}'],
-      ['{=n1}', '{=n1}{=n1}{=n1} 3 copies'],
+      ['{=n1}', '3 copies: {=n1}{=n1}{=n1}'],
       ['{=n2} {=n3} {=n4}', '2 copies each'],
-      ['{=n5}', '1 copy: never discard it'],
-      ['Hand size', '5 cards (2–3 players), 4 (4–5)'],
+      ['{=n5}', '1 copy only: once discarded, that colour can’t reach 5'],
+      ['Hand size', '5 cards each with 2–3 players; 4 each with 4–5'],
     ],
   },
 
-  example: 'Red is on 2. Lee spends a {=clue} and tells Mia, “These two are **3s**.” Mia knows red 3 is needed, reads the clue as “play”, and plays one: red 3. Ben has no safe play, so he discards his oldest card and regains the {=clue}.',
+  example: 'The red pile’s top card is a 2. Lee spends a {=clue}, points at 2 of Mia’s cards and says, “These two are **3s**.” Mia knows the red pile needs a 3, takes the clue as a hint to play, and plays one of them: it is the red 3. Ben has no card he knows is playable, so he discards his oldest card and regains 1 {=clue}.',
 
   setup: [
-    'Shuffle the 50 cards. Put out 8 {clue}s and 3 {fuse}s.',
-    'Deal 5 cards each with 2–3 players, 4 with 4–5.',
-    'Hold your hand facing **away**: you see only {=back} backs. Never peek.',
+    'Shuffle the 50 cards into a face-down deck. Put 8 {clue}s and 3 {fuse}s in the middle.',
+    'Deal 5 cards each with 2–3 players, 4 each with 4–5.',
+    'Hold your hand with the faces pointing **away** from you: you see only {=back} backs, and everyone else sees your cards. Never look at your own cards.',
   ],
 
   terms: [
-    ['{=clue} Clue token', 'Spent to clue; regained by discarding or by completing a pile with its 5. Max 8.'],
-    ['{=fuse} Fuse token', 'Lost on each misplay. The 3rd ends the game.'],
+    ['{=clue} Clue token', 'Spend 1 to give a clue. Regain 1 when you discard, or when you play a 5. At most 8 are ever available.'],
+    ['{=fuse} Fuse token', 'The team loses 1 each time a played card can’t join its pile. Losing the 3rd ends the game at once.'],
     ['Critical card', 'The last copy of a card still needed, e.g. any {=n5}.'],
-    ['Chop', 'Convention: your oldest unclued card, discarded first.'],
+    ['Chop', 'Player convention, not a rule: your oldest card that no clue has pointed at; discard it first.'],
   ],
 
   gotchas: [
-    'A clue points at **every** matching card in that hand (“these two are blue”) and must touch at least 1.',
-    'No hints by tone, faces or “are you sure?”. Only the clue is information.',
-    'You **can’t discard** while all 8 {=clue} are available.',
+    'A clue must point at **every** matching card in that player’s hand (“these two are blue”), and at least 1 card must match.',
+    'Clues are the only information allowed: no hints by tone, faces or “are you sure?”.',
+    'You **can’t discard** while all 8 {=clue} are available (none spent).',
   ],
 
   tips: [
     'Clue cards playable **now** first; players tend to play what was just pointed at.',
     'Protect {n5}s and last copies with a quick number clue.',
-    'Discard your oldest unclued card; keep clued cards in place so the table can track them.',
+    'Discard your oldest card that no clue has pointed at; keep clued cards in place so the table can track them.',
   ],
 
   walk(A) {
@@ -139,15 +139,15 @@ defineGame({
     const bubble = A.k('clue', A.bubble(2, 50, 62, 26, '“These are 3s”', { size: 7.5 }));
     const newMia = A.k('mnew', face(hx(0), MY, 'b', 2));
     return [
-      { step: 0, say: 'Red is on **2**. Lee spends a {=clue} and tells Mia: “These two are **3s**.”',
+      { step: 0, say: 'The red pile is on **2**. Lee spends a {=clue}, points at 2 of Mia’s cards and says: “These two are **3s**.”',
         svg: board + miaHand() + benHand() + tok(true) + bubble + chip(0) + chip(2) + A.glow(hx(0) + W / 2, MY + H / 2, 22, 'g1') + A.glow(hx(2) + W / 2, MY + H / 2, 22, 'g2') },
-      { step: 2, say: 'Mia knows red 3 is needed and that Lee clued now for a reason. She **plays** her left 3.',
+      { step: 2, say: 'Mia can’t see her cards, but she knows the red pile needs a 3 and that Lee clued now for a reason. She **plays** her leftmost 3.',
         svg: board + miaHand(0) + benHand() + tok(true) + chip(2) + A.k('m0', face(px(0), PY - 4, 'r', 3)) + A.glow(px(0) + W / 2, PY + H / 2 - 4, 26, 'gp') },
-      { step: 2, say: 'It’s the **red 3**: the red pile grows. Mia draws a replacement.',
+      { step: 2, say: 'It’s the **red 3**: it goes on the red pile. Mia draws 1 card.',
         svg: board + miaHand(0) + benHand() + tok(true) + chip(2) + A.k('m0', face(px(0), PY - 4, 'r', 3)) + newMia },
-      { step: 1, say: 'Ben has no clued cards, so no play is safe. He **discards** his oldest card: green 4.',
+      { step: 1, say: 'No clue has pointed at any of Ben’s cards, so no play is safe. He **discards** his oldest card: green 4.',
         svg: board + miaHand(0) + newMia + benHand(3) + tok(true) + chip(2) + A.k('m0', face(px(0), PY - 4, 'r', 3)) + A.k('b3', face(286, 146, 'g', 4)) + A.glow(300, 166, 18, 'gd') },
-      { step: 1, say: 'Discarding regains **1** {=clue}; Ben draws. Lee can clue again.',
+      { step: 1, say: 'Discarding regains **1** {=clue}; Ben draws 1 card. Lee can give a clue again.',
         svg: board + miaHand(0) + newMia + benHand(3) + tok(false) + chip(2) + A.k('m0', face(px(0), PY - 4, 'r', 3)) + A.k('b3', face(286, 146, 'g', 4)) + A.k('bnew', face(hx(3), BY, 'y', 2)) + A.glow(slot(7)[0], slot(7)[1], 11, 'gt') },
     ];
   },
@@ -178,7 +178,7 @@ defineGame({
     const ic = this.icons;
     for (let i = 0; i < 8; i++) { const x = 272 + (i % 2) * 18, y = 138 + Math.floor(i / 2) * 15; o += i < 5 ? A.use(ic.clue.draw(A), x - 8, y - 8, 16) : A.circle(x, y, 6.5, '#2a2f55', { stroke: '#cfd8ff', sw: 1 }); }
     for (let i = 0; i < 3; i++) o += i < 1 ? A.circle(32 + i * 18, 178, 7, '#3a2020', { stroke: '#ffd1c8', sw: 1 }) : A.use(ic.fuse.draw(A), 32 + i * 18 - 8.5, 169.5, 17);
-    o += A.note(151, 44, 70, 28, 'Teammate: you see it');
+    o += A.note(151, 44, 70, 28, 'You see teammates’ cards');
     o += A.note(158, 160, 248, 186, 'Your hand faces away');
     o += A.note(90, 108, 130, 128, 'Played piles, 1 → 5');
     o += A.note(281, 138, 282, 116, 'Clue tokens');

@@ -25,37 +25,37 @@ defineGame({
 
   pitch: 'Draft tiles from shared factories onto your wall; each tile scores for the tiles it links to. Most points wins.',
 
-  goal: { big: 'Most points', text: 'Each tile moved to your **wall** scores for the tiles it links to in its row and column. End bonuses add more.' },
+  goal: { big: 'Most points', text: 'Score the most points. Each tile you move to your **wall** scores for the tiles it connects to in its row and column; bonuses at game end add more.' },
 
   turn: {
     type: 'round',
-    intro: 'Each round (steps 1–2 go round the table until every tile is taken):',
+    intro: 'Each round, players take turns clockwise doing steps 1–2, starting with the holder of the first-player tile, until every factory and the centre are empty. Then everyone does steps 3–4:',
     steps: [
-      { verb: 'Take', text: 'Take **all** tiles of one colour from one {factory} (the rest slide to the centre), or all of one colour from the centre.' },
-      { verb: 'Place', text: 'Put them all in **one** pattern line, or straight onto your floor line. Tiles that don’t fit drop to your floor line.' },
-      { verb: 'Tile', text: 'When all tiles are taken, top to bottom, each **full** pattern line moves one tile to its colour’s space in that wall row and scores; discard the rest of that line.' },
-      { verb: 'Refill', text: 'Subtract floor-line penalties, then fill each factory with 4 tiles from the bag.' },
+      { verb: 'Take', text: 'Take **all** tiles of one colour from one {factory} and push that factory’s other tiles into the centre; or take all tiles of one colour from the centre.' },
+      { verb: 'Place', text: 'Put them all in **one** of your pattern lines, or all straight onto your floor line. Tiles that don’t fit in the chosen line go on your floor line, filling it left to right.' },
+      { verb: 'Tile', text: 'Going top to bottom, from each **full** pattern line move one tile to the space of its colour in the same wall row and score it. Discard that line’s other tiles.' },
+      { verb: 'Refill', text: 'Lose the points shown by each filled floor space and discard those tiles. Whoever had the {=first} goes first next round. Fill each factory with 4 tiles from the bag.' },
     ],
   },
 
   tension: 'You must take every tile of the colour you pick, so take exactly what fits and leave rivals piles that spill onto their floor.',
 
   structure: [
-    { label: 'Setup', text: 'Fill each {factory} with 4 tiles from the bag; {first} in the centre.' },
-    { label: 'Factory offer', repeat: 'each round', text: 'Take turns drafting tiles until factories and centre are empty.' },
-    { label: 'Wall-tiling', text: 'Full lines move a tile to the wall and score; floor penalties; refill factories. The {=first} holder starts the next round.' },
-    { label: 'Final scoring', text: 'After the round in which someone completes a horizontal wall row: row, column and colour bonuses.' },
+    { label: 'Setup', text: 'Fill each {factory} with 4 tiles from the bag; put the {first} in the centre.' },
+    { label: 'Factory offer', repeat: 'each round', text: 'Going clockwise, players take tiles one turn at a time until every factory and the centre are empty.' },
+    { label: 'Wall-tiling', text: 'Each full pattern line moves a tile to the wall and scores; subtract floor penalties; refill the factories. The holder of the {=first} starts the next round.' },
+    { label: 'Final scoring', text: 'After the round in which someone completes a horizontal wall row, add the row, column and colour bonuses.' },
   ],
 
   points: [
-    ['New wall tile', '1 if no neighbours; otherwise the length of its linked row (if 2+) plus its linked column (if 2+), itself included'],
+    ['New wall tile', '1 if it touches no other wall tile. Otherwise: the number of tiles in the unbroken horizontal line it is part of (if 2 or more) plus the number in its unbroken vertical line (if 2 or more), counting itself in each'],
     ['Floor line', '−1 −1 −2 −2 −2 −3 −3, left to right; score never drops below 0'],
-    ['Full row (end)', '+2'],
-    ['Full column (end)', '+7'],
-    ['{=red}{=red}{=red}{=red}{=red} (end)', '+10 for all 5 tiles of one colour'],
+    ['Full row (end)', '+2 per complete horizontal row'],
+    ['Full column (end)', '+7 per complete vertical column'],
+    ['{=red}{=red}{=red}{=red}{=red} (end)', '+10 per colour with all 5 of its tiles on your wall'],
   ],
 
-  end: { trigger: 'someone completes a horizontal row of their wall', detail: 'Finish that round’s tiling, then add end bonuses. Ties go to the player with more complete rows.' },
+  end: { trigger: 'someone completes a horizontal row of their wall', detail: 'Finish that round’s wall-tiling, then add end bonuses. If tied, the player with more complete horizontal rows wins.' },
   scoring: [
     { label: 'Placing tiles', share: 6 },
     { label: 'Column bonuses', share: 2 },
@@ -68,29 +68,29 @@ defineGame({
     rows: [
       ['Tiles', '{blue} {yellow} {red} {black} {teal} (20 each)'],
       ['2 / 3 / 4 players', '5 / 7 / 9 {=factory}'],
-      ['Bag empty', 'refill it from the discarded tiles; if those run out too, leave factories short'],
+      ['Bag empty', 'refill it with all the discarded tiles; if those run out too, fill the factories as far as you can'],
     ],
   },
 
   example: 'Ben takes the **3** {=red}{=red}{=red} from a factory; its lone {=yellow} slides to the centre. They exactly fill his 3-space line. At round end one red moves to his wall next to 2 tiles in its row and 1 in its column: 3 + 2 = **5 points**.',
 
   setup: [
-    'Each player takes a board and a score marker on 0. Put out factories (table).',
+    'Each player takes a board and puts a score marker on 0. Put out the number of factories shown in the table.',
     'Fill each factory with 4 random tiles from the bag.',
-    'Put the {first} in the centre; the start player goes first.',
+    'Put the {first} in the centre. The player who most recently visited Portugal goes first; turns pass clockwise. At the start of every later round, the {first} goes back to the centre.',
   ],
 
   terms: [
-    ['{=factory} Factory', 'Display holding 4 tiles at round start.'],
-    ['Centre', 'Where leftover factory tiles collect.'],
+    ['{=factory} Factory', 'Round display that holds 4 tiles at the start of each round.'],
+    ['Centre', 'The middle of the table, where leftover factory tiles collect. The {=first} starts each round there.'],
     ['Pattern line', 'The 5 staging rows left of your wall (1 to 5 spaces).'],
     ['Wall', '5×5 grid printed with colours; each colour has one space per row and column.'],
     ['Floor line', 'Penalty row for tiles you can’t use.'],
   ],
 
   gotchas: [
-    'A pattern line holds **one colour**, never one already in that wall row.',
-    'The first player to take from the centre also takes the {first}: it goes on their floor (−1), and they start next round.',
+    'Each pattern line holds tiles of only **one colour** at a time, and never a colour already on your wall in that row.',
+    'The first player each round to take from the centre also takes the {first}: it goes on their floor line like a tile (usually −1), and they go first next round.',
     'Unfinished lines stay between rounds; only **full** lines move a tile to the wall.',
     'The floor line has 7 spaces; once full, extra tiles are discarded with no further penalty. The {=first} counts as a floor tile.',
   ],

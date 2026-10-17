@@ -35,38 +35,38 @@ defineGame({
 
   pitch: 'Co-op: play power cards to destroy invaders and earn Fear until they leave, before blight overruns the island.',
 
-  goal: { big: 'Drive them out', text: 'Destroy invaders and earn **Fear**. Each Terror level lowers the bar, from "no invaders at all" down to "no cities".' },
+  goal: { big: 'Drive them out', text: 'Destroy invaders and earn **Fear** cards. You win the moment the island meets the goal for the current Terror level: level 1, no invaders at all; level 2, no {=town} or {=city}; level 3, no {=city}. Earning the last Fear card also wins.' },
 
   turn: {
     type: 'round',
-    intro: 'Each round, all spirits act together, then the invaders:',
+    intro: 'Each round has these phases, in order. In the spirit steps, all players act at the same time:',
     outro: 'Then a new round starts.',
     steps: [
-      { verb: 'Grow', text: 'Each spirit picks 1 **Growth** option (add {=presence}, gain cards, reclaim), gains {energy}, and pays for the Power cards it plays.' },
-      { verb: 'Fast powers', text: 'Resolve {fast} powers **before** the invaders act.' },
-      { verb: 'Invaders', text: 'Resolve earned {=fear} Fear cards; invaders **Ravage**, **Build** and **Explore** in the lands shown; each card slides 1 slot.' },
-      { verb: 'Slow powers', text: 'Resolve {slow} powers **after** the invaders act.' },
-      { verb: 'Time passes', text: 'Discard played cards; damage on invaders and {=dahan} heals.' },
+      { verb: 'Grow', text: 'Each spirit picks 1 **Growth** option (e.g. add a {=presence}, gain a Power card, reclaim cards), gains {energy} equal to the highest number uncovered on its Energy track, then chooses Power cards to play (up to its Card Plays number) and pays their energy costs.' },
+      { verb: 'Fast powers', text: 'Resolve every {fast} power (played cards and unlocked innate powers) **before** the invaders act, in any order the players choose.' },
+      { verb: 'Invaders', text: 'Resolve earned {=fear} Fear cards. Then invaders **Ravage** in the lands named by the Ravage card, **Build** in the lands on the Build card, and **Explore** in the lands on a newly flipped card. Then each invader card slides 1 slot left.' },
+      { verb: 'Slow powers', text: 'Resolve every {slow} power **after** the invaders act, in any order.' },
+      { verb: 'Time passes', text: 'Discard the Power cards played this round; all damage on invaders and {=dahan} heals.' },
     ],
   },
 
   tension: 'Each round: grow your spirit for later, or spend everything now to stop the next Ravage.',
 
   structure: [
-    { label: 'Setup', text: 'Island boards, starting pieces, Blight card, Fear pool, invader and Fear decks. Flip the first invader card and **Explore**.' },
-    { label: 'Spirits', repeat: 'round', text: 'All at once: 1 Growth option; gain {=energy} = highest uncovered Energy track number; choose up to your Card Plays in Power cards and pay their costs.' },
-    { label: 'Fast', repeat: 'round', text: '{fast} cards and innate powers, in any order the players like.' },
+    { label: 'Setup', text: 'Set out island boards, starting pieces, the Blight card, the Fear pool, and the invader and Fear decks. Flip the first invader card, **Explore**, then move that card to the Build slot.' },
+    { label: 'Spirits', repeat: 'round', text: 'All at once, each spirit: picks 1 Growth option; gains {=energy} equal to the highest uncovered Energy track number; chooses Power cards from hand, no more than its Card Plays number, and pays their energy costs.' },
+    { label: 'Fast', repeat: 'round', text: 'Resolve {fast} Power cards and Fast innate powers, in any order the players choose.' },
     { label: 'Invaders', repeat: 'round', text: 'Blighted Island effect (if flipped) → earned {=fear} Fear cards → **Ravage** → **Build** → **Explore** → invader cards slide 1 slot left.' },
-    { label: 'Slow, cleanup', repeat: 'round', text: '{slow} cards and innates. Time passes: discard played cards; all damage heals.' },
+    { label: 'Slow, cleanup', repeat: 'round', text: 'Resolve {slow} Power cards and Slow innate powers. Time passes: discard played cards; all damage heals.' },
     { label: 'Game end', text: 'Win or lose the **moment** a condition below is met, even mid-round.' },
   ],
 
   end: {
     trigger: 'the invaders are driven off, or the island falls',
-    detail: 'The Fear pool holds 4 {=fear} per player; emptying it earns a Fear card. Every 3 Fear cards the Terror level rises.',
+    detail: 'The Fear pool starts with 4 {=fear} per player. Each time its last token is taken, the team earns 1 Fear card and the pool refills. After every 3 Fear cards earned, the Terror level rises by 1.',
     results: [
-      { side: 'Spirits win', text: 'at Terror 1 with no invaders on the island; Terror 2 with no {=town} or {=city}; Terror 3 with no {=city}; or on earning the last Fear card.' },
-      { side: 'Spirits lose', text: 'if **{=blight} runs out** on the flipped Blight card, any spirit loses all its {=presence}, or the invader deck runs out.' },
+      { side: 'Spirits win', text: 'at once: at Terror level 1 when no invaders are on the island; at level 2 when no {=town} or {=city} are; at level 3 when no {=city} are; or on earning the last Fear card.' },
+      { side: 'Spirits lose', text: 'at once if **{=blight} runs out** on the Blight card after it has been flipped to Blighted Island, any spirit has no {=presence} left on the island, or an invader card must be flipped and the deck is empty.' },
     ],
   },
 
@@ -74,34 +74,34 @@ defineGame({
     title: 'Pieces',
     rows: [
       ['{explorer}', '1 health · deals 1 damage'],
-      ['{town}', '2 health · deals 2 · destroyed = {=fear}'],
-      ['{city}', '3 health · deals 3 · destroyed = {=fear}{=fear}'],
-      ['{dahan}', '2 health · survivors strike back for 2 each'],
-      ['{blight}', 'added when a Ravage deals 2+ damage to a land'],
+      ['{town}', '2 health · deals 2 damage · destroying one earns 1 {=fear}'],
+      ['{city}', '3 health · deals 3 damage · destroying one earns 2: {=fear}{=fear}'],
+      ['{dahan}', '2 health · each one that survives a Ravage deals 2 damage back'],
+      ['{blight}', '1 is added to a land that takes 2 or more damage in one Ravage'],
       ['Elements', '{=sun}{=moon}{=fire}{=air}{=water}{=earth}{=plant}{=animal}'],
     ],
   },
 
-  example: 'The Ravage card shows Wetland, where {=explorer}, {=town} and {=dahan}{=dahan} stand. A spirit plays a {=fast} power: 2 damage destroys the **town** (+1 {=fear}). The Ravage then deals only 1 damage, so **no blight**; both Dahan survive and strike back for 4, destroying the explorer.',
+  example: 'The card in the Ravage slot shows Wetland, where {=explorer}, {=town} and {=dahan}{=dahan} stand. A spirit plays a {=fast} power: 2 damage destroys the **town** (1 {=fear} is earned). The Ravage then deals only 1 damage (from the explorer), so **no blight** is added and no Dahan is destroyed; both Dahan strike back for 2 damage each, destroying the explorer.',
 
   setup: [
-    'Pick spirits (first game: Lightning’s Swift Strike, River Surges in Sunlight, Vital Strength of the Earth or Shadows Flicker Like Flame); lay out 1 island board per player. Each spirit takes its 4 unique Power cards, follows the setup on the back of its panel (starting {=presence}), and fills its tracks with the rest.',
-    'Place the invaders, {=dahan} and {=blight} shown on each land. Put the {=blight} amount printed on the Blight card onto it, and 4 {=fear} per player in the Fear pool.',
-    'Build the invader deck (3 stage I on top, 4 stage II, 5 stage III) and the Fear deck (9 cards, Terror dividers after 3 and 6); flip 1 invader card, **Explore**, and move it to Build.',
+    'Pick spirits (first game: Lightning’s Swift Strike, River Surges in Sunlight, Vital Strength of the Earth or Shadows Flicker Like Flame); lay out 1 island board per player. Each spirit takes its 4 unique Power cards into hand, places its starting {=presence} as shown on the back of its panel, and puts its other presence discs on the spaces of its 2 presence tracks.',
+    'Place the invaders, {=dahan} and {=blight} printed on each land. Put as many {=blight} on the Blight card as it shows, and 4 {=fear} per player in the Fear pool.',
+    'Build the face-down invader deck: shuffle each stage’s cards **separately**, take 3 stage I, 4 stage II and 5 stage III at random (return the 1 left over of each stage to the box), and stack them with stage I on top, then II, then III. Build the Fear deck: 9 face-down Fear cards, with a Terror level divider under the 3rd card and another under the 6th. Flip the top invader card, **Explore** its lands, and move the card to the Build slot.',
   ],
 
   terms: [
-    ['{=presence} Presence', 'Your discs on the island. Powers target lands within range of them; each disc taken off a track uncovers more energy or card plays.'],
+    ['{=presence} Presence', 'Your discs on the island. Your powers target lands within range of them. Each disc taken off a track and placed uncovers a space giving more energy or more card plays.'],
     ['{=dahan} Dahan', 'Neutral pieces that strike back at invaders after a Ravage in their land.'],
-    ['{=fear} Fear', 'Earned from destroyed towns, cities and some powers. Each Fear card weakens the invaders once.'],
-    ['{=blight} Blight', 'Added to a land that takes 2+ Ravage damage. Run out and you lose.'],
-    ['Elements', 'Symbols on Power cards ({=sun}{=water}{=plant}…). Enough of them unlock your spirit’s **innate** powers.'],
+    ['{=fear} Fear', 'Tokens earned by destroying towns and cities, and from some powers. Each time the Fear pool empties, the team earns a Fear card, which hampers the invaders once.'],
+    ['{=blight} Blight', 'Added to a land that takes 2 or more damage in one Ravage. If the Blight card runs out after being flipped, you lose.'],
+    ['Elements', 'Symbols on Power cards ({=sun}{=water}{=plant}…). Having enough of them among the cards you played this round unlocks your spirit’s **innate** powers.'],
   ],
 
   gotchas: [
-    'Ravage, Build, Explore resolve in that order, and each card **slides 1 slot** per round, so you see next round’s targets.',
-    'Blight added to a land that already has blight **cascades** to an adjacent land; each blight added also destroys 1 {=presence} of each spirit there.',
-    'Discarded cards stay discarded until you pick a **Reclaim** Growth option.',
+    'In the invader phase, Ravage resolves first, then Build, then Explore. Then each card **slides 1 slot left**, so the Build card shows where next round’s Ravage will hit.',
+    'Blight added to a land that already has blight **cascades**: add 1 more {=blight} to an adjacent land. Each blight added to a land also destroys 1 {=presence} of each spirit in that land.',
+    'Played Power cards go to your discard pile and stay there until you pick a Growth option that says **Reclaim**.',
   ],
 
   tips: [
@@ -112,49 +112,49 @@ defineGame({
 
   extended: [
     { title: 'Invader cards and the Explore → Build → Ravage cycle', items: [
-      'The invader deck has **3 stage I**, **4 stage II** and **5 stage III** cards, 1 of each stage removed at random. Stage I and II cards name 1 terrain (stage II also includes a Coastal Lands card); stage III cards name 2 terrains. Ignore escalation flags unless playing an adversary.',
-      '**Explore**: flip the top card into the Explore slot. 1 {=explorer} goes into each matching land that is **coastal**, or has or is next to a {=town} or {=city}.',
-      '**Build**: in each matching land with **any** invaders, add a {=city} if it has more towns than cities; otherwise add a {=town}.',
-      '**Ravage**: in each matching land with invaders, they deal their total damage ({=explorer} 1, {=town} 2, {=city} 3) to the **land** and to the {=dahan} there.',
-      'After Explore, every card **slides 1 slot left** (Explore → Build → Ravage → discard), so you always see 1 round ahead.',
+      'The invader deck has **3 stage I**, **4 stage II** and **5 stage III** cards, after removing 1 card of each stage at random. Stage I and II cards name 1 terrain (one stage II card names Coastal Lands instead); stage III cards name 2 terrains. Ignore escalation symbols unless playing an adversary.',
+      '**Explore**: flip the top card into the Explore slot. Add 1 {=explorer} to each land of the named terrain that is **coastal** (touches the ocean), has a {=town} or {=city}, or is next to a land with a {=town} or {=city}.',
+      '**Build**: in each land of the named terrain that has **at least 1** invader, add a {=city} if that land has more towns than cities; otherwise add a {=town}.',
+      '**Ravage**: in each land of the named terrain that has invaders, add up their damage ({=explorer} 1, {=town} 2, {=city} 3). That total is dealt to the **land**, and the same total is dealt to the {=dahan} there.',
+      'After Explore, every card **slides 1 slot left** (Explore slot → Build slot → Ravage slot → discard pile), so you always see 1 round ahead.',
     ] },
     { title: 'Ravage in detail', items: [
-      'If the land takes **2 or more** damage, add 1 {=blight}. Defend reduces the invaders’ damage in that land and can prevent the blight.',
-      'Invader damage to {=dahan} kills as many as possible; each has **2 health**.',
-      'Surviving Dahan then **strike back**: 2 damage each to invaders in that land, split as the players choose.',
+      'If the land takes **2 or more** damage, add 1 {=blight}. **Defend X**: for the rest of the turn, whenever invaders deal damage in that land, reduce the damage to the land by X and the damage to the {=dahan} by X. Several Defends in one land add up.',
+      'Invader damage to {=dahan} is assigned to destroy as many as possible; each has **2 health**.',
+      'Each surviving Dahan then **strikes back** for 2 damage to invaders in that land; the players choose how to split it among the invaders.',
       'Damage lasts until Time Passes: a {=fast} power that deals 1 damage to a {=town} leaves 1 health for the Dahan to finish.',
     ] },
     { title: 'Fear and Terror levels', items: [
       'The Fear pool holds **4 {=fear} per player**. A destroyed {=town} gives **1**, a {=city} **2**; many powers give Fear directly.',
-      'Each time the pool empties, take the top Fear card face down into the **earned** pile and refill the pool. Earned cards resolve at the start of the next invader phase.',
+      'Each time the pool empties, move the top Fear card face down to the **earned** pile and refill the pool. Earned cards resolve in the Fear step at the start of the next invader phase.',
       'The Fear deck has 9 cards, split into **Terror levels 1–3** (3 / 3 / 3 by default). Each Fear card has a stronger effect at higher Terror.',
-      'Victory: TL1 no invaders, TL2 no {=town} or {=city}, TL3 no {=city}. Earning the last Fear card wins at once.',
+      'Victory: at Terror level 1, no invaders on the island; at level 2, no {=town} or {=city}; at level 3, no {=city}. Earning the last Fear card wins at once.',
     ] },
     { title: 'Blight and the Blighted Island', items: [
-      'The Blight card starts with the amount printed on it. Each time blight is added to a land, also **destroy 1 {=presence}** of each spirit there.',
+      'The Blight card starts with as many {=blight} as it shows. Each time blight is added to a land, also **destroy 1 {=presence}** of each spirit in that land.',
       'Adding blight to a land that already has blight **cascades**: add 1 more to an adjacent land of your choice (which can cascade again).',
-      'When the Blight card empties, follow it: usually **flip it** to Blighted Island, which refills it (amount printed on its back) and may add a harsher rule. If it empties again, the spirits lose.',
+      'When the last {=blight} leaves the Blight card, follow its text: usually **flip it** to the Blighted Island side, put on it the number of blight printed there, and apply any harsher rule it adds. If it empties again, the spirits lose.',
       'Blight removed from the island returns to the Blight card.',
     ] },
     { title: 'Presence, tracks and Growth', items: [
       'Each spirit has 2 **presence tracks**: Energy (gain the highest uncovered {=energy} value each round) and Card Plays (how many Power cards you may play).',
-      'Placing {=presence} uncovers track spaces. Some spaces grant an **element** every round or a one-time Reclaim.',
-      '2+ presence in one land make it a **sacred site**, which some powers require or reward.',
-      'Pick **1** Growth option per round (some spirits pick 2). Reclaim returns discarded Power cards to hand. Gaining a power: choose 1 of 4 minor or 4 major powers; a major makes you forget a card.',
+      'Taking a {=presence} off a track to place it on the island uncovers that track space. Some uncovered spaces grant an **element** every round or a one-time Reclaim.',
+      'A land with 2 or more of one spirit’s presence is that spirit’s **sacred site**, which some powers require or reward.',
+      'Pick **1** Growth option per round (some spirits pick 2). Reclaim returns your discarded Power cards to your hand. Gaining a power: choose the Minor or Major deck, draw 4 cards, keep 1 in your hand and put the other 3 on that deck’s discard pile; taking a Major also makes you forget (permanently remove) 1 of your Power cards.',
     ] },
     { title: 'Elements and innate powers', items: [
       'Power cards show **elements**: {sun}, {moon}, {fire}, {air}, {water}, {earth}, {plant}, {animal}. Count those on the cards you played this round plus any from your tracks.',
-      'Your spirit board’s **innate powers** list thresholds such as "2 {=water} 1 {=plant}". Meeting one unlocks that tier for free this round.',
+      'Your spirit board’s **innate powers** list thresholds such as "2 {=water} 1 {=plant}". Meeting a threshold unlocks that tier this round, at no energy cost.',
       'Innates have their own speed and resolve once per round, using every tier you unlocked.',
     ] },
     { title: 'Fast vs Slow, range and targeting', items: [
       '{fast} powers resolve **before** the invaders (stop the coming Ravage); {slow} powers resolve **after** (set-up and clean-up). Pay for all cards at once, then resolve by speed.',
-      'Range counts lands from one of your **{=presence}** (or a sacred site if the power says so). Oceans are not lands unless a spirit says otherwise.',
-      'Push moves pieces to an adjacent land of your choice; Gather pulls them in. Pushing the only invader out of a land stops next round’s Build there.',
+      'Range is the most land-to-land steps the target may be from one of your **{=presence}** (or from your sacred site if the power says so); **range 0** means a land where you have presence; Oceans are not lands unless a spirit says otherwise.',
+      'Push moves pieces from the target land to adjacent lands of your choice; Gather moves pieces from adjacent lands into the target land. Build needs at least 1 invader, so pushing every invader out of a land before its Build stops that Build.',
     ] },
     { title: 'Optional score (to compare games)', items: [
       'Win: 5 × difficulty + 10 + 2 per card left in the invader deck. Loss: 2 × difficulty + 1 per invader card out of the deck (discarded or face up in the slots).',
-      'Either way, with X = number of players: +1 per X {=dahan} on the island, −1 per X {=blight} on the island.',
+      'Either way, with X = number of players: +1 for every X {=dahan} on the island, −1 for every X {=blight} on the island.',
     ] },
   ],
 
@@ -223,19 +223,19 @@ defineGame({
     const after = base + presOld + pC1land + wetland;
 
     return [
-      { step: 0, say: 'Round start. You can play **1** card. Wetland sits in the **Ravage** slot: it gets attacked this round.',
+      { step: 0, say: 'Round start. Your Card Plays track shows **1**, so you may play 1 card. The Wetland card is in the **Ravage** slot: invaders in the Wetland ravage this round.',
         svg: base + presOld + pC1track + wetland + wTown + wExp + mExp + pool(4) + cardsStart + handCards + A.k('coin', coin(2)) + A.glow(220, 40, 20, 'g-card') },
-      { step: 0, say: '**Grow:** move a {=presence} from the Card Plays track to the Jungle. You can now play **2** cards; gain 1 {=energy} (highest uncovered energy space).',
+      { step: 0, say: '**Grow:** take a {=presence} off the Card Plays track and place it in the Jungle. That uncovers a 2, so you may play **2** cards. Gain 1 {=energy}: the highest uncovered Energy space shows 1.',
         svg: after + wTown + wExp + mExp + pool(4) + cardsStart + handCards + A.k('coin', coin(3)) + A.glow(148, 64, 11, 'g-pres') + A.glow(...tr(1, 1), 8, 'g-track') },
-      { step: 0, say: 'Pay for both cards at once: a {=fast} 2-damage power (cost 1) and a {=slow} push (cost 2).',
+      { step: 0, say: 'Choose and pay for both cards at once (3 {=energy} total): a {=fast} 2-damage power (cost 1) and a {=slow} push (cost 2).',
         svg: after + wTown + wExp + mExp + pool(4) + cardsStart + playCards + A.k('coin', coin(0)) + A.glow(124, 177, 13, 'g-coin') },
-      { step: 1, say: '{=fast} powers resolve before the invaders. 2 damage destroys the Wetland {=town}: 1 {=fear} leaves the pool.',
+      { step: 1, say: '{=fast} powers resolve before the invaders. 2 damage destroys the Wetland {=town}: 1 {=fear} moves from the pool to Generated.',
         svg: after + wExp + mExp + pool(3) + earned + cardsStart + playCards + A.k('coin', coin(0)) + A.k('dmg', dmg(66, 40, '2 dmg')) + A.glow(60, 52, 26, 'g-wet') + A.glow(292, 92, 9, 'g-fear') },
-      { step: 2, say: '**Ravage** the Wetland: 1 {=explorer} deals 1 damage, so **no blight**. Both {=dahan} survive and strike back for 4.',
+      { step: 2, say: '**Ravage** the Wetland: 1 {=explorer} deals 1 damage to the land and the {=dahan}. That is under 2, so **no blight**, and no Dahan dies. Both strike back for 2 damage each, destroying the explorer.',
         svg: after + mExp + pool(3) + earned + cardsStart + playCards + A.k('coin', coin(0)) + A.k('dmg2', dmg(62, 38, 'Dahan: 4')) + A.glow(220, 40, 20, 'g-card') + A.glow(62, 70, 22, 'g-wet') },
-      { step: 2, say: '**Build** in the Mountain: it has an {=explorer}, so add a {=town}. Flip the next card: **Explore** the Jungle. Cards slide left.',
+      { step: 2, say: '**Build** in the Mountain: it has an {=explorer} and no towns, so add a {=town}. Flip the next invader card: **Explore** the Jungle. Then every invader card slides 1 slot left.',
         svg: after + mExp + A.k('mtown', town(108, 122)) + A.k('jexp', explorer(162, 76)) + pool(3) + earned + cardsNext + playCards + A.k('coin', coin(0)) + A.glow(116, 118, 20, 'g-mtn') + A.glow(162, 72, 13, 'g-jun') },
-      { step: 3, say: '{=slow} You push the Jungle explorer into the Wetland, so next round’s Jungle **Build** finds no invaders. Time passes.',
+      { step: 3, say: '{=slow} Your push moves the Jungle explorer into the Wetland, so next round’s Jungle **Build** finds no invaders. Time passes: played cards are discarded and damage heals.',
         svg: after + mExp + A.k('mtown', town(108, 122)) + A.k('jexp', explorer(84, 46)) + pool(3) + earned + cardsNext + A.k('coin', coin(0)) + A.glow(84, 44, 14, 'g-push') + A.glow(258, 40, 20, 'g-card2') },
     ];
   },

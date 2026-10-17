@@ -23,35 +23,35 @@ defineGame({
 
   pitch: 'Negotiate, then secretly order every unit; orders resolve at once, with no dice. Own 18 of 34 supply centers to win.',
 
-  goal: { big: '18 centers', text: 'Own **18 of the 34 supply centers** after a Fall turn to win alone. Each center supports one army or fleet.' },
+  goal: { big: '18 centers', text: 'Own **18 of the 34 supply centers** at the end of a Fall turn to win alone. Each center you own lets you keep 1 army or fleet.' },
 
   turn: {
     type: 'simultaneous',
     intro: 'Each season (Spring, then Fall), everyone at once:',
     steps: [
       { verb: 'Negotiate', text: 'Talk privately with anyone. Promises are **not binding**.' },
-      { verb: 'Write', text: 'Secretly write one order for **every** unit: {=hold} hold, {=move} move, {=support} support or {=convoy} convoy. No order or an illegal one means hold.' },
-      { verb: 'Reveal', text: 'Read all orders and resolve them together: in each clash the highest strength (1 + supports) wins; ties **bounce**.' },
-      { verb: 'Retreat', text: 'Each dislodged unit retreats to an adjacent empty province (not the attacker’s origin, not a bounce site) or is disbanded. Two retreats to one province: both disband.' },
+      { verb: 'Write', text: 'Secretly write 1 order for **every** unit you have: {=hold} hold, {=move} move, {=support} support or {=convoy} convoy. A unit with no order, or with an impossible order, holds.' },
+      { verb: 'Reveal', text: 'Read all orders aloud, then resolve them all at the same time. Each unit’s strength is 1, plus 1 per valid support. When units compete for one province, the strongest wins; if the strongest are tied, none of them moves (they **bounce**).' },
+      { verb: 'Retreat', text: 'Each dislodged unit must retreat to an adjacent empty province or be disbanded (removed). It can’t retreat to the province its attacker came from, or to one left empty by a tie this turn. If two units retreat to the same province, both are disbanded.' },
     ],
-    outro: 'After Fall: build or disband to match your supply centers',
+    outro: 'In Winter, after Fall, each power builds or disbands units until its units equal its supply centers',
   },
 
   tension: 'You can’t gain ground without an ally’s support, but your closest ally is best placed to stab you.',
 
   structure: [
-    { label: 'Setup', text: 'Each power has 3 units on its home {=sc} (Russia 4); 12 centers start neutral. Year 1901.' },
+    { label: 'Setup', text: 'Each power starts with 1 unit on each of its 3 home {=sc} (Russia: 4); the other 12 centers start unowned. The first season is Spring 1901.' },
     { label: 'Spring', repeat: 'each year', text: 'Negotiate, write orders, resolve, retreat.' },
-    { label: 'Fall', repeat: 'each year', text: 'Same as Spring. Then each {=sc} you occupy becomes yours, and stays yours until someone else occupies it after a Fall.' },
-    { label: 'Winter', repeat: 'each year', text: 'More centers than units: build in your empty, owned home centers ({=fleet} only on coastal ones). More units than centers: disband the difference.' },
-    { label: 'Game end', text: 'A power owns **18** centers after Fall, or all survivors agree a draw.' },
+    { label: 'Fall', repeat: 'each year', text: 'Same as Spring. Then each {=sc} that one of your units occupies becomes yours. It stays yours until another power’s unit occupies it at the end of a Fall.' },
+    { label: 'Winter', repeat: 'each year', text: 'If you own more centers than you have units, you may build 1 unit per extra center, each on one of your starting home centers that you still own and that is empty ({=fleet} only on coastal ones). If you have more units than centers, you must disband units until the numbers match.' },
+    { label: 'Game end', text: 'A power owns **18** centers at the end of a Fall, or all remaining players agree to a draw.' },
   ],
 
   end: {
     trigger: 'one power owns 18 supply centers',
     detail: 'Most games end earlier in an agreed draw.',
     results: [
-      { side: 'Solo win', text: 'own 18 centers after a Fall turn.' },
+      { side: 'Solo win', text: 'own 18 centers at the end of a Fall turn.' },
       { side: 'Draw', text: 'all remaining players agree to share the result.' },
     ],
   },
@@ -59,37 +59,37 @@ defineGame({
   ref: {
     title: 'Orders',
     rows: [
-      ['{=hold} Hold', 'Stay put. Strength 1 + supports to hold.'],
-      ['{=move} Move', 'To an adjacent province. Strength 1 + supports.'],
-      ['{=support} Support', '+1 to a unit holding in, or moving into, a province this unit could move to.'],
-      ['{=convoy} Convoy', 'Fleets in a chain of sea spaces (not coasts) carry an army across them; dislodge one and the convoy fails.'],
-      ['Notation', 'A Par–Bur (move) · A Mar S A Par–Bur (support) · F Eng C A Lon–Bre (convoy) · A Mun H (hold)'],
-      ['{=army} {=fleet} Units', '{=army} on land only; {=fleet} on seas and coasts. Units = supply centers owned.'],
+      ['{=hold} Hold', 'Stay in place. Strength: 1, plus 1 per support.'],
+      ['{=move} Move', 'Go to an adjacent province. Strength: 1, plus 1 per support.'],
+      ['{=support} Support', 'Stay in place and add 1 to another unit’s strength as it holds in, or moves into, a province the supporting unit could move to itself.'],
+      ['{=convoy} Convoy', 'Fleets in a chain of sea provinces (not coastal land) carry an army across them in one move. If any of those fleets is dislodged, the army doesn’t move.'],
+      ['Notation', 'A = army, F = fleet. A Par–Bur (move) · A Mar S A Par–Bur (support) · F Eng C A Lon–Bre (convoy) · A Mun H (hold)'],
+      ['{=army} {=fleet} Units', '{=army} on land only; {=fleet} on seas and coastal provinces. After each Winter, your units equal your supply centers.'],
     ],
   },
 
-  example: 'Spring 1901. Germany promised France to leave Burgundy alone, but writes **A Mun–Bur**. France writes **A Par–Bur** and **A Mar S A Par–Bur**. France attacks with strength **2** against Germany’s **1**: France enters Burgundy; the German army bounces and stays in Munich.',
+  example: 'Spring 1901. Germany promised France to leave Burgundy alone, but writes **A Mun–Bur**. France writes **A Par–Bur** and **A Mar S A Par–Bur**. France moves into Burgundy with strength **2** against Germany’s **1**, so France enters Burgundy; the German army fails to move and stays in Munich.',
 
   setup: [
     'Assign the seven powers: England, France, Germany, Italy, Austria-Hungary, Russia, Turkey.',
-    'Place starting units on home centers: 3 each, Russia 4. The other 12 centers start neutral.',
-    'Talk time: 30 minutes before Spring 1901, 15 before each later season; orders are then written in silence.',
-    'Fewer than 7 players: with 6, Italy’s units just hold; with 5, Italy and Germany. 4: one plays England, the others Austria+France, Germany+Turkey, Italy+Russia. 3: England+Germany+Austria, Russia+Italy, France+Turkey. 2: England+France+Russia vs Austria+Germany+Turkey; Italy is neutral and can’t be entered; play starts in 1914, a coin flip before the Fall 1914 builds picks Italy’s side, and the first to 24 centers wins. With 2–4 players, count centers and build per country.',
+    'Place 1 starting unit on each home center: 3 per power, Russia 4. The other 12 centers start unowned.',
+    'Talk time: 30 minutes before the Spring 1901 orders, 15 minutes before each later season’s orders. Then everyone writes orders in silence.',
+    'Fewer than 7 players: with 6, no one plays Italy and its units always hold; with 5, the same for Italy and Germany. With 4, one player plays England and the other three play Austria + France, Germany + Turkey and Italy + Russia. With 3: England + Germany + Austria, Russia + Italy, France + Turkey. With 2: England + France + Russia vs Austria + Germany + Turkey; Italy is neutral and no unit may enter it; play starts in Spring 1914; just before the Fall 1914 builds, a coin flip decides which side takes over Italy; the first side to own 24 centers wins. With 2–4 players, count centers and build or disband separately for each country.',
   ],
 
   terms: [
-    ['{=sc} Supply center', 'A province with a dot. 34 in all; each supports 1 unit.'],
-    ['Bounce', 'Equal strengths into the same province: none of them moves.'],
-    ['Dislodged', 'Beaten by a stronger attack where it stands; must retreat or disband.'],
-    ['Cut support', 'Attacking a supporting unit cancels its support.'],
+    ['{=sc} Supply center', 'A province marked with a dot. There are 34; each one you own lets you keep 1 unit.'],
+    ['Bounce', 'Units of equal strength try to enter the same province: none of them moves, and each stays where it was.'],
+    ['Dislodged', 'Forced out of its province by a stronger unit moving in; it must retreat or be disbanded.'],
+    ['Cut support', 'Ordering a move into a supporting unit’s province cancels its support (exceptions in Rules people miss).'],
     ['Stab', 'Breaking a promise to an ally.'],
   ],
 
   gotchas: [
-    'Support is **cut** if the supporting unit is attacked from anywhere except the province it supports into, or is dislodged. Your own attacks never cut your support.',
-    'Centers change owner only when occupied **after a Fall** turn; passing through in Spring does nothing.',
-    'You can’t dislodge your own unit, and two units can’t swap places by moving into each other (only by convoy).',
-    'Spain, Bulgaria and St Petersburg have **two coasts**: a fleet order there must name the coast, and the fleet can then only move along that coast.',
+    'Support is **cut** if another power orders a move into the supporting unit’s province, unless that move comes from the province the support is aimed at. It is also cut if the supporting unit is dislodged. Your own units never cut your support.',
+    'A center changes owner only if a unit occupies it **at the end of a Fall** turn; passing through, or sitting there only after Spring, does nothing.',
+    'You can’t dislodge your own unit. Two units ordered into each other’s provinces both fail; they can swap places only if one of them goes by convoy.',
+    'Spain, Bulgaria and St Petersburg have **two coasts**: an order moving a fleet there must name the coast, and the fleet can then move only to provinces next to that coast.',
   ],
 
   tips: [
@@ -141,7 +141,7 @@ defineGame({
         svg: map + units(P0) + slips + orders + badge(150, 88, 2, F) + badge(196, 112, 1, G) },
       { step: 2, say: 'All units move **at once**. The fleets and the Berlin army reach their new provinces…',
         svg: map + units(P1) + slips + A.glow(178, 102, 18, 'g-bur') },
-      { step: 2, say: '…but 2 beats 1: France takes Burgundy; the German army **bounces** back to Munich.',
+      { step: 2, say: '…but 2 beats 1: France takes Burgundy; the German army **fails to move** and stays in Munich.',
         svg: map + units(P2) + slips + A.glow(165, 104, 16, 'g-fr') },
       { step: 3, say: 'No unit was dislodged, so no retreats. Germany’s fleet is in Holland, but centers change owner only after **Fall**.',
         svg: map + units(P2) + A.glow(176, 38, 12, 'g-hol') },

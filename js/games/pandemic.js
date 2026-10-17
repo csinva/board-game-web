@@ -24,74 +24,75 @@ defineGame({
     infection: { name: 'infection card', draw: A => A.rect(4, 1, 16, 22, '#3c6e47', { rx: 2.5, sw: 1.3 }) + A.text(12, 12.5, '\u2623\uFE0E', { size: 14, weight: 400, fill: '#e9e2d0' }) },
   },
 
-  pitch: 'Spend 4 actions a turn moving, treating cubes and trading cards; cure all 4 diseases together to win.',
+  pitch: 'Spend up to 4 actions a turn moving, treating cubes and trading cards; cure all 4 diseases together to win.',
 
   goal: { big: 'Cure 4 diseases', text: 'Everyone wins the moment the **4th cure** is found. Cubes may stay on the board.' },
 
   turn: {
     type: 'sequence',
     steps: [
-      { verb: 'Act ×4', text: 'Take **4 actions**: move, build a {station}, treat (remove a cube), share a {citycard}, or discover a {cure}.' },
-      { verb: 'Draw 2', text: 'Draw 2 player cards. An {epidemic} resolves at once and is not replaced. Hand limit 7: discard or play events at once.' },
-      { verb: 'Infect', text: 'Flip {infection}s equal to the **infection rate** (2–4); add 1 cube of the city’s colour to each city shown (none if that colour is eradicated).' },
+      { verb: 'Act ×4', text: 'Take **up to 4** actions, in any mix (the same one may repeat): move, build a {station}, treat (remove cubes from your city), share a {citycard}, or discover a {cure}. See the action table below.' },
+      { verb: 'Draw 2', text: 'Draw the top 2 player cards into your hand. If one is an {epidemic}, resolve it immediately, discard it, and do not draw a replacement. If you now hold more than 7 cards, discard cards or play Event cards until you hold 7.' },
+      { verb: 'Infect', text: 'Flip {infection}s from the top of the infection deck, equal to the **infection rate** (2–4, shown by the rate marker). For each, place 1 cube of that city’s colour on that city (none if that colour is eradicated), then put the card on the infection discard pile.' },
     ],
+    outro: 'Then the player to your left takes a turn.',
   },
 
   tension: 'Each action spent treating cubes is one not spent collecting cards for cures, and only cures win.',
 
   structure: [
-    { label: 'Setup', text: 'Infect 9 cities, deal roles and hands, seed the player deck with {epidemic} cards. All pawns start in Atlanta.' },
-    { label: 'Turns', repeat: 'clockwise', text: '4 actions → draw 2 player cards → flip {infection}s equal to the infection rate.' },
-    { label: 'Epidemic', text: 'When drawn: rate marker +1; the bottom infection card’s city gets 3 cubes (if it already has that colour, fill to 3 and it outbreaks); shuffle the infection discards and put them on top. Discard the {=epidemic}.' },
-    { label: 'Outbreak', text: 'When a city would get a 4th cube: each connected city gets 1 cube of that colour instead, and the {=outbreak} marker moves +1. Chains, once per city.' },
-    { label: 'Game end', text: 'Win at the 4th {=cure}. Lose at the 8th outbreak, when a colour runs out of cubes, or when the player deck can’t supply 2 cards.' },
+    { label: 'Setup', text: 'Infect 9 cities, deal roles and hands, shuffle {epidemic} cards into the player deck. All pawns start in Atlanta.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Up to 4 actions → draw 2 player cards → flip {infection}s equal to the infection rate. Then the player to the left goes.' },
+    { label: 'Epidemic', text: 'When one is drawn, do all 3 in order. 1: move the rate marker 1 space right. 2: take the **bottom** infection card, put 3 cubes on that city (if the city already has cubes of that colour, add only enough to reach 3; then it outbreaks), and put the card on the infection discard pile. 3: shuffle the infection discard pile (including that card) and put it on **top** of the infection deck. Then discard the {=epidemic}.' },
+    { label: 'Outbreak', text: 'When a city would get a 4th cube of one colour: place no cube there; instead every city connected to it by a line gets 1 cube of that colour, and the {=outbreak} marker moves 1 space. If that gives another city a 4th cube, it outbreaks too, but each city outbreaks at most once per chain.' },
+    { label: 'Game end', text: 'Win when the 4th {=cure} is discovered. Lose when the outbreak marker reaches 8, when a cube must be placed and none of that colour are left, or when a player must draw 2 player cards and fewer remain.' },
   ],
 
   end: {
-    trigger: 'the 4th disease is cured, or the team hits a loss condition',
+    trigger: 'the 4th disease is cured, or the team meets a loss condition',
     results: [
-      { side: 'Team wins', text: 'when the 4th disease is cured.' },
-      { side: 'Team loses', text: 'on the **8th** {outbreak}, when a colour runs out of cubes, or when the player deck can’t supply 2 cards.' },
+      { side: 'Team wins', text: 'immediately when the 4th disease is cured.' },
+      { side: 'Team loses', text: 'immediately when the {outbreak} marker reaches **8**, when a cube must be placed and none of that colour are left in the supply, or when a player must draw 2 player cards and fewer than 2 remain.' },
     ],
   },
 
   ref: {
-    title: 'Actions (each costs 1)',
+    title: 'Actions (each uses 1 of your 4)',
     rows: [
-      ['Drive / Shuttle', 'one step along a line, or {=station} → any {=station}'],
-      ['Direct / Charter', 'discard {=citycard} of where you go / of where you are (then fly anywhere)'],
-      ['Treat', 'remove 1 cube; all of that colour once it has a {=cure}'],
-      ['Share', 'give or take the {=citycard} of the city you are both in'],
-      ['{=station} Build', 'discard {=citycard} of your city (max 6 stations; then move one)'],
-      ['{=cure} Cure', 'at a {=station}: {=citycard}{=citycard}{=citycard}{=citycard}{=citycard} of one colour'],
+      ['Drive / Shuttle', 'Drive: move to a city connected to yours by a line. Shuttle: move from a {=station} to any other {=station}.'],
+      ['Direct / Charter flight', 'Direct: discard any {=citycard}; move to that city. Charter: discard the {=citycard} of the city you are in; move to any city.'],
+      ['Treat', 'Remove 1 cube from your city. If that colour is cured, remove **all** cubes of that colour from your city.'],
+      ['Share', 'You and another player in the same city: one of you gives the other the {=citycard} of **that** city.'],
+      ['{=station} Build', 'Discard the {=citycard} of your city; put a {=station} there. If all 6 are on the board, move one of them.'],
+      ['{=cure} Cure', 'At a {=station}, discard 5 {=citycard} of one colour: {=citycard}{=citycard}{=citycard}{=citycard}{=citycard}.'],
     ],
   },
 
-  example: 'Hong Kong has {=red}{=red}{=red}. Ana (Medic) discards her Hong Kong card to fly there (1 action) and treats (1 action), removing **all 3**: a Medic clears a whole colour. She drives to Manila and treats again. She draws Tokyo and an {epidemic}: Lagos gets {=yellow}{=yellow}{=yellow} and the infection rate rises.',
+  example: 'Hong Kong has {=red}{=red}{=red}. Ana (Medic) discards her Hong Kong card to fly there (1 action) and treats (1 action), removing **all 3**: a Medic’s treat removes every cube of one colour from her city. She drives to Manila (1 action) and treats again (1 action). She draws Tokyo and an {epidemic}: Lagos is the bottom infection card, so it gets {=yellow}{=yellow}{=yellow}, and the infection rate marker moves 1 space.',
 
   setup: [
-    'Infect 9 cities: 3 get 3 cubes, 3 get 2, 3 get 1. Put a {station} in Atlanta.',
-    'Shuffle the 48 city cards with the 5 event cards. Deal roles and 4/3/2 cards each (2/3/4 players). Everyone starts in Atlanta.',
-    'Split the rest of the player deck into 4, 5 or 6 piles (introductory / standard / heroic), shuffle 1 {=epidemic} into each, stack them. Rate marker on 2, outbreaks on 0.',
+    'Put a {station} in Atlanta. Shuffle the infection deck. Flip 3 cards: put 3 cubes on each city shown. Flip 3 more: 2 cubes each. Flip 3 more: 1 cube each. Put these 9 cards face up on the infection discard pile.',
+    'Give each player a role card and its pawn; all pawns start in Atlanta. Shuffle the 48 city cards with the 5 event cards and deal hands: 4 cards each with 2 players, 3 each with 3, 2 each with 4. The player whose hand holds the city with the highest population goes first.',
+    'Choose 4, 5 or 6 {=epidemic} cards (introductory / standard / heroic). Split the rest of the player deck into that many piles, as equal in size as possible, shuffle 1 {=epidemic} into each, and stack the piles with the **smaller** piles at the bottom. Put the infection rate marker on its first space (2) and the outbreak marker on 0.',
   ],
 
   terms: [
-    ['{=outbreak} Outbreak', 'A city would get a 4th cube: instead, each connected city gets 1. Can chain.'],
-    ['{=epidemic} Epidemic', 'Rate rises; the bottom infection card’s city gets 3 cubes; infection discards are shuffled back on top.'],
-    ['{=station} Research station', 'Where cures are made; shuttle flights go station to station.'],
-    ['{=cure} Eradicated', 'Cured and no cubes left: that colour is never placed again.'],
-    ['Event card', 'Player card played any time, even on others’ turns, for no action, except between drawing and resolving a card; then discarded.'],
+    ['Connected', 'Two cities joined by a line on the board.'],
+    ['{=outbreak} Outbreak', 'A city would get a 4th cube of one colour: instead, each connected city gets 1 cube of that colour. Can chain to other cities.'],
+    ['{=epidemic} Epidemic', 'Rate marker moves 1 space; the bottom infection card’s city gets 3 cubes and that card is discarded; the infection discard pile (including that card) is shuffled and put back on top of the infection deck.'],
+    ['{=cure} Eradicated', 'A cured colour with no cubes of it left on the board: cubes of that colour are never placed again.'],
+    ['Event card', 'A player card any player may play at any time, even on another player’s turn, without using an action, except while a drawn card is being resolved. Discard it after use.'],
   ],
 
   gotchas: [
-    'Share Knowledge moves only **the card of the city you are both in** (Researcher excepted).',
-    'After an Epidemic the reshuffled cities go **back on top**: the same cities come up again soon.',
-    'A city outbreaks only **once per chain**.',
+    'Share Knowledge moves only **the card of the city both players are in**. Exception: the Researcher may give any city card from her hand.',
+    'After an Epidemic, the reshuffled infection discards go **on top** of the infection deck: those same cities are infected again soon.',
+    'Each city outbreaks at most **once per chain**, but the outbreak marker moves 1 space for every outbreak in the chain.',
   ],
 
   tips: [
     'Use roles: Scientist cures with 4 cards, Medic clears cities, Dispatcher moves other pawns.',
-    'Watch cities with {=black}{=black}{=black} in the infection discard: they return after the next Epidemic.',
+    'Watch cities with {=black}{=black}{=black} whose cards are in the infection discard pile: they come back on top after the next Epidemic.',
     'Plan the next player’s turn aloud; funnel cards to one curer.',
   ],
 
@@ -131,19 +132,19 @@ defineGame({
     const hkDisc = A.k('c-hk', card(276, 108, col.r, 'H. Kong'));
     const tokHand = A.k('c-tok', card(...hand(3), col.r, 'Tokyo'));
     return [
-      { step: 0, say: 'Ana (Medic, orange) is in Khartoum. Hong Kong has {=red}{=red}{=red}: one more is an {outbreak}.',
+      { step: 0, say: 'Ana (Medic, orange) is in Khartoum. Hong Kong has {=red}{=red}{=red}: a 4th {=red} there would cause an {outbreak}.',
         svg: board + base + cubes('hk', 3) + cubes('man', 2) + pawn('kha') + hkCard + keep + rate(0) + A.glow(P.hk[0], P.hk[1] - 12, 20) },
-      { step: 0, say: '**Action 1: direct flight.** Discard the Hong Kong {=citycard}, fly there.',
+      { step: 0, say: '**Action 1: direct flight.** She discards the Hong Kong {=citycard} and moves to Hong Kong.',
         svg: board + base + cubes('hk', 3) + cubes('man', 2) + pawn('hk') + hkDisc + keep + rate(0) },
-      { step: 0, say: '**Action 2: treat.** A Medic removes **all** cubes of one colour: all 3 go.',
+      { step: 0, say: '**Action 2: treat.** A Medic’s treat removes **all** cubes of one colour from her city: all 3 go.',
         svg: board + base + cubes('man', 2) + pawn('hk') + hkDisc + keep + rate(0) + A.glow(P.hk[0], P.hk[1] - 12, 20) },
-      { step: 0, say: '**Actions 3–4:** drive to Manila, treat. Both {=red} gone.',
+      { step: 0, say: '**Action 3:** drive along the line to Manila. **Action 4:** treat; both {=red} there go.',
         svg: board + base + pawn('man') + hkDisc + keep + rate(0) + A.glow(P.man[0], P.man[1] - 8, 18) },
-      { step: 1, say: '**Draw 2:** Tokyo goes to her hand; the second is an {epidemic}.',
+      { step: 1, say: '**Draw 2:** the first card, Tokyo, goes to her hand; the second is an {epidemic}.',
         svg: board + base + pawn('man') + hkDisc + keep + rate(0) + tokHand + A.k('epi', A.use(ic.epidemic.draw(A), 225.5, 106.5, 41)) + A.glow(246, 126, 24) },
-      { step: 1, say: 'The rate marker moves up, the bottom infection card, **Lagos**, gets {=yellow}{=yellow}{=yellow}, and the infection discards go back on top.',
+      { step: 1, say: 'The rate marker moves 1 space. The bottom infection card is **Lagos**: it gets {=yellow}{=yellow}{=yellow}. Then the infection discard pile is shuffled and put on top of the infection deck.',
         svg: board + base + pawn('man') + A.k('c-hk', card(276, 108, col.r, 'H. Kong')) + A.k('epi', A.use(ic.epidemic.draw(A), 273.5, 110.5, 41)) + keep + tokHand + rate(1) + cubes('lag', 3) + A.glow(P.lag[0], P.lag[1] - 12, 20) },
-      { step: 2, say: '**Infect:** rate 2, so flip 2 {infection}s. Tokyo and Bangkok get 1 {=red} each.',
+      { step: 2, say: '**Infect:** the rate is still 2, so flip 2 {infection}s. Tokyo and Bangkok get 1 {=red} each.',
         svg: board + base + pawn('man') + A.k('c-hk', card(276, 108, col.r, 'H. Kong')) + A.k('epi', A.use(ic.epidemic.draw(A), 273.5, 110.5, 41)) + keep + tokHand + rate(1) + cubes('lag', 3) +
           A.k('i-tok', A.card(276, 12, 30, 30, '#3c6e47', { title: 'Tokyo' })) + A.k('i-bkk', A.card(282, 26, 30, 30, '#3c6e47', { title: 'Bangkok' })) + cubes('tok', 1, 1) + cubes('bkk', 1, 1) },
     ];
@@ -186,9 +187,9 @@ defineGame({
       o += A.rect(x, 168, 14, 24, done ? col[c] : '#2c4a6e', { rx: 6, stroke: col[c], sw: 2 });
       if (done) o += A.text(x + 7, 180, '✓', { size: 10, fill: '#fff', weight: 800 });
     });
-    o += A.note(P.bag[0] + 4, P.bag[1] - 16, 214, 16, '3 cubes: next = outbreak');
+    o += A.note(P.bag[0] + 4, P.bag[1] - 16, 214, 16, '3 cubes: a 4th = outbreak');
     o += A.note(P.atl[0] + 9, P.atl[1] + 7, 60, 16, 'Research station');
-    o += A.note(61, 182, 90, 146, 'Outbreak track (8 = lose)');
+    o += A.note(61, 182, 90, 146, 'Outbreaks (reach 8 = lose)');
     o += A.note(242, 168, 258, 146, 'Cures: 1 of 4');
     return o;
   },

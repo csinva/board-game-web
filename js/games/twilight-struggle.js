@@ -35,41 +35,41 @@ defineGame({
 
   turn: {
     type: 'choose',
-    intro: 'Each turn starts with a Headline: both pick a card in secret and reveal together. Then you alternate action rounds, playing one card each for one of:',
+    intro: 'Each turn starts with a Headline: each player secretly picks 1 card, then both reveal at once. Then players alternate action rounds; in each round you play 1 card and use it for one of:',
     steps: [
-      { verb: 'Event', text: 'Do the card’s text. You may trigger your own side’s events and neutral ones.' },
-      { verb: 'Influence', text: 'Place influence equal to the card’s {=ops} **Ops** in or next to countries where you had some at the start of the round, or next to your superpower (2 per point into enemy-controlled ones).' },
-      { verb: 'Coup', text: 'Roll {=die} + Ops − 2 × the target’s **stability**; each point over 0 removes enemy influence, then adds yours. A {=bg} coup lowers DEFCON.' },
-      { verb: 'Realign', text: 'Per Op, both roll {=die} with modifiers; the loser removes influence equal to the difference.' },
-      { verb: 'Space Race', text: 'Discard a card with enough Ops and roll on the {=space} track for VP and perks; its event doesn’t happen.' },
+      { verb: 'Event', text: 'Carry out the card’s text. You may choose this only for your own side’s events and neutral ones.' },
+      { verb: 'Influence', text: 'Place influence equal to the card’s {=ops} **Ops**. Each point goes into a country where you had influence at the start of this round, a country next to one of those, or a country next to your superpower. Each influence placed in an enemy-controlled country costs 2 Ops.' },
+      { verb: 'Coup', text: 'Pick a country with enemy influence. Roll {=die}, add the card’s Ops and subtract 2 × the country’s **stability**. For each point above 0, remove 1 enemy influence there; once none is left, add 1 of yours instead. A coup in a {=bg} lowers DEFCON by 1.' },
+      { verb: 'Realign', text: 'For each Op, pick a country; both players roll {=die} and add modifiers (see Extended details). The player with the lower total removes their influence there equal to the difference.' },
+      { verb: 'Space Race', text: 'Discard a card with enough Ops and roll {=die} to try to advance on the {=space} track, which gives VP and abilities. The card’s event doesn’t happen.' },
     ],
-    outro: 'USSR acts first each round; 6 action rounds per turn, 7 from turn 4',
+    outro: 'In each action round the USSR plays first, then the US. 6 action rounds per turn, 7 from turn 4',
   },
 
   tension: 'Half your hand is your opponent’s events: playing them for Ops triggers them anyway, so each turn you choose which harm to accept and when.',
 
   structure: [
-    { label: 'Setup', text: 'Starting influence plus free placements (USSR 6, US 7). Deal 8 Early War cards; the USSR holds the {china}.' },
-    { label: 'Turn start', repeat: '10 turns', text: 'DEFCON improves by 1; refill hands to 8 (9 from turn 4, when Mid War is added; Late War on turn 8). **Headline**: both play a card face down for its event; higher Ops resolves first (US on a tie).' },
-    { label: 'Action rounds', repeat: '6, then 7', text: 'Alternate, USSR first, one card each per round.' },
-    { label: 'Turn end', text: 'Military ops below DEFCON: the opponent gains the shortfall in VP. A {=score} may never be held into the next turn. The {=china} turns face up.' },
-    { label: 'Final scoring', text: 'After turn 10: every region scores, the China Card holder gains 1 VP, and the leader wins.' },
+    { label: 'Setup', text: 'Place the starting influence plus free placements (USSR 6, US 7). Deal 8 Early War cards to each player; the USSR takes the {china}.' },
+    { label: 'Turn start', repeat: '10 turns', text: 'DEFCON improves by 1; each player draws until they hold 8 cards (9 from turn 4, when the Mid War cards are added to the deck; Late War cards are added on turn 8). **Headline**: each player plays 1 card face down for its event; the higher-Ops card resolves first (US first on a tie).' },
+    { label: 'Action rounds', repeat: '6, then 7', text: 'Each round, the USSR plays 1 card, then the US plays 1 card.' },
+    { label: 'Turn end', text: 'A player whose military ops are below the DEFCON level gives the opponent VP equal to the shortfall. No one may keep a {=score} in hand into the next turn. The {=china} turns face up.' },
+    { label: 'Final scoring', text: 'After turn 10: every region scores, the China Card holder gains 1 VP, and the player ahead on VP wins.' },
   ],
 
   points: [
     ['{=score} Region scoring', 'Presence / Domination / Control VP printed on the card, +1 per {=bg} you control there, +1 per controlled country there next to the enemy superpower'],
     ['Events', 'Many cards award VP directly'],
     ['{=space} Space Race', 'VP boxes, worth more to whoever reaches them first'],
-    ['Military ops', 'Opponent’s shortfall below DEFCON at turn end'],
+    ['Military ops', 'VP equal to your opponent’s shortfall below the DEFCON level at turn end'],
     ['{=china} China Card', '+1 VP to its holder at final scoring'],
   ],
 
   end: {
     trigger: 'turn 10 ends, or someone wins early',
     results: [
-      { side: 'Instant win', text: 'reach 20 VP, or Control Europe when it scores.' },
-      { side: 'Instant loss', text: 'cause DEFCON 1 (nuclear war). Tournament rule: hold a scoring card at the end of a turn.' },
-      { side: 'Final scoring', text: 'after turn 10 every region scores (20 VP is not an instant win here); the player ahead on VP wins, 0 is a draw.' },
+      { side: 'Instant win', text: 'push the VP marker to 20 on your side, or have Control of Europe when Europe is scored.' },
+      { side: 'Instant loss', text: 'the player who causes DEFCON 1 (nuclear war) loses. Tournament rule only: a player holding a scoring card at the end of a turn loses.' },
+      { side: 'Final scoring', text: 'after turn 10 every region scores (reaching 20 VP here is not an instant win); the player ahead on VP wins; a VP marker at 0 is a draw.' },
     ],
   },
 
@@ -84,56 +84,57 @@ defineGame({
     ],
   },
 
-  example: 'As the US you play **Decolonization**, a Soviet event worth {=ops2}. You take the Ops first: 1 {=us} into Nigeria and 1 into Zaire. Then the event fires for the USSR: it adds 1 {=ussr} to each of 4 countries in Africa or Southeast Asia.',
+  example: 'As the US you play **Decolonization**, a Soviet event worth {=ops2}. You take the Ops first: 1 {=us} into Nigeria and 1 into Zaire. Then the event happens for the USSR: the USSR adds 1 {=ussr} to each of 4 countries in Africa or Southeast Asia.',
 
   setup: [
     'Place the starting influence printed on the board, then free placements: USSR 6 in Eastern Europe, US 7 in Western Europe.',
-    'Shuffle the Early War cards; deal 8 each. The USSR takes the {china}.',
-    'DEFCON at {=dc5}, VP at 0, turn marker on turn 1.',
+    'Shuffle the Early War cards and deal 8 to each player. The USSR takes the {china} face up.',
+    'Put the DEFCON marker on {=dc5}, the VP marker on 0 and the turn marker on turn 1.',
   ],
 
   terms: [
-    ['{=ops} Ops', 'The number on each card (1–4): how much you can do with it.'],
-    ['Control', 'Your influence ≥ stability and exceeds the enemy’s by at least the stability.'],
-    ['{=bg} Battleground', 'A key country (purple). Coups there lower DEFCON; scoring rewards them.'],
-    ['{=dc3} DEFCON', 'Nuclear tension, 5 (calm) to 1 (war). Battleground coups lower it.'],
-    ['{=china} China Card', 'Shared card: 4 Ops (+1 if all spent in Asia); passes face down to the opponent after use.'],
+    ['{=ops} Ops', 'Operations points: the number on each card (1–4), saying how much you can do with it.'],
+    ['Control', 'You control a country when your influence there is at least its stability number and exceeds the opponent’s influence there by at least its stability number.'],
+    ['{=bg} Battleground', 'A key country (purple box). A coup there lowers DEFCON; region scoring gives extra VP for them.'],
+    ['{=dc3} DEFCON', 'The nuclear tension track, from 5 (calm) to 1 (war). Coups in battlegrounds lower it.'],
+    ['Military ops', 'A track counting the Ops you spent this turn on coups and some events.'],
+    ['{=china} China Card', 'A shared card worth 4 Ops (+1 if all of them are spent in Asia). After you play it, it passes face down to your opponent.'],
   ],
 
   gotchas: [
-    'Playing an **opponent’s event card for Ops still triggers their event**; you only choose before or after your Ops.',
-    '{=score} **Scoring cards** must be played in the turn you draw them; they can never be held (tournament rule: holding one at turn end loses).',
-    'At turn end, each player needs **military ops** (coups and some events) at least equal to DEFCON, or the opponent gains the shortfall as VP.',
+    'Playing an **opponent’s event card for Ops still triggers their event**; you choose only whether the event happens before or after you use the Ops.',
+    '{=score} **Scoring cards** must be played during the turn you draw them; you may never keep one into the next turn (tournament rule only: holding one at turn end loses the game).',
+    'At turn end, each player needs **military ops** this turn (from coups and some events) at least equal to the DEFCON level, or the opponent gains the shortfall as VP.',
   ],
 
   extended: [
-    { title: 'The Headline phase', text: 'Both players choose a card face down and reveal together. Headlines are played **for the event only**: the higher-Ops card resolves first (US first on a tie). Headlining an opponent’s event triggers it for them. Scoring cards may be headlined; they resolve second. The China Card can never be headlined.' },
+    { title: 'The Headline phase', text: 'Each player chooses 1 card face down, then both reveal at once. Headline cards are played **for the event only**: the higher-Ops card resolves first (US first on a tie). Headlining an opponent’s event triggers it for them. Scoring cards may be headlined; a headlined scoring card resolves after the other headline. The China Card can never be headlined.' },
     { title: 'The China Card', items: [
       'Starts face up with the USSR. Worth **4 Ops**, +1 if every Op is spent in Asia. Playable only for Ops, never as an event or headline.',
       'After use it passes **face down** to the opponent, who can use it from the next turn.',
       'It doesn’t count toward hand size and can’t be forced out of your hand; whoever holds it at the end of turn 10 gains **+1 VP**.',
     ] },
     { title: 'Regions, battlegrounds and scoring', items: [
-      '**Presence**: at least one controlled country. **Domination**: more countries **and** more {=bg} than the opponent, with at least one battleground and one non-battleground. **Control**: more countries and **every** battleground.',
+      '**Presence**: you control at least 1 country in the region. **Domination**: you control more countries **and** more {=bg} there than the opponent, including at least 1 battleground and 1 non-battleground. **Control**: you control more countries there than the opponent, and **every** battleground there.',
       'VP for presence / domination / control: Europe 3 / 7 / **automatic win**; Asia 3 / 7 / 9; Middle East 3 / 5 / 7; Africa 1 / 4 / 6; Central America 1 / 3 / 5; South America 2 / 5 / 6.',
       'Bonuses: +1 per battleground you control in the region, +1 per controlled country there adjacent to the enemy superpower.',
       'Southeast Asia scoring (Mid War): 1 VP per controlled country there, 2 for Thailand; the card is then removed.',
     ] },
     { title: 'Coups and realignments in detail', items: [
-      'Target only a country with enemy influence, and only where DEFCON allows. Coup roll: {=die} + Ops − 2 × stability; each point over 0 removes an enemy influence, then the rest adds yours.',
+      'A coup must target a country with enemy influence. Coups and realignments are allowed only where the DEFCON level allows (see the DEFCON table). Coup roll: {=die} + Ops − 2 × stability. Each point above 0 removes 1 enemy influence; points left after all enemy influence is gone each add 1 of yours.',
       'Every coup (successful or not) advances your **military ops** by the card’s Ops. A coup in a {=bg} lowers DEFCON by 1.',
-      'Realignment: each Op is a separate roll-off. Each side adds +1 per adjacent country it controls, +1 if it has more influence in the target, +1 if the target is adjacent to its superpower. The loser removes influence equal to the difference.',
+      'Realignment: each Op is a separate roll by both players. Each player adds +1 per adjacent country they control, +1 if it has more influence in the target, +1 if the target is adjacent to its superpower. The loser removes influence equal to the difference.',
       'Realignments don’t lower DEFCON and don’t count as military ops.',
     ] },
     { title: 'The Space Race', items: [
-      'Once per turn (twice with the second box’s ability), discard a card instead of using it: its event does **not** happen. Boxes 1–4 need a 2-Ops card, 5–7 need 3 Ops, the last needs 4.',
-      'Roll the range printed on the next box (e.g. 1–3) to advance. VP boxes pay more to whoever reaches them first.',
-      'Ability boxes last until the opponent catches up: two attempts per turn, the opponent reveals their headline first, discard a held card at turn end, eight action rounds per turn.',
+      'Once per turn (twice with the two-attempts ability below), you may discard a card to the Space Race instead of using it: its event does **not** happen. To try for boxes 1–4 the card needs 2+ Ops, boxes 5–7 need 3+ Ops, and the last box needs 4 Ops.',
+      'Roll {=die}: if the result is within the range printed on your next box (e.g. 1–3), move your marker into it. VP boxes pay more to whoever reaches them first.',
+      'An ability box’s power lasts until the opponent reaches that box too. The abilities: two Space Race attempts per turn; the opponent reveals their headline first; you may discard 1 held card at turn end; you get eight action rounds per turn.',
     ] },
     { title: 'Turn bookkeeping', items: [
-      'Start of turn: DEFCON improves by 1; hands refill to **8** (9 from turn 4, when the Mid War deck is shuffled in; Late War joins on turn 8).',
-      'End of turn: check military ops (each side needs at least the DEFCON level, or the opponent scores the shortfall), flip the China Card face up. Tournament rule: reveal held cards; holding a scoring card loses.',
-      'Starred events are removed after use; underlined events stay in effect. Playing **your own** event card for Ops does nothing extra; only the opponent’s events fire.',
+      'Start of turn: DEFCON improves by 1; each player draws until they hold **8** cards (9 from turn 4, when the Mid War cards are shuffled into the deck; Late War cards are added on turn 8).',
+      'End of turn: check military ops (each player needs at least the DEFCON level, or the opponent scores the shortfall), then flip the China Card face up. Tournament rule only: both players reveal their held cards, and holding a scoring card loses.',
+      'Events with a star (*) are removed from the game after their event happens; underlined events stay in effect afterwards. Playing **your own** event card for Ops does nothing extra; only the opponent’s events happen when played for Ops.',
     ] },
   ],
 

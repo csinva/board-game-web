@@ -32,28 +32,28 @@ defineGame({
 
   pitch: 'Bank money, lay property cards and charge rent; first to 3 complete colour sets wins.',
 
-  goal: { big: '3 full sets', text: 'First to have **3 complete property sets**, each a **different colour**, on the table.' },
+  goal: { big: '3 full sets', text: 'The first player with **3 complete property sets** of **different colours** face up in front of them wins.' },
 
   turn: {
     type: 'sequence',
     steps: [
-      { verb: 'Draw', text: 'Draw **2** cards, or **5** if your hand is empty.' },
-      { verb: 'Play', text: 'Play **up to 3** cards: {money}s or {action}s to your bank, {prop}s to the table, or {action}s such as {rent}s to the centre.' },
-      { verb: 'Discard', text: 'Discard down to **7** cards.' },
+      { verb: 'Draw', text: 'Draw **2** cards from the deck, or **5** if you have no cards in hand.' },
+      { verb: 'Play', text: 'Play **0 to 3** cards, one at a time. Each goes to one place: a {money} or {action} face up in your bank (an action banked this way is only money); a {prop} face up in front of you; or an {action} such as a {rent} onto the discard pile, doing what it says.' },
+      { verb: 'Discard', text: 'If you have more than **7** cards in hand, discard down to 7.' },
     ],
   },
 
   tension: 'Every action card is also money: bank it for protection, or hold it to steal the set you need.',
 
   structure: [
-    { label: 'Setup', text: 'Shuffle; deal 5 cards each.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Draw 2 (5 if your hand is empty), play up to 3, discard to 7. Deck empty: shuffle the discards.' },
+    { label: 'Setup', text: 'Shuffle; deal 5 cards to each player.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Draw 2 (5 if your hand is empty), play up to 3, discard down to 7 in hand. When the deck runs out, shuffle the discard pile to make a new deck.' },
     { label: 'Game end', text: 'The moment a player has 3 full sets of different colours, they win.' },
   ],
 
   end: {
     trigger: 'a player has 3 complete sets of different colours',
-    detail: 'You win the moment you have 3 full sets, even mid-turn. Wilds can be moved to complete a set only on your turn.',
+    detail: 'You win the moment you have 3 full sets, even partway through your turn. You may move your wilds to complete a set only on your own turn.',
     results: [
       { side: 'Winner', text: 'the first player with 3 full sets of different colours.' },
       { side: 'Everyone else', text: 'loses; there is no score count.' },
@@ -61,42 +61,42 @@ defineGame({
   },
 
   ref: {
-    title: 'Rent (M) for 1 / 2 / 3 / 4 properties owned',
+    title: 'Rent in M for 1 / 2 / 3 / 4 properties of a colour',
     rows: [
-      ['Brown · Utility', '1 / 2 · 1 / 2'],
-      ['Light blue · Pink', '1 / 2 / 3 · 1 / 2 / 4'],
-      ['Orange · Red', '1 / 3 / 5 · 2 / 3 / 6'],
-      ['Yellow · Green', '2 / 4 / 6 · 2 / 4 / 7'],
+      ['Brown · Utility', 'brown 1 / 2 · utility 1 / 2'],
+      ['Light blue · Pink', 'light blue 1 / 2 / 3 · pink 1 / 2 / 4'],
+      ['Orange · Red', 'orange 1 / 3 / 5 · red 2 / 3 / 6'],
+      ['Yellow · Green', 'yellow 2 / 4 / 6 · green 2 / 4 / 7'],
       ['Dark blue', '3 / 8'],
       ['Railroad', '1 / 2 / 3 / 4'],
     ],
   },
 
-  example: 'Dev has {=prop}{=prop} of the 3 greens. **Sly Deal** steals Lia’s lone green to complete the set. A green/blue {=rent}: Lia and Sam each owe 7M. Lia pays a 10M note and gets **no change**. That’s 2 of Dev’s 3 plays.',
+  example: 'Dev has {=prop}{=prop}, 2 of the 3 green properties. He plays **Sly Deal** to take Lia’s only green, completing his set. Then he plays a green/blue {=rent} on his greens: Lia and Sam each owe him 7M. Lia pays with a 10M card and gets **no change**. That’s 2 of Dev’s 3 plays.',
 
   setup: [
     '110 cards: 4 quick-reference cards (set aside), 20 {money}s, 28 {prop}s, 11 {wild}s, 13 {rent}s, 34 other {action}s. Shuffle all but the reference cards.',
-    'Deal **5 cards** each.',
+    'Deal **5 cards** to each player.',
     'Youngest goes first; play passes left.',
   ],
 
   terms: [
-    ['{=money} Bank', 'Your face-up money pile; pays debts. M = millions; notes run 1M to 10M.'],
+    ['{=money} Bank', 'Your face-up pile of money cards (and actions played as money). You pay debts from it. M = millions; money cards are worth 1M to 10M.'],
     ['{=prop}{=prop}{=prop} Full set', 'Every property of one colour (2–4 cards; the number is on the card).'],
-    ['{=wild} Wild', 'Property for either colour shown. The 2 any-colour wilds have no money value. Move wilds between sets on your turn; it isn’t a play.'],
-    ['{=rent} Rent', 'Two-colour: every other player pays rent for one of your sets in those colours. Any-colour: one player pays. **Double the Rent** doubles it.'],
-    ['Sly Deal · Forced Deal', 'Steal one property · swap one of yours for one of theirs. Never from a full set.'],
-    ['Deal Breaker', 'Steal a full set, with its House and Hotel.'],
-    ['Debt Collector · Birthday · Pass Go', '5M from one player · 2M from every player · draw 2 cards.'],
-    ['{=house} House · {=hotel} Hotel', '+3M / +4M rent on a full set; one each per set; Hotel needs a House. Not on railroads or utilities.'],
+    ['{=wild} Wild', 'Property card that counts as either colour shown. The 2 any-colour wilds count as any colour and have no money value. On your turn you may move your wilds between your sets; this is not one of your 3 plays.'],
+    ['{=rent} Rent', 'Two-colour card: pick one of your sets in either colour shown; **every** other player pays you its rent (table). Any-colour card: pick any one of your sets and **one** player, who pays. **Double the Rent**, played together with a rent card, doubles that rent.'],
+    ['Sly Deal · Forced Deal', 'Sly Deal: take 1 property from another player. Forced Deal: swap 1 of your properties for 1 of theirs. Neither can take a property that is part of a full set.'],
+    ['Deal Breaker', 'Take another player’s full set, including any House and Hotel on it.'],
+    ['Debt Collector · Birthday · Pass Go', 'Debt Collector: 1 player of your choice pays you 5M. It’s My Birthday: every other player pays you 2M. Pass Go: draw 2 cards.'],
+    ['{=house} House · {=hotel} Hotel', 'Placed on one of your full sets: a House adds 3M to its rent, a Hotel another 4M. At most one of each per set, and a Hotel needs a House there first. Not allowed on railroads or utilities.'],
   ],
 
   gotchas: [
-    'Pay from your **bank and properties** (your pick), never your hand. **No change** is given. Short: pay everything you have; nothing on the table: pay nothing.',
+    'Pay debts with cards from your **bank and properties** on the table, in any mix you choose, never from your hand. **No change** is given. If you can’t cover the debt, pay everything you have on the table; if you have nothing there, you pay nothing.',
     'Paid money goes to the receiver’s bank; paid properties go to their table. Properties never go in a bank.',
     'Action cards banked as money **lose** their action for good.',
-    'Every card played counts toward the 3, including Pass Go, Double the Rent, House and Hotel. Check the 7-card limit at the **end** of your turn.',
-    '**Just Say No** cancels any action played against you, even on another player’s turn (then it isn’t one of your plays). Another Just Say No cancels it, and so on.',
+    'Every card you play counts as one of your 3 plays, including Pass Go, Double the Rent, House and Hotel. The 7-card hand limit applies only at the **end** of your turn.',
+    '**Just Say No** cancels an action card played against you, even on another player’s turn (then it isn’t one of your plays). The player you stopped may cancel your Just Say No with one of their own, and so on.',
   ],
 
   tips: [

@@ -34,65 +34,65 @@ defineGame({
     type: 'round',
     intro: 'The whole game is one round:',
     steps: [
-      { verb: 'Look', text: 'Look at your card, then place it face down.' },
-      { verb: 'Night', text: 'Eyes closed. Roles are called **in order**; each wakes and acts, often peeking at or swapping cards.' },
-      { verb: 'Talk', text: 'Everyone wakes and debates for a few minutes: claim, accuse, lie.' },
-      { verb: 'Vote', text: 'On “3”, everyone **points** at a player. The player with the most votes dies.' },
+      { verb: 'Look', text: 'Each player secretly looks at their own card, then places it face down in front of them.' },
+      { verb: 'Night', text: 'Everyone closes their eyes. The narrator (app or a player) calls each role **in the night order**; only players whose **starting** card is that role open their eyes, act, and close them again.' },
+      { verb: 'Talk', text: 'Everyone opens their eyes and discusses for a few minutes. Anyone may claim any role, true or not. Nobody looks at cards.' },
+      { verb: 'Vote', text: 'On the count of 3, every player at once **points** at another player. The player with the most votes dies (see How it ends for ties).' },
     ],
-    outro: 'Reveal & play again',
+    outro: 'Flip every card face up and check who won',
   },
 
   tension: 'To catch a wolf you must share what you saw at night, but every truth you share tells a liar which story to tell.',
 
   structure: [
-    { label: 'Night', text: 'Eyes closed. Roles wake one at a time in the night order (table) and act.' },
+    { label: 'Night', text: 'Eyes closed. Roles wake one at a time in the night order (table), act, and close their eyes again.' },
     { label: 'Day', text: 'A few minutes of open talk: claim roles, compare stories, spot contradictions.' },
-    { label: 'Vote', text: 'One vote, all at once. Flip every card and check which team won.' },
+    { label: 'Vote', text: 'One vote, everyone pointing at the same time. Then flip every player’s card face up and check which team won.' },
   ],
 
   end: {
-    trigger: 'The one vote is resolved and all cards are flipped',
-    detail: 'Ties kill everyone tied. If nobody gets more than 1 vote, nobody dies.',
+    trigger: 'the one vote is resolved and all cards are flipped',
+    detail: 'If two or more players tie for the most votes, all of them die. If no player gets more than 1 vote, nobody dies.',
     results: [
       { side: 'Village wins', text: 'if at least one {=werewolf} dies, or if no player is a werewolf and nobody dies.' },
-      { side: 'Werewolves win', text: 'if a player is a {=werewolf} and no werewolf dies. The {minion} wins with them, even if he dies.' },
-      { side: 'Tanner wins', text: 'if he dies (optional role). If he dies and no {=werewolf} does, the werewolves don’t win.' },
+      { side: 'Werewolves win', text: 'if at least one player holds a {=werewolf} and no werewolf dies. The {minion} wins with them, even if the Minion is the one who dies.' },
+      { side: 'Tanner wins', text: 'if the Tanner dies (an optional role). If the Tanner dies and no {=werewolf} dies, the werewolves don’t win.' },
     ],
   },
 
   ref: {
-    title: 'Night order (common roles)',
+    title: 'Night order, top to bottom (common roles)',
     rows: [
-      ['{=werewolf} Werewolves', 'see each other; a lone wolf views 1 centre card'],
-      ['{=minion} Minion', 'sees the wolves (they don’t see him); wolf team. No wolves among players: wins if anyone else dies'],
-      ['{=mason} Masons', 'see each other; village team'],
-      ['{=seer} Seer', 'views 1 player’s card or 2 centre cards'],
-      ['{=robber} Robber', 'swaps with a player, then views his new card'],
-      ['{=troublemaker} Troublemaker', 'swaps two other players’ cards without looking'],
-      ['{=drunk} Drunk, {=insomniac} Insomniac', 'Drunk swaps with a centre card blind; Insomniac views own card last'],
-      ['{=hunter} Hunter (no night action)', 'if he dies, the player he voted for dies too'],
+      ['{=werewolf} Werewolves', 'open eyes to see each other. A lone wolf (no other werewolf among players) may look at 1 centre card'],
+      ['{=minion} Minion', 'opens eyes to see who the werewolves are (they don’t learn who the Minion is). Wolf team. If no player holds a werewolf, the Minion wins if any other player dies'],
+      ['{=mason} Masons', 'open eyes to see each other. Village team'],
+      ['{=seer} Seer', 'may look at 1 other player’s card **or** 2 of the centre cards'],
+      ['{=robber} Robber', 'may swap own card with another player’s card, then looks at the new card'],
+      ['{=troublemaker} Troublemaker', 'may swap the cards of 2 other players, without looking at either'],
+      ['{=drunk} Drunk, then {=insomniac} Insomniac', 'Drunk **must** swap own card with 1 centre card without looking at it. Insomniac then looks at their own card to see if it changed'],
+      ['{=hunter} Hunter (no night action)', 'if the Hunter dies, the player the Hunter pointed at also dies'],
     ],
   },
 
   example: 'Five players. Mia, the {robber}, swaps with Leo and sees {=werewolf}: Mia is now a werewolf and Leo the Robber. By day Leo claims Robber; Mia claims {=seer} Seer and says Leo is a wolf. If the vote kills Leo, the werewolves (Mia) win.',
 
   setup: [
-    'Use **players + 3** role cards, including 2 {werewolf}s, the {seer}, {robber} and {troublemaker}.',
-    'Shuffle. Deal 1 card face down to each player and 3 face down to the centre.',
-    'Use the free app or a narrator script to call night roles in order.',
+    'Use exactly **players + 3** role cards: 2 {werewolf}s, the {seer}, {robber} and {troublemaker}, plus any other roles to make up the count.',
+    'Shuffle. Deal 1 card face down to each player and 3 face down in the middle of the table (the centre cards).',
+    'Use the free app, or have one player read the narrator script, to call night roles in order.',
   ],
 
   terms: [
-    ['{=back} Centre cards', 'The 3 unused roles. Some roles look at or swap with them.'],
+    ['{=back} Centre cards', 'The 3 roles nobody was dealt, face down in the middle. Some roles look at or swap with them.'],
     ['Claim', 'Saying which role you are (true or not).'],
-    ['{=villager} Village team', 'Every role except the werewolves, Minion and Tanner.'],
-    ['Lone wolf', 'The only werewolf among players; may view 1 centre card.'],
+    ['{=villager} Village team', 'Every role except the Werewolves, Minion and Tanner.'],
+    ['Lone wolf', 'A werewolf who sees no other werewolf at night (the other is in the centre); may look at 1 centre card.'],
   ],
 
   gotchas: [
     'You are the role on the card in front of you **at the end**, even if you never saw it change.',
-    'Never look at or show your card after the night (only the {=insomniac} checks, at night).',
-    'Night actions follow your **starting** card: a robbed Seer doesn’t wake again, and the new “Robber” never acts.',
+    'After the night, nobody may look at or show their card until the final flip (only the {=insomniac} checks, and only at night).',
+    'You wake and act only for the card you were **dealt**: if the Robber takes the Seer card, the Robber does not then act as Seer, and the old Seer (now holding the Robber card) does not act as Robber.',
   ],
 
   tips: [

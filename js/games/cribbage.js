@@ -32,41 +32,41 @@ defineGame({
     peg: { name: 'peg', draw: A => peg(A, '#c8423b') },
   },
 
-  pitch: 'Score fifteens, pairs and runs while playing cards to 31 and again in your hand; first to peg 121 wins.',
+  pitch: 'Score fifteens, pairs and runs while playing cards to 31 and again in your hand; first to 121 points wins.',
 
-  goal: { big: '121 points', text: 'First to move a {=peg} peg **121** holes around the board wins. Points come from card combinations.' },
+  goal: { big: '121 points', text: 'You record each point by moving a {=peg} peg 1 hole along the cribbage board. The first player to reach hole **121** wins. Points come from card combinations made while playing cards and when counting your hand.' },
 
   turn: {
     type: 'round',
-    intro: 'Each deal goes through these phases; the deal alternates.',
+    intro: 'Each deal goes through these phases; players take turns being the dealer.',
     steps: [
-      { verb: 'Deal', text: 'Dealer gives **6 cards** each. The other player is the **pone**.' },
-      { verb: 'Crib', text: 'Each player puts 2 cards face down into the **crib**: an extra hand that scores for the dealer.' },
-      { verb: 'Cut', text: 'Pone cuts; dealer turns up the top card as the **starter**. A Jack starter scores the dealer 2.' },
-      { verb: 'Play to 31', text: 'From the pone, alternate laying one card face up and saying the **running total**. Score 15s, 31, pairs and runs as they form. If you can’t play without passing 31, say **go**: the other player must play every card they can, then scores 1 (2 for exactly 31).' },
-      { verb: 'Show', text: 'Pick your 4 cards back up and score them with the starter: pone, then dealer, then the dealer’s **crib**.' },
+      { verb: 'Deal', text: 'The dealer deals **6 cards** to each player. The non-dealer is called the **pone**.' },
+      { verb: 'Crib', text: 'Each player chooses 2 of their cards and puts them face down in the **crib**: a 4-card extra hand that scores for the dealer later. Keep the other 4.' },
+      { verb: 'Cut', text: 'The pone cuts the rest of the deck; the dealer turns up its top card as the **starter**. If the starter is a Jack, the dealer scores 2 (**his heels**).' },
+      { verb: 'Play to 31', text: 'Starting with the pone, players take turns laying 1 card face up in front of themselves and saying the **running total** of the cards played (A = 1, J Q K = 10). The total may not go over 31. Score as you play when the total reaches exactly 15 or 31, or your card makes a pair or run with the cards just played (see Scoring). If you can’t play without going over 31, say **go**: the other player must play every card they can without going over 31, then scores 1 (2 if the total is exactly 31).' },
+      { verb: 'Show', text: 'Each player picks their 4 played cards back up and scores them together with the starter, as a 5-card hand: first the pone, then the dealer, then the dealer scores the **crib** (also with the starter).' },
     ],
   },
 
   tension: 'You keep 4 of 6 cards, and the 2 you throw away score for the dealer, so on the opponent’s deal you must discard cards that help nobody.',
 
   structure: [
-    { label: 'Setup', text: 'Cut for deal; lower card deals. Pegs start at 0.' },
-    { label: 'Deal & crib', repeat: 'every deal', text: '6 cards each. Both put 2 face down in the dealer’s **crib**.' },
-    { label: 'Cut', repeat: 'every deal', text: 'Pone cuts; dealer turns the **starter**. A Jack: dealer pegs 2.' },
-    { label: 'The play', repeat: 'every deal', text: 'Pone leads. Alternate cards, total ≤ 31. After 31 or a go, the count restarts at 0; whoever did not play last leads. Ends when all 8 cards are out.' },
-    { label: 'The show', repeat: 'every deal', text: 'Score pone’s hand, dealer’s hand, then the crib (for the dealer), each with the starter. Deal passes.' },
-    { label: 'Game end', text: 'First peg to **121** wins at once.' },
+    { label: 'Setup', text: 'Each player cuts the deck; the lower card deals first. All pegs start at 0.' },
+    { label: 'Deal & crib', repeat: 'every deal', text: '6 cards each. Each player puts 2 face down in the dealer’s **crib**.' },
+    { label: 'Cut', repeat: 'every deal', text: 'The pone cuts; the dealer turns up the **starter**. If it is a Jack, the dealer scores 2.' },
+    { label: 'The play', repeat: 'every deal', text: 'The pone plays first. Players alternate cards; the running total may not go over 31. After 31 or a go, the count restarts at 0 and the player who did not play the last card plays next. The play ends when all 8 cards have been played.' },
+    { label: 'The show', repeat: 'every deal', text: 'Score the pone’s hand, the dealer’s hand, then the crib (for the dealer), each with the starter. The other player deals next.' },
+    { label: 'Game end', text: 'The first player to reach **121** wins at once, even in the middle of the play or the show.' },
   ],
 
   points: [
     ['Fifteen', 'Show: each set of cards totalling 15, e.g. {=5h}{=10s} or {=4d}{=5c}{=6s} = **2** · play: count reaches 15 = **2**'],
-    ['Pair', '{=7c}{=7d} = **2** · three of a kind 6 · four 12'],
-    ['Run', '{=4d}{=5h}{=6s} = **1 per card**, any order; ace is low (A-2-3, not Q-K-A)'],
-    ['Flush (show)', '4 hand cards of one suit = **4**, 5 with the starter'],
-    ['{=jh} His nobs (show)', 'Jack of the starter’s suit in your hand = **1**'],
-    ['His heels', 'Jack turned as the starter = **2** to the dealer'],
-    ['31 / go (play)', 'exactly 31 = **2** · last card under 31 = **1**'],
+    ['Pair', '2 cards of one rank {=7c}{=7d} = **2** · three of a kind = 6 · four of a kind = 12'],
+    ['Run', '3 or more consecutive ranks, any suits {=4d}{=5h}{=6s} = **1 per card**, any order; ace is low (A-2-3, not Q-K-A)'],
+    ['Flush (show)', 'all 4 hand cards of one suit = **4**; 5 if the starter is that suit too (crib: see Rules people miss)'],
+    ['{=jh} His nobs (show)', 'the Jack of the starter’s suit in the hand being counted = **1**'],
+    ['His heels', 'a Jack turned up as the starter = **2** to the dealer'],
+    ['31 / go (play)', 'card that makes the total exactly 31 = **2** · last card played before the count restarts, under 31 = **1**'],
   ],
 
   end: { trigger: 'a player’s front peg reaches hole 121', detail: 'The game stops at once, even mid-play or mid-count. Optional convention: the win counts double if the loser has under 91 (a **skunk**).' },
@@ -88,8 +88,8 @@ defineGame({
   example: 'Ben deals. You keep {=4d}{=5h}{=5c}{=6s} and throw {=kc}{=9d} in his crib; the starter is {=10s}. In play you lead the 4, Ben plays a 6, your 5 makes **15 for 2** plus a run of 3 for 3. In the show your hand counts **16**: four fifteens (8), a pair (2), two runs of 3 (6).',
 
   setup: [
-    '52-card deck, cribbage board, 2 {=peg} pegs per player. With 3 or 4, deal 5 each and discard 1 (3 players: add 1 card from the deck to the crib; 4: partners).',
-    'Cut for deal: lower card deals first.',
+    '52-card deck, cribbage board, 2 {=peg} pegs per player. With 3 or 4 players, deal 5 cards each and each player puts 1 in the crib (3 players: also add 1 card from the deck to the crib; 4 players: play as 2 teams of 2).',
+    'Each player cuts the deck: the lower card deals first.',
     'Card values: A = 1, 2–10 face value, J Q K = 10.',
   ],
 
@@ -98,13 +98,14 @@ defineGame({
     ['Crib', 'The 4 discards; scored by the dealer after both hands.'],
     ['Starter', 'The cut card. Counts as a 5th card in both hands and the crib.'],
     ['Go', 'Said when you can’t play without passing 31; the other player plays on, and the last to play scores 1.'],
-    ['{=peg} Leapfrog', 'Move your back peg past your front peg by the points scored.'],
+    ['{=peg} Leapfrog', 'How you score with your 2 pegs: move your back peg ahead of your front peg by the number of points scored.'],
+    ['Show', 'Counting the hands and crib after the play.'],
   ],
 
   gotchas: [
-    'The **pone counts first**. Reach 121 then and you win before the dealer counts.',
+    'The **pone counts first**. If the pone reaches 121 while counting, the pone wins before the dealer counts.',
     'Crib flushes count only with **5** cards of one suit (starter included).',
-    'After 31 or a go, the count **restarts at 0**. Runs in play count in any order (4-6-5) but break when an out-of-place card lands.',
+    'After 31 or a go, the count **restarts at 0**. Runs in play count in any order (4-6-5), but only among the most recent cards in a row; a card that doesn’t fit the run breaks it.',
   ],
 
   tips: [
@@ -140,9 +141,9 @@ defineGame({
       { step: 0, say: 'Ben deals 6 each. Your hand: {=4d}{=5h}{=5c}{=6s}{=kc}{=9d}.', svg: scene + pegs(6, 2) + ben([1, 2, 3, 4, 5, 6]) + you(order) },
       { step: 1, say: 'Keep 4-5-5-6 for fifteens and runs. Throw {=kc}{=9d} into **Ben’s crib**: far apart, hard to combine. Ben throws 2 too.', svg: scene + pegs(6, 2) + ben([1, 2, 3, 4]) + you(order.slice(0, 4)) + crib + A.glow(272, 76, 30) },
       { step: 2, say: 'You cut; Ben turns the **starter** {=10s}. Not a Jack, so no points. It counts in every hand.', svg: scene + pegs(6, 2) + ben([1, 2, 3, 4]) + you(order.slice(0, 4)) + crib + starter() + A.glow(33, 114, 26) },
-      { step: 3, say: 'You lead 4 (“four”), Ben plays 6 (“ten”), you play 5: “**fifteen** for 2, and a run of 3 for 3.” Leapfrog 5 holes.',
+      { step: 3, say: 'You lead 4 (“four”), Ben plays 6 (“ten”), you play 5: “**fifteen** for 2, and a run of 3 for 3.” Move your back peg 5 holes past your front peg.',
         svg: scene + pegs(6, 11) + ben([2, 3, 4]) + you(['5c', '6s']) + crib + starter() + A.k('y4d', put(...play(0), F('4', '♦'))) + A.k('b1', put(...play(1), F('6', '♣'))) + A.k('y5h', put(...play(2), F('5', '♥'))) + total('15', '+5 you') + A.glow(hx(11), 30, 8, 'gp') },
-      { step: 3, say: 'Ben plays K (“twenty-five”); your 6 makes exactly **31 for 2**. The count restarts at 0; Ben leads the last 3 cards, and nobody scores.',
+      { step: 3, say: 'Ben plays K (“twenty-five”); your 6 makes exactly **31 for 2**. The count restarts at 0; Ben plays first for the last 3 cards, and nobody scores.',
         svg: scene + pegs(13, 11) + ben([3, 4]) + you(['5c']) + crib + starter() + A.k('y4d', put(...play(0), F('4', '♦'))) + A.k('b1', put(...play(1), F('6', '♣'))) + A.k('y5h', put(...play(2), F('5', '♥'))) +
           A.k('b2', put(...play(3), F('K', '♦'))) + A.k('y6s', put(...play(4), F('6', '♠'))) + total('31', '+2 you') + A.glow(hx(13), 30, 8, 'gp') },
       { step: 4, say: 'Show: your 4 + the starter. Fifteen 2, 4, 6, 8, a pair is 10, two runs of 3 make **16**. Then Ben counts his hand and crib.',

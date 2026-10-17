@@ -43,37 +43,37 @@ defineGame({
 
   pitch: 'Co-op: each round play 2 cards to move and fight; meet the scenario goal before your shrinking hands run out.',
 
-  goal: { big: 'Beat the scenario', text: 'Meet the scenario goal, usually **kill all enemies**, before every character is exhausted. You win at the end of that round.' },
+  goal: { big: 'Beat the scenario', text: 'Meet the scenario goal (usually **kill all enemies**) before every character is exhausted (knocked out of the scenario). You win at the end of the round in which the goal is met.' },
 
   turn: {
     type: 'round',
-    intro: 'Each round, everyone picks cards in secret, then all figures act in initiative order:',
-    outro: 'Round end: elements wane; players may short rest.',
+    intro: 'Each round, everyone picks cards in secret, then every figure (characters and monsters) takes a turn in initiative order:',
+    outro: 'Round end: each element wanes 1 step; then each player may short rest.',
     steps: [
-      { verb: 'Pick 2', text: 'Each player secretly picks **2 cards** (or declares a long rest) and marks one as leading: its number is your {initiative}.' },
-      { verb: 'Reveal', text: 'Reveal; flip 1 ability card per monster type. Every figure acts in {=initiative} order, **lowest first**.' },
-      { verb: 'Act', text: 'On your turn use the **top** half of one card (often {=attack}) and the **bottom** half of the other (often {=move}), in either order.' },
-      { verb: 'Monsters', text: 'Each monster picks a **focus** (the enemy it can reach in the fewest moves) and follows its ability card, whose {=move} / {=attack} values **modify** its stat card.' },
+      { verb: 'Pick 2', text: 'Each player secretly picks **2 cards** from hand (or declares a long rest) and chooses one as the leading card: the number on it is your {initiative}.' },
+      { verb: 'Reveal', text: 'All players reveal. For each monster type on the board, flip the top card of its ability deck. Every figure takes its turn in {=initiative} order, **lowest number first**.' },
+      { verb: 'Act', text: 'On your turn, use the **top** action of one of your 2 cards (often {=attack}) and the **bottom** action of the other (often {=move}), in either order. Then both go to your discard pile, or to your lost pile if marked {lost}.' },
+      { verb: 'Monsters', text: 'On its turn, each monster picks a **focus** (the enemy it can attack using the fewest movement points) and does what its type’s ability card says. The card’s {=move} / {=attack} values are **added to** the numbers on its stat card (e.g. {=move} +1).' },
     ],
   },
 
   tension: 'The strongest actions are {lost} cards that leave your hand for good, so every big play brings exhaustion closer.',
 
   structure: [
-    { label: 'Setup', text: 'Build the first room; place its monsters with their stat cards at scenario level. Each player: class, hit points, hand, {=modifier} deck.' },
-    { label: 'Pick cards', repeat: 'round', text: 'Each player secretly picks 2 cards and which one leads, or declares a long rest. Can’t do either: exhausted.' },
-    { label: 'Initiative', repeat: 'round', text: 'Reveal. Flip 1 ability card per monster type on the board. Order all figures by {=initiative}, lowest first.' },
-    { label: 'Turns', repeat: 'round', text: 'Players: top of one card + bottom of the other (or long rest). Monsters: pick a focus, follow their card. Loot your hex at the end of your turn.' },
-    { label: 'Round end', repeat: 'round', text: 'Elements wane 1 step. Reshuffle any deck that drew a shuffle card (monsters) or ×2 / miss ({=modifier}). Players may **short rest**.' },
-    { label: 'Scenario end', text: 'Won at the end of the round the goal is met; lost when every character is exhausted. Keep XP, gold and items either way.' },
+    { label: 'Setup', text: 'Build the first room; place its monsters and set their stat cards to the scenario level. Each player takes a class, sets hit points, chooses a hand and shuffles a {=modifier} deck.' },
+    { label: 'Pick cards', repeat: 'round', text: 'Each player secretly picks 2 cards and which one leads, or declares a long rest. A player who can do neither is exhausted.' },
+    { label: 'Initiative', repeat: 'round', text: 'Reveal. Flip 1 ability card for each monster type on the board. Order all figures by {=initiative}, lowest number first.' },
+    { label: 'Turns', repeat: 'round', text: 'Each player: top action of one card + bottom action of the other (or the long rest). Each monster: pick a focus, follow its type’s card. At the end of a character’s turn, they loot the hex they stand on.' },
+    { label: 'Round end', repeat: 'round', text: 'Each element wanes 1 step. Reshuffle each monster ability deck that drew a card with a shuffle icon this round, and each {=modifier} deck that drew a ×2 or miss card. Each player may **short rest**.' },
+    { label: 'Scenario end', text: 'Won at the end of the round in which the goal is met; lost when every character is exhausted. Keep XP, gold and items either way.' },
   ],
 
   end: {
     trigger: 'the scenario goal is met at the end of a round, or every character is exhausted',
     detail: 'Between scenarios you keep XP, gold and items, level up, unlock new locations and follow a branching story. Characters retire when their personal quest is done.',
     results: [
-      { side: 'Scenario won', text: 'at the end of the round the goal is met.' },
-      { side: 'Scenario lost', text: 'when **every character is exhausted**: 0 hit points, or unable to play 2 cards or rest.' },
+      { side: 'Scenario won', text: 'at the end of the round in which the goal is met.' },
+      { side: 'Scenario lost', text: 'when **every character is exhausted**. A character is exhausted at 0 hit points, or when at the start of a round they can neither play 2 cards nor rest.' },
     ],
   },
 
@@ -81,67 +81,68 @@ defineGame({
     title: 'Symbols and card flow',
     rows: [
       ['Actions', '{move} {attack} {range} {shield} {heal}'],
-      ['Played card', 'to discard; with {=lost}, lost for the scenario'],
-      ['Short rest', 'round end: lose 1 random discard, return the rest to hand'],
-      ['Long rest', '{=initiative} 99: lose 1 chosen card, {=heal} 2, refresh items'],
-      ['Block damage', 'lose 1 card from hand or 2 from discard'],
+      ['Played card', 'goes to your discard pile; if marked {=lost}, to your lost pile for the rest of the scenario'],
+      ['Short rest', 'at round end: put 1 random card from your discard pile in your lost pile; return the rest to hand'],
+      ['Long rest', 'declared instead of picking cards; act at {=initiative} 99: lose 1 discarded card of your choice, return the rest of your discard pile to your hand, {=heal} 2, refresh items'],
+      ['Cancel damage', 'lose 1 card from hand, or 2 from your discard pile, to cancel all damage from one source'],
       ['Elements', '{=fire}{=ice}{=air}{=earth}{=light}{=dark}'],
     ],
   },
 
-  example: 'Ana’s Brute leads with {=initiative} **15**, so she acts before the Bandit Guards (50). Top of one card: {=attack} 3 on the adjacent {=elite} elite guard (Shield 1 at level 1); she draws a **+1** {=modifier}: 4 − 1 = **3** damage. Bottom of the other: {=move} 3, out of the guards’ reach. The first card has {=lost}, so it is gone for this scenario.',
+  example: 'Ana’s Brute leads with {=initiative} **15**, so she acts before the Bandit Guards (50). Top action of one card: {=attack} 3 on the adjacent {=elite} elite guard (Shield 1 at level 1); she draws a **+1** {=modifier}: 3 + 1 − 1 = **3** damage. Bottom action of the other card: {=move} 3, out of the guards’ reach. The first card is marked {=lost}, so it goes to her lost pile for the rest of the scenario; the other goes to her discard pile.',
 
   setup: [
     'Pick a scenario, build its first room from map tiles, and place the monsters shown for your player count. Scenario level = average character level ÷ 2, rounded up; it sets monster stats.',
-    'Each player takes a class, sets hit points for their level, and chooses a hand up to the class card limit (Brute: 10).',
-    'Shuffle each player’s {=modifier} attack modifier deck and each monster type’s ability deck.',
+    'Each player takes a class, sets hit points for their level, and chooses a hand of **exactly** as many ability cards as the class’s hand size (Brute: 10).',
+    'Shuffle each player’s {=modifier} attack modifier deck, each monster type’s ability deck, and the one monster attack modifier deck (the 20 cards marked M), which all monsters draw from.',
   ],
 
   terms: [
-    ['{=initiative} Initiative', 'The number on your leading card. Lower acts first.'],
-    ['{=lost} Lost', 'A card with this icon leaves play for the rest of the scenario after use.'],
-    ['Exhausted', 'Out of the scenario: 0 hit points, or unable to play 2 cards or rest.'],
+    ['{=initiative} Initiative', 'The number on your leading card. The lower number acts first.'],
+    ['{=lost} Lost', 'After you use a card with this icon, it goes to your lost pile for the rest of the scenario. Rests and cancelling damage also send cards there.'],
+    ['Exhausted', 'Out of the scenario: at 0 hit points, or when at the start of a round you can neither play 2 cards nor rest.'],
     ['{=elite} Elite', 'Tougher monster on a gold base; {=normal} normal monsters have a white base.'],
     ['{=modifier} Modifier', 'Attack modifier card, drawn for every attack instead of a die roll: +1, −1, ×2, miss…'],
   ],
 
   gotchas: [
-    'Any card can be played as a basic **{=attack} Attack 2** (top) or **{=move} Move 2** (bottom).',
-    'Don’t share exact card names or numbers: say "I’ll go early", not "I’m playing initiative 12".',
-    'Monsters focus the enemy they can reach in the **fewest moves**, then the closest, then the earliest initiative; not simply the closest hex.',
+    'Any card’s top action can be replaced by a basic **{=attack} Attack 2**, and any card’s bottom action by a basic **{=move} Move 2**.',
+    'While picking cards you may discuss plans, but not exact card names or numbers: say "I’ll go early", not "I’m playing initiative 12".',
+    'A monster focuses on the enemy it can attack using the **fewest movement points**; ties go to the closest, then to the earliest initiative. It is not simply the closest enemy.',
   ],
 
   tips: [
     'Your hand size sets how many rounds you last; don’t burn {=lost} cards early.',
-    'Use the default {=move} 2 / {=attack} 2 freely to save stronger cards.',
+    'Use the basic {=move} 2 / {=attack} 2 freely to save stronger actions.',
     'Kill monsters before they act: a low-{=initiative} attack can prevent a hit.',
   ],
 
   extended: [
     { title: 'Initiative in detail', items: [
       'Your {=initiative} is the number on your **leading** card. Choose which card leads when you pick them, before the reveal.',
-      'Ties between players: compare the **second** cards; still tied, the players decide. Players act before monsters on an exact tie; summons act just before their summoner.',
-      'Each monster **type** acts on its ability card’s initiative: {=elite} elites first, then {=normal} normals, each group by ascending standee number.',
+      'Ties between players: compare the initiative on their **second** cards; if still tied, the players decide. A player tied with a monster acts first; summons act just before their summoner.',
+      'Each monster **type** acts on its ability card’s initiative. Within a type, {=elite} elites act first, then {=normal} normals, each group in ascending standee number.',
       'A **long rest** has initiative 99, so you act last.',
     ] },
     { title: 'Monster focus and the AI', items: [
       'A monster’s **focus** is the enemy it can attack using the fewest movement points (it paths through traps only if no other path exists).',
-      'Tiebreaks: the enemy **closest by range** (hexes), then the one with the **earliest initiative** this round.',
-      'It moves only as far as needed to attack its focus with as many targets as possible, stays at {=range} if ranged, and avoids disadvantage when it can. No focus: no move, no attack.',
-      'Ranged monsters adjacent to an enemy attack with **disadvantage**; they step away first if their move allows.',
+      'Tiebreaks: the enemy **fewest hexes away**, then the one with the **earliest initiative** this round.',
+      'It moves only as far as needed to attack its focus (and as many other targets as it can). A ranged monster stops once its focus is within {=range} and avoids standing adjacent to it when it can. A monster with no focus neither moves nor attacks.',
+      'A ranged attack on an adjacent enemy has **disadvantage**, so a ranged monster steps away first if its move allows.',
       'Monster ability decks reshuffle at the end of a round in which a card with a shuffle icon was drawn.',
     ] },
     { title: 'Attacks and movement', items: [
-      'Damage = {=attack} value + 1 drawn {=modifier}, minus the target’s {=shield}. A figure at 0 hit points is removed (a character is exhausted).',
-      'Melee attacks hit an adjacent hex; {=range} attacks reach up to that many hexes. **Advantage**: draw 2 modifiers, use the better; **disadvantage**: use the worse.',
-      'Modifiers with a rolling icon add on: draw again and add the next one too. A ×2 or miss card makes that deck reshuffle at round end.',
-      '{=move} costs 1 per hex; difficult terrain costs 2. You can’t move through enemies, obstacles or walls; a figure entering a trap hex (without Jump or Flying) springs it.',
-      'Entering a closed door hex opens it: set up the next room and its monsters right away.',
+      'Damage = {=attack} value + the 1 {=modifier} drawn, minus the target’s {=shield}. A monster at 0 hit points is removed; a character at 0 is exhausted.',
+      'A melee attack (no {=range}) targets an adjacent enemy; a {=range} attack targets an enemy up to that many hexes away. **Advantage**: draw 2 modifiers and use the better; **disadvantage**: draw 2 and use the worse.',
+      'A modifier with a rolling icon adds on: draw another card and add it too. Drawing a ×2 or miss card makes that deck reshuffle at round end.',
+      '{=move} costs 1 per hex; a difficult-terrain hex costs 2. You can’t move through enemies, obstacles or walls. A figure entering a trap hex (without Jump or Flying) springs it.',
+      'When a character enters a closed door hex, the door opens: set up the next room and its monsters right away.',
     ] },
     { title: 'Conditions', items: [
-      '{poison}: attacks against you get +1; heals remove poison instead of healing. {wound}: suffer 1 damage at the start of each of your turns until healed.',
-      '{immobilize}: cannot move. {disarm}: cannot attack. {stun}: no actions (you still play 2 cards). These end at the end of your next turn.',
-      '{muddle}: your attacks have disadvantage. Positive: {strengthen} (advantage), {invisible} (enemies cannot focus or target you).',
+      '{poison}: every attack on the poisoned figure gets +1 {=attack}; a heal on it removes the poison instead of healing. {wound}: the figure suffers 1 damage at the start of each of its turns until a heal removes it.',
+      '{immobilize}: cannot move. {disarm}: cannot attack. {stun}: cannot perform any abilities or use items (a stunned character still plays 2 cards, which are discarded unused, or long rests). {muddle}: the figure’s attacks have disadvantage.',
+      'Positive: {strengthen} (its attacks have advantage), {invisible} (enemies cannot focus on or target it).',
+      'Immobilize, disarm, stun, muddle, strengthen and invisible each end at the **end of that figure’s next turn**.',
     ] },
     { title: 'Elements', items: [
       '6 elements: {fire}, {ice}, {air}, {earth}, {light}, {dark}. An action that **infuses** an element sets it to Strong at the end of that figure’s turn.',
@@ -149,18 +150,18 @@ defineGame({
       'An ability that **consumes** an element needs it Strong or Waning; it gains the bonus and the element becomes Inert. Monsters consume elements too.',
     ] },
     { title: 'Resting, damage and exhaustion', items: [
-      '**Short rest** (end of round): shuffle the discard back into your hand, losing 1 **random** card. **Long rest** (your turn, initiative 99): lose 1 card of your choice, {=heal} 2, refresh spent items.',
+      '**Short rest** (at round end): shuffle your discard pile, put 1 **random** card from it in your lost pile, and return the rest to your hand. **Long rest** (declared instead of picking cards; you act at initiative 99): put 1 card of your choice from your discard pile in your lost pile, return the rest of your discard pile to your hand, {=heal} 2, refresh spent items.',
       'You need at least 2 cards in your discard pile to rest.',
-      'Instead of taking damage from one source, you may **lose** 1 card from hand or 2 from discard to negate it all.',
-      'You are **exhausted** at 0 hit points, or at the start of a round when you cannot play 2 cards and cannot rest. You keep the XP and money gathered so far.',
+      'Instead of taking damage from one source, you may **lose** 1 card from your hand or 2 from your discard pile to cancel all of it.',
+      'You are **exhausted** at 0 hit points, or at the start of a round when you cannot play 2 cards and cannot rest. You keep the XP and gold gathered so far.',
     ] },
     { title: 'Loot and scenario goals', items: [
-      '{coin} and treasure must be **looted**: end a move on the hex, or use a Loot action. Each coin is worth gold by scenario level at the end.',
-      'At the end of **your** turn you loot the hex you stand on. Monsters never loot; killed monsters drop a coin on their hex.',
+      '{coin} and treasure are picked up only by **looting**: by standing on their hex at the end of your turn, or with a Loot action. At scenario end, each coin is worth an amount of gold set by the scenario level.',
+      'At the end of **your** turn you must loot the hex you stand on. Monsters never loot; a killed monster drops a coin on its hex unless it was summoned or spawned.',
       'Goals vary: kill all enemies, reach a hex, protect an NPC, loot treasure. A lost scenario still keeps XP and gold, but not the reward.',
     ] },
     { title: 'Campaign, perks and retirement', items: [
-      'Between scenarios: buy items with gold, level up from XP (add stronger cards), and gain **perks** from check marks to improve your {=modifier} deck.',
+      'Between scenarios: buy items with gold, level up from XP (add stronger cards to your pool), and gain **perks** that improve your {=modifier} deck: 1 per level-up, plus 1 for every **3** check marks (at most 6 perks from check marks).',
       'Each character has a secret **personal quest**. Completing it forces **retirement**: the character leaves, unlocks new content (often a new class), and you start a new character.',
       'City and road events, global achievements and party reputation decide which scenarios and shop items become available.',
     ] },
@@ -223,16 +224,16 @@ defineGame({
     return [
       { step: 0, say: '**Pick 2.** Ana’s Brute stands next to an {=elite} elite Bandit Guard. She secretly picks 2 cards and chooses one to lead.',
         svg: base + brute(1, 3) + elite(2, 2) + guard(3, 1) + mon(false) + handBacks(3) + A.k('pickA', back(slotA[0] + 9, slotA[1] + 14, 36, 52)) + A.k('pickB', back(slotB[0] + 9, slotB[1] + 14, 36, 52)) + A.glow(227, 118, 12, 'g-pickA') + A.glow(287, 118, 12, 'g-pickB') },
-      { step: 1, say: '**Reveal.** Her leading card shows {=initiative} **15**; the Guard ability card shows **50**. Lower goes first.',
+      { step: 1, say: '**Reveal.** Her leading card shows {=initiative} **15**; the Guard ability card shows **50**. The lower number goes first, so she acts first.',
         svg: base + brute(1, 3) + elite(2, 2) + guard(3, 1) + mon(true) + handBacks(3) + cA() + cB() + order + A.glow(227, 118, 11, 'g-init') + A.glow(216, 45, 14, 'g-mon') },
-      { step: 2, say: '**Top half** of the first card: {=attack} 3 on the elite. She draws a **+1** {=modifier}: 4, minus its {=shield} 1 = **3** damage.',
+      { step: 2, say: '**Top action** of the first card: {=attack} 3 on the elite. She draws a **+1** {=modifier}: 3 + 1 = 4, minus its {=shield} 1 = **3** damage.',
         svg: base + brute(1, 3) + elite(2, 2) + guard(3, 1) + mon(true) + handBacks(3) + cA('top') + cB() + order + A.glow(238, 13, 10, 'g-o') +
           A.k('mod', A.use(I.modifier.draw(A), ex + 6, ey + 2, 34)) + dmg(ex, ey) },
-      { step: 2, say: '**Bottom half** of the other card: {=move} 3, out of the guards’ reach.',
+      { step: 2, say: '**Bottom action** of the other card: {=move} 3, out of the guards’ reach.',
         svg: base + brute(0, 6) + elite(2, 2) + guard(3, 1) + mon(true) + handBacks(3) + cA() + cB('bot') + order + A.glow(238, 13, 10, 'g-o') + dmg(ex, ey) + A.glow(...at(0, 6), 14, 'g-move') },
-      { step: 2, say: 'Turn over. The attack card has {=lost}, so it is gone for the scenario; the other goes to discard.',
+      { step: 2, say: 'Turn over. The attack card is marked {=lost}, so it goes to her lost pile for the rest of the scenario; the other goes to her discard pile.',
         svg: base + brute(0, 6) + elite(2, 2) + guard(3, 1) + mon(true) + handBacks(3) + piles + order + A.glow(299, 185, 14, 'g-lost') + dmg(ex, ey) },
-      { step: 3, say: '**Monsters** at 50: {=move} +0 and {=attack} +0 to their stat cards. Both focus the Brute; the elite moves 2, the guard 3. Neither reaches her, so neither attacks.',
+      { step: 3, say: '**Monsters** at 50: the card adds {=move} +0 and {=attack} +0 to their stat cards. Both focus on the Brute; the elite moves 2, the guard 3. Neither ends next to her, so neither attacks.',
         svg: base + brute(0, 6) + elite(1, 4) + guard(2, 4) + mon(true) + handBacks(3) + piles + order + A.glow(270, 13, 10, 'g-o2') + A.glow(...at(1, 4), 14, 'g-move1') + dmg(...at(1, 4)) },
     ];
   },
@@ -283,7 +284,7 @@ defineGame({
     o += pcard(264, 82, '62', ['heal', 2], ['move', 3], false);
     // lost icon on first card
     o += ic('lost', 252, 90, 10);
-    o += A.note(262, 44, 262, 62, 'Monster card: ± its stats');
+    o += A.note(262, 44, 262, 62, 'Monster card adjusts stats');
     o += A.note(236, 128, 122, 188, 'Initiative: low goes first');
     o += A.note(ex + 8, ey, 100, 12, 'Elite = gold base');
     o += A.note(300, 164, 266, 188, 'Use top + bottom');

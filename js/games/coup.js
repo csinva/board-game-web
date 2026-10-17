@@ -29,58 +29,58 @@ defineGame({
     type: 'choose',
     intro: 'On your turn, take exactly one action:',
     steps: [
-      { verb: 'Act', text: 'Take Income, Foreign Aid or Coup, or **claim** any character and use its action, whatever you hold.' },
-      { verb: 'Challenge', text: 'Anyone may challenge a claim. A caught liar **loses an influence** and the action fails (coins refunded); otherwise the challenger loses one.' },
-      { verb: 'Block', text: 'Anyone may block Foreign Aid; only the target may block stealing or assassination. A block is a claim too, so it can be challenged.' },
-      { verb: 'Resolve', text: 'If the action stands, it happens: take {=coin}, steal, swap cards, or a player loses an influence.' },
+      { verb: 'Act', text: 'Announce Income, Foreign Aid or Coup, or **claim** any character and announce its action (see table), whatever cards you really hold. Pay any cost now.' },
+      { verb: 'Challenge', text: 'Before it resolves, any other player may challenge a character claim. If the claimer can’t show that character, they **lose an influence** and the action fails (coins paid are returned). If they show it, the challenger loses an influence.' },
+      { verb: 'Block', text: 'Any other player may block Foreign Aid by claiming Duke; only the targeted player may block stealing or assassination. A block is a claim too, so any player may challenge it. If the block stands, the action fails.' },
+      { verb: 'Resolve', text: 'If the action is not stopped, it happens: take {=coin}, steal, swap cards, or the target loses an influence.' },
     ],
   },
 
   tension: 'The truth is safe but slow; bluffing a strong character gets you ahead, but one lost challenge costs half your life.',
 
   structure: [
-    { label: 'Setup', text: 'Each player gets 2 face-down {=influence} and 2 {=coin}.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'One action per turn; others may challenge or block. Save {=coin} for a 7-coin Coup.' },
-    { label: 'Elimination', text: 'Each lost influence flips face up; both up and you are out. Last player with a face-down card wins.' },
+    { label: 'Setup', text: 'Each player gets 2 face-down {=influence} cards and 2 {=coin}.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'One action per turn; other players may challenge or block it. Save {=coin} for a 7-coin Coup.' },
+    { label: 'Elimination', text: 'Each time you lose an influence, you turn one of your cards face up (your choice). When both are face up, you are out. The last player with a face-down card wins.' },
   ],
 
   end: {
-    trigger: 'Only one player has influence left',
-    detail: 'Losing an influence means turning one of your cards face up (your choice). Both face up: you are out.',
+    trigger: 'only one player has influence left',
+    detail: 'Losing an influence means turning one of your face-down cards face up (you choose which). When both are face up, you are out.',
     results: [{ side: 'Winner', text: 'the last player with a face-down card.' }],
   },
 
   ref: {
     title: 'Characters and actions',
     rows: [
-      ['Anyone', 'Income: take {=coin} · Foreign aid: take {=coin}{=coin} · Coup: pay 7 {=coin}, a player loses 1 {=influence} (unblockable)'],
-      ['{duke}', 'Tax: take {=coin}{=coin}{=coin} · blocks Foreign aid'],
-      ['{assassin}', 'pay 3 {=coin}: a player loses 1 {=influence}'],
-      ['{captain}', 'steal {=coin}{=coin} from a player (1 if they have 1) · blocks stealing'],
-      ['{ambassador}', 'draw 2 cards, return 2 · blocks stealing'],
-      ['{contessa}', 'blocks assassination'],
+      ['Anyone', 'Income: take {=coin} (can’t be blocked) · Foreign aid: take {=coin}{=coin} (a Duke can block it) · Coup: pay 7 {=coin}; the player you name loses 1 {=influence} (can’t be blocked)'],
+      ['{duke}', 'Tax: take {=coin}{=coin}{=coin} from the treasury · blocks any player’s Foreign aid'],
+      ['{assassin}', 'pay 3 {=coin} to the treasury: the player you name loses 1 {=influence}'],
+      ['{captain}', 'take {=coin}{=coin} from another player (1 if they have only 1) · blocks stealing from you'],
+      ['{ambassador}', 'draw 2 cards from the Court deck, then return any 2 of your cards to it · blocks stealing from you'],
+      ['{contessa}', 'blocks an assassination against you'],
     ],
   },
 
-  example: 'Nora has 2 {=coin} and claims {duke} to take 3. Eli challenges. Nora reveals a real Duke, so Eli loses an influence. Nora shuffles the Duke into the deck, draws a new card and takes {=coin}{=coin}{=coin}: 5 total.',
+  example: 'Nora has 2 {=coin} and claims {duke} to take 3. Eli challenges. Nora reveals a real Duke, so Eli loses an influence. Nora shuffles the Duke into the Court deck, draws a new card and takes {=coin}{=coin}{=coin}: 5 total.',
 
   setup: [
     'Shuffle the 15 character cards: 3 each of {duke}, {assassin}, {captain}, {ambassador}, {contessa}.',
-    'Deal each player **2 face-down** cards: their {influence}. Look at yours secretly.',
+    'Deal each player **2 face-down** cards: their {influence}. Each player looks at their own cards secretly.',
     'Give each player **2** {=coin} (with 2 players, the first player gets 1); the rest form the treasury. Remaining cards form the Court deck.',
   ],
 
   terms: [
-    ['{=influence} Influence', 'A face-down character card. You have 2: lose both and you are out.'],
+    ['{=influence} Influence', 'One of your face-down character cards. You start with 2; when both are face up, you are out.'],
     ['Claim', 'Saying you hold a character, to use its action or block.'],
-    ['Challenge', 'Calling a claim a lie. A caught liar, or a wrong challenger, loses an influence.'],
+    ['Challenge', 'Saying a claim is a lie. The claimed player must show the character or lose an influence; if they show it, the challenger loses an influence instead.'],
     ['Court deck', 'The face-down pile of unused characters.'],
   ],
 
   gotchas: [
     'If you **start your turn with 10+** {=coin}, you must Coup.',
-    'A player who wins a challenge shuffles the revealed card back and draws a **replacement**, so the reveal tells you less than it seems.',
-    'A blocked assassination still costs 3 {=coin}. A target who bluffs {=contessa} and is caught, or wrongly challenges the Assassin, loses **both** influence.',
+    'A player who wins a challenge shuffles the shown card into the Court deck and draws a **replacement**, so the reveal tells you less than it seems.',
+    'A blocked assassination still costs 3 {=coin}. A target who bluffs {=contessa} and is caught, or wrongly challenges the Assassin, loses **both** influence: one for the challenge, one for the assassination.',
   ],
 
   tips: [

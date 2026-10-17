@@ -37,36 +37,36 @@ defineGame({
     type: 'round',
     intro: 'Each game round has four phases:',
     steps: [
-      { verb: 'Strategy', text: 'In speaker order, each player picks a strategy card ({=sc1} to {=sc8}). Lowest number acts first this round.' },
-      { verb: 'Action', text: 'In that order, take **one action** each: a tactical action (place a {=ct} on a system to move, fight, invade and build there), your strategy card, or a component action. Repeat until all pass.' },
-      { verb: 'Status', text: 'Score up to **1 public + 1 secret** objective, reveal a new public objective, gain 2 {=ct}, ready everything.' },
-      { verb: 'Agenda', text: 'Once someone has taken {=mecatol} **Mecatol Rex**, vote on two agendas by exhausting planets for their {=inf}.' },
+      { verb: 'Strategy', text: 'Starting with the speaker and going clockwise, each player picks a strategy card ({=sc1} to {=sc8}). The player holding the lowest number acts first this round.' },
+      { verb: 'Action', text: 'In initiative order (lowest strategy card number first), each player takes **1 action**: a tactical action (place a {=ct} on a system to move, fight, invade and build there), your strategy card’s primary ability, or a component action. Keep going around in that order until every player has passed.' },
+      { verb: 'Status', text: 'Each player may score up to **1 public and 1 secret** objective; reveal 1 new public objective; each player gains 2 {=ct}; ready all exhausted cards and planets.' },
+      { verb: 'Agenda', text: 'Only after someone has taken {=mecatol} **Mecatol Rex**: vote on 2 agendas, casting votes by exhausting planets for their {=inf}.' },
     ],
   },
 
   tension: 'Command tokens pay for actions, fleet size and strategy plays, so every move, ship and favour competes for the same few tokens.',
 
   structure: [
-    { label: 'Setup', text: 'Build the galaxy; take faction units, techs and 8 {=ct}. Reveal 2 {=obj1}; each player keeps 1 of 2 {=secret}.' },
-    { label: 'Strategy', repeat: 'each round', text: 'Speaker first, each picks a strategy card (2 each with 3–4 players). Unpicked cards gain 1 {=tg}.' },
-    { label: 'Action', repeat: 'each round', text: 'In initiative order, one action at a time until everyone passes. You can’t pass before using your strategy card.' },
-    { label: 'Status', repeat: 'each round', text: 'Score objectives, reveal the next one; draw 1 action card; take your {=ct} back off the board, gain 2 and redistribute; ready and repair.' },
-    { label: 'Agenda', repeat: 'each round', text: 'Only once {=mecatol} is taken: vote on 2 agendas with {=inf}, then ready planets.' },
-    { label: 'Game end', text: 'Someone reaches **10 VP** (immediately), or a public objective must be revealed and none are left: most VP wins.' },
+    { label: 'Setup', text: 'Build the galaxy; each player takes their faction’s units, techs and 8 {=ct}. Reveal 2 {=obj1}; each player draws 2 {=secret} and keeps 1.' },
+    { label: 'Strategy', repeat: 'each round', text: 'Starting with the speaker and going clockwise, each player picks a strategy card (2 cards each with 3–4 players). Each card left unpicked gets 1 {=tg} placed on it.' },
+    { label: 'Action', repeat: 'each round', text: 'In initiative order (lowest strategy card number first), players take 1 action at a time until everyone has passed. You can’t pass until you have used your strategy card’s primary ability.' },
+    { label: 'Status', repeat: 'each round', text: 'Score objectives, then reveal the next public one. Each player draws 1 action card, takes their {=ct} back off the board, gains 2 more and redistributes them among their pools. Ready all cards and planets; repair damaged units.' },
+    { label: 'Agenda', repeat: 'each round', text: 'Only once someone has taken {=mecatol}: vote on 2 agendas with {=inf}, then ready all planets.' },
+    { label: 'Game end', text: 'The game ends the moment a player reaches **10 VP**. It also ends when a public objective must be revealed and none are left; then the player with the most VP wins.' },
   ],
 
   points: [
-    ['{=obj1} Stage I objective', '1 VP each; 2 revealed at setup, one more each Status phase'],
-    ['{=obj2} Stage II objective', '2 VP each; revealed once Stage I runs out'],
-    ['{=secret} Secret objective', '1 VP each; hold at most 3'],
-    ['{=mecatol} Mecatol Rex', '1 VP to the first to take it (6 {=inf} to remove the custodians)'],
+    ['{=obj1} Stage I objective', '1 VP each; 2 revealed at setup, 1 more each Status phase'],
+    ['{=obj2} Stage II objective', '2 VP each; revealed instead once all Stage I objectives are out'],
+    ['{=secret} Secret objective', '1 VP each; you may hold at most 3, scored and unscored'],
+    ['{=mecatol} Mecatol Rex', '1 VP to the first player to take it (they spend 6 {=inf} to remove the custodians token)'],
     ['{=sc8} Imperial', '+1 VP each time you play it while holding Mecatol Rex'],
-    ['Other', 'Support for the Throne notes and some agendas'],
+    ['Other', 'Support for the Throne promissory notes and some agendas'],
   ],
 
   end: {
     trigger: 'someone reaches 10 VP',
-    detail: 'The game ends immediately, even mid-round. It also ends if a public objective must be revealed and none are left: most VP wins. Ties (including two players reaching 10 at once): earliest in initiative order wins.',
+    detail: 'The game ends immediately, even mid-round. It also ends if a public objective must be revealed and none are left: most VP wins. On a tie (including two players reaching 10 at once), the tied player earliest in initiative order wins.',
   },
   scoring: [
     { label: '{=obj1} Stage I objectives', share: 3 },
@@ -78,28 +78,30 @@ defineGame({
   ref: {
     title: 'The 8 strategy cards (primary ability)',
     rows: [
-      ['{=sc1} Leadership · {=sc2} Diplomacy', '+3 {=ct} · lock a system against attack'],
+      ['{=sc1} Leadership · {=sc2} Diplomacy', 'gain 3 {=ct} · choose a system with your planet; other players can’t activate it'],
       ['{=sc3} Politics · {=sc4} Construction', 'pick a new speaker, draw 2 action cards · build a PDS or space dock'],
       ['{=sc5} Trade · {=sc6} Warfare', '+3 {=tg}, refill commodities · take a {=ct} back from the board'],
       ['{=sc7} Technology · {=sc8} Imperial', 'research a tech · score a public objective now (+1 {=vp} with Mecatol Rex)'],
-      ['Secondary', 'Every other player may use a weaker version by spending a **strategy** {=ct}.'],
+      ['Secondary', 'After the primary, each other player may use the card’s weaker secondary ability by spending 1 {=ct} from their **strategy** pool.'],
     ],
   },
 
   example: 'You place a {=ct} on the system next to your home and move in 2 cruisers and a carrier with 4 infantry. A lone destroyer waits. Cruisers hit on **7+** on a {=d10}: you roll 8 and 3, and the destroyer dies. You land 2 infantry and take the planet. In the Status phase you control **6 planets outside your home system** and score that 1 VP public objective.',
 
   setup: [
-    'Choose factions and build the galaxy: Mecatol Rex in the centre, home systems at the edge, other tiles placed in turns.',
+    'Choose factions and build the galaxy: Mecatol Rex in the centre, home systems at the edge; players take turns placing the other tiles.',
     'Take your faction’s starting units and techs, and 8 {=ct} (3 tactic, 3 fleet, 2 strategy).',
     'Reveal 2 {=obj1} Stage I objectives; each player draws 2 {=secret} secret objectives and keeps 1.',
   ],
 
   terms: [
-    ['{=ct} Command token', 'Your action budget, split into tactic, fleet (max ships per system) and strategy pools.'],
-    ['Activate', 'Put a tactic token on a system to move into it and act there.'],
-    ['{=res} {=inf} Planet values', 'Every planet has **resources** (build, research) and **influence** (votes, command tokens). Spend by exhausting the planet.'],
-    ['{=mecatol} Mecatol Rex', 'Central planet. First to take it pays 6 influence, scores 1 VP and starts the Agenda phase.'],
-    ['{=tg} Trade goods', 'Money: 1 resource or 1 influence each. Commodities become trade goods when given to another player.'],
+    ['{=ct} Command token', 'Your action budget, split into 3 pools: tactic (spent to activate systems), fleet (the most non-fighter ships you may have in one system) and strategy (spent on other players’ secondary abilities).'],
+    ['Speaker', 'The player holding the speaker token: picks a strategy card first and breaks tied agenda votes. The Politics card changes who it is.'],
+    ['Component action', 'An action printed on an action card, technology, faction sheet or other component.'],
+    ['Activate', 'Put a token from your tactic pool on a system; you may then move ships into it and act there.'],
+    ['{=res} {=inf} Planet values', 'Every planet has **resources** (spent to build and research) and **influence** (spent on votes and command tokens). To spend them, exhaust the planet: turn its card face down until it is readied.'],
+    ['{=mecatol} Mecatol Rex', 'The central planet. The first player to take it pays 6 influence and scores 1 VP; from then on, every round includes an Agenda phase.'],
+    ['{=tg} Trade goods', 'Money: each one can be spent as 1 resource or 1 influence. Commodities become trade goods when you give them to another player.'],
   ],
 
   gotchas: [
@@ -111,36 +113,36 @@ defineGame({
   extended: [
     { title: 'All 8 strategy cards (primary / secondary)', items: [
       '{=sc1} **Leadership**: gain 3 {=ct}, then buy more at 3 {=inf} each / buy tokens at 3 influence each (no strategy token needed).',
-      '{=sc2} **Diplomacy**: choose a system with your planet (not Mecatol Rex); every other player puts a token there, so they can’t activate it; ready 2 planets / ready 2 planets.',
+      '{=sc2} **Diplomacy**: choose a system with your planet (not Mecatol Rex); every other player puts 1 of their command tokens there, so they can’t activate it; ready up to 2 of your planets / ready up to 2 of your planets.',
       '{=sc3} **Politics**: choose any player except the current speaker to become speaker, draw 2 action cards, look at the top 2 agendas / draw 2 action cards.',
-      '{=sc4} **Construction**: place a PDS or space dock, plus a PDS / place a token from reinforcements in any system and a PDS or space dock on your planet there.',
+      '{=sc4} **Construction**: place 1 PDS or space dock on your planet, plus 1 PDS / place 1 command token from reinforcements in any system, then 1 PDS or space dock on your planet there.',
       '{=sc5} **Trade**: gain 3 {=tg}, refill your commodities, and let any players you choose use the secondary free / refill your commodities.',
-      '{=sc6} **Warfare**: take a {=ct} back from the board and redistribute / produce at your home space dock.',
-      '{=sc7} **Technology**: research a tech, and a second for 6 {=res} / research a tech for 4 resources.',
+      '{=sc6} **Warfare**: take 1 of your {=ct} back from the board, then redistribute your tokens / produce units at your home system’s space dock.',
+      '{=sc7} **Technology**: research 1 tech, and a second for 6 {=res} / research 1 tech for 4 resources.',
       '{=sc8} **Imperial**: score a public objective now, then +1 VP if you hold Mecatol Rex (otherwise draw a {=secret}) / draw a secret objective.',
     ] },
     { title: 'Tactical action, step by step', items: [
       '**Activate**: place a tactic {=ct} in a system that doesn’t already hold one of yours.',
-      '**Move**: ships with enough move value come in (they can’t leave systems holding your tokens or pass through enemy ships), carrying fighters and ground forces up to capacity.',
-      '**Space cannon offense**: PDS in or next to the system fire at the arriving ships.',
+      '**Move**: any of your ships whose move value is enough to reach the system may move in (they can’t leave systems holding your tokens or pass through enemy ships), carrying fighters and ground forces up to their capacity.',
+      '**Space cannon offense**: starting with the active player and going clockwise, each player **may** fire the space cannon of their units in the active system (with the PDS upgrade, also from adjacent systems). Other players’ hits must target the active player’s ships; the active player picks one player with ships there to target.',
       '**Space combat**, then **invasion**: bombardment, commit ground forces, space cannon defense against them, ground combat, establish control (gain the planet card exhausted).',
       '**Production**: your space docks in the activated system may build units.',
     ] },
     { title: 'Combat in detail', items: [
-      'Each round: anti-fighter barrage (first round only; destroyers 9 ×2), either side may announce a retreat, both roll one {=d10} per ship, assign hits, repeat until one side is gone.',
-      'Base combat values: war sun 3 (×3), dreadnought 5, cruiser 7, carrier / destroyer / fighter 9; infantry 8 (mech 6 with the Prophecy of Kings expansion). Unit upgrades improve them.',
-      '**Sustain damage**: dreadnoughts and war suns (and some flagships) can cancel one hit by turning sideways; repaired in the Status phase.',
+      'Each round: anti-fighter barrage (first round only: each destroyer rolls 2 dice and hits fighters on 9+); either side may announce a retreat; both sides roll 1 {=d10} per ship; each player assigns the hits they take to their own ships. Repeat until one side is gone.',
+      'Base combat values (roll this or higher to hit): war sun 3 (rolls 3 dice), dreadnought 5, cruiser 7, carrier / destroyer / fighter 9; infantry 8 (mech 6 with the Prophecy of Kings expansion). Unit upgrades improve them.',
+      '**Sustain damage**: a dreadnought or war sun (and some flagships) can cancel 1 hit by becoming damaged (turn it sideways); it is repaired in the Status phase.',
       'Ground combat works the same with ground forces. PDS on the planet fire space cannon defense at landing forces; planetary shields stop bombardment.',
     ] },
     { title: 'Building and fleet limits', items: [
-      'A space dock produces up to its planet’s {=res} + 2 units; fighters and infantry come 2 for 1 resource.',
+      'A space dock produces up to its planet’s {=res} value + 2 units; fighters and infantry cost 1 resource per 2 units.',
       'Your **fleet pool** tokens cap the non-fighter ships you may have in any one system; excess ships are removed.',
       'Fighters and ground forces beyond your ships’ capacity are removed too.',
     ] },
     { title: 'Objectives and the throne', items: [
-      '{=obj1} Stage I public objectives are worth 1 VP, {=obj2} Stage II 2 VP; one is revealed each Status phase. Score them only in the Status phase or with Imperial.',
-      'You may hold **3 {=secret}**. Some score in the Status phase, others the moment you achieve them in the action phase (e.g. destroy a ship in combat).',
-      'First to land on **Mecatol Rex** spends 6 {=inf} to remove the custodians token: +1 VP, and an Agenda phase follows every round after.',
+      '{=obj1} Stage I public objectives are worth 1 VP, {=obj2} Stage II 2 VP; 1 is revealed each Status phase. You may score them only in the Status phase or with Imperial.',
+      'You may hold at most **3 {=secret}**. Some score in the Status phase, others the moment you achieve them in the action phase (e.g. destroy a ship in combat).',
+      'The first player to land on **Mecatol Rex** spends 6 {=inf} to remove the custodians token, scores 1 VP, and from then on every round ends with an Agenda phase.',
       'Holding Mecatol Rex makes Imperial worth an extra point each time you play it. **Support for the Throne** notes from other players are worth 1 VP while you hold them.',
       'Variant: for a longer game, play to **14 VP** on the other side of the victory point track.',
     ] },
@@ -190,7 +192,7 @@ defineGame({
     const obj = A.k('obj', A.card(202, 128, 50, 40, '#e2b33c', {}) + A.text(227, 141, 'Stage I · 1 VP', { size: 5.5, weight: 800 }) + A.text(227, 150, '6 non-home', { size: 5.5 }) + A.text(227, 157, 'planets', { size: 5.5 }));
     const own = A.k('own', A.circle(P[0] + 10, P[1] - 8, 3.5, ME, { stroke: '#fff', sw: 0.8 }));
     return [
-      { step: 0, say: '**Strategy phase**: in turn, each player takes a strategy card. You pick {=sc1} **Leadership**, so you act first this round.',
+      { step: 0, say: '**Strategy phase**: starting with the speaker, each player takes a strategy card. You pick {=sc1} **Leadership**, so you act first this round.',
         svg: sky + cards(true) + toks(3) + vp(2) + fleet(false) + enemy + obj + A.glow(291, 119, 26, 'g-sc') },
       { step: 1, say: '**Tactical action**: place a tactic {=ct} on the system next door, **activating** it.',
         svg: sky + cards(true) + toks(3, true) + vp(2) + fleet(false) + enemy + obj + A.glow(...T, 30, 'g-t') },

@@ -27,24 +27,24 @@ defineGame({
   turn: {
     type: 'sequence',
     steps: [
-      { verb: 'Roll', text: 'Roll {=die}{=die} and move clockwise. Landing on or passing **GO** pays $200. Doubles: roll again after this move.' },
-      { verb: 'Resolve', text: 'Unowned property: **buy** its {deed} at the printed price, or the bank auctions it. Owned: pay the rent on its deed. Other spaces: draw a {=chance}{=chest} card, pay the tax shown or go to jail.' },
-      { verb: 'Deal', text: 'Any time: trade, mortgage, or build {house}s evenly on colour sets you fully own.' },
+      { verb: 'Roll', text: 'Roll {=die}{=die} and move your token that many spaces clockwise. Each time you land on or pass **GO**, collect $200 from the bank. If you rolled doubles (both dice the same), roll again after dealing with this space.' },
+      { verb: 'Resolve', text: 'Unowned property (street, railroad or utility): you may **buy** its {deed} at the printed price; if you don’t, the bank auctions it. Another player’s property: pay that player the rent on its deed. {chance} or {chest} space: draw the top card of that deck and do what it says. Tax space: pay the bank the amount shown. Go to Jail space: move straight to jail; you do not pass GO or collect $200, and your turn ends.' },
+      { verb: 'Deal', text: 'At any time, you may trade with other players, mortgage your properties, or buy {house}s for colour sets you fully own (building evenly).' },
     ],
   },
 
   tension: 'Cash protects you from rent, but only property and houses earn, so you decide how close to broke you dare to build.',
 
   structure: [
-    { label: 'Setup', text: '$1,500 each; all tokens on GO.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Roll, move, resolve the space, then trade or build. Doubles: go again. Third doubles in a row: go to jail.' },
-    { label: 'Bankruptcy', text: 'Owe more than you can raise: you are out. Owed to a player: they get your cash, deeds and half the cost of your buildings. Owed to the bank: it auctions your deeds.' },
+    { label: 'Setup', text: 'Each player gets $1,500; all tokens start on GO.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Roll, move, and deal with the space you land on. Doubles: roll again. Doubles **3 times in a row** in one turn: go straight to jail.' },
+    { label: 'Bankruptcy', text: 'If you owe more than you can raise, you are out. If you owe a player, that player gets your cash and deeds plus half the price of your buildings (the buildings go back to the bank). If you owe the bank, it auctions your deeds.' },
     { label: 'Game end', text: 'The last player not bankrupt wins.' },
   ],
 
   end: {
     trigger: 'all but one player are bankrupt',
-    detail: 'You are bankrupt when you owe more than you can raise by selling buildings and mortgaging.',
+    detail: 'You are bankrupt when you owe more than you can raise by selling your buildings and mortgaging your properties.',
     results: [{ side: 'Winner:', text: 'the last player left.' }],
   },
 
@@ -53,10 +53,10 @@ defineGame({
     rows: [
       ['Passing GO', '+$200 {=cash}'],
       ['{=deed} Streets', 'rent, house price and mortgage value printed on the deed'],
-      ['Leave jail', 'pay $50, use a card, or roll doubles {=d3}{=d3} (3 tries, then pay $50 and move)'],
-      ['{=deed}{=deed}{=deed} Full set', 'double rent on streets without buildings; {=hotel} = {=house}{=house}{=house}{=house} + hotel price'],
-      ['Railroads', '$25 / 50 / 100 / 200 rent for 1 / 2 / 3 / 4 owned'],
-      ['Utilities', 'rent = 4× the dice roll, 10× if one owner has both'],
+      ['Leave jail', 'on your turn, before rolling: pay $50 or use a Get Out of Jail Free card. Or roll for doubles {=d3}{=d3} on each of up to 3 turns; after the third miss, pay $50 and move by that roll'],
+      ['{=deed}{=deed}{=deed} Full set', 'its streets without buildings charge double rent. A {=hotel} replaces {=house}{=house}{=house}{=house} on one street: pay the hotel price and return the 4 houses'],
+      ['Railroads', 'rent $25 / 50 / 100 / 200 if the owner has 1 / 2 / 3 / 4 railroads'],
+      ['Utilities', 'rent = 4 × the lander’s dice total, or 10 × if the same player owns both utilities'],
     ],
   },
 
@@ -65,29 +65,29 @@ defineGame({
   setup: [
     'Give each player $1,500 {=cash}; the Banker keeps the rest, the deeds, 32 {house}s and 12 {hotel}s.',
     'Shuffle the {chance} and {chest} decks face down on their spaces.',
-    'Everyone puts a token on GO; highest roll starts.',
+    'Everyone puts a token on GO. Everyone rolls 2 dice; the highest roller goes first, then play passes clockwise.',
   ],
 
   terms: [
-    ['{=deed} Colour set', 'All streets of one colour. Required to build.'],
-    ['Mortgage', 'Flip a deed to take its mortgage value (half its price); it earns no rent until you repay that plus 10%.'],
-    ['Auction', 'A property the lander declines goes to the highest bidder, the lander included.'],
-    ['Jail', 'Up to 3 turns; you still collect rent, trade and build.'],
+    ['{=deed} Colour set', 'All the streets of one colour (2 or 3). You must own the whole set to build on it.'],
+    ['Mortgage', 'Turn your deed face down and take its mortgage value (half its price) from the bank. It earns no rent until you pay back that amount plus 10%.'],
+    ['Auction', 'When the player who lands on a property doesn’t buy it, every player, that player included, may bid; the highest bidder pays and takes it.'],
+    ['Jail', 'You stay up to 3 turns (see Leave jail). While there you still collect rent, trade and build. Landing on the Jail space by a normal roll is “just visiting”: nothing happens.'],
   ],
 
   gotchas: [
     '**Free Parking** pays nothing. Collecting tax money there is a house rule that lengthens the game.',
-    'A property you decline must be **auctioned**; anyone may bid, you included, from any price. Skipping auctions is another house rule.',
-    '{house}s go up and come down **evenly** across a set, at most 4 per street before a {hotel}. No building on a set with a mortgaged street. Buildings sell back to the bank at **half** price.',
-    '**Housing shortage**: when the bank has no {house}s left, nobody can build until some are sold back. If more players want buildings than remain, auction them.',
-    'Three doubles in a row: go straight to jail, no $200. Doubles that free you from jail move you but give no extra roll.',
-    'Buying a mortgaged deed from a player: pay the bank 10% at once; if you lift the mortgage later, pay another 10%.',
-    'Players can’t lend each other money. An owner who forgets to ask for rent before the second player after you rolls loses it.',
+    'A property you decline must be **auctioned**; every player may bid, you included, and bidding may start at any price. Skipping auctions is another house rule.',
+    'Build and sell {house}s **evenly**: two streets in the same set may never differ by more than 1 house. A street holds at most 4 houses, then a {hotel}. You can’t build on a set while any of its streets is mortgaged. Buildings sell back to the bank at **half** price.',
+    '**Housing shortage**: when the bank has no {house}s left, nobody can build until some are sold back. If more players want buildings than the bank has left, the bank auctions them.',
+    'If you roll doubles 3 times in a row in one turn, go straight to jail: don’t move by the third roll, and collect no $200. Doubles that free you from jail move you, but you don’t roll again.',
+    'When you buy a mortgaged deed from a player, pay the bank 10% of its mortgage value at once. If you later pay off the mortgage, pay another 10% then.',
+    'Players can’t lend each other money. An owner must ask for rent before the second player after the lander rolls; after that, the rent is lost.',
   ],
 
   tips: [
     'Buy almost everything early, then trade hard to finish a set.',
-    'Orange and red are landed on most (jail feeds them). The third house is the biggest rent jump.',
+    'Orange and red are landed on most, because players leaving jail often land there. The third house on a street raises its rent the most.',
     'Late game, roll for doubles instead of paying to leave jail: you avoid rivals’ hotels and still collect rent.',
   ],
 
@@ -121,7 +121,7 @@ defineGame({
     const bill = (x, y) => A.k('bill', A.rect(x, y, 34, 16, '#9fd2f2', { rx: 2, sw: 1 }) + A.text(x + 17, y + 8, '$50', { size: 8, weight: 800 }));
     const base = board + cash('m', 42, 1200);
     return [
-      { step: 0, say: 'You are on Jail (just visiting). Roll {=d4}{=d4}: **8**.', svg: base + cash('y', 128, 1500) + pawn(0) + dice(4, 4) },
+      { step: 0, say: 'You are on the Jail space, just visiting (not in jail). Roll {=d4}{=d4}: **8**.', svg: base + cash('y', 128, 1500) + pawn(0) + dice(4, 4) },
       { step: 0, say: 'Move 8 spaces clockwise onto an unowned **orange street**. Price: $180.', svg: base + cash('y', 128, 1500) + pawn(8) + dice(4, 4) + A.glow(...mid(8), 14, 'g8') },
       { step: 1, say: 'You decline, so the bank **auctions** it. Maya bids $110; you win at **$120**.', svg: base + cash('y', 128, 1500) + pawn(8) + dice(4, 4) + deed(102, 50) +
         A.bubble(52, 148, 60, 20, 'Maya $110', { size: 8.5 }) + A.bubble(128, 148, 60, 20, 'You $120', { size: 8.5 }) },

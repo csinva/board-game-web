@@ -33,13 +33,13 @@ defineGame({
 
   turn: {
     type: 'choose',
-    intro: 'Move your token to a different section of your mat than last turn. Take its top action, its bottom action, or both (top first):',
-    outro: 'Next player. There are no rounds.',
+    intro: 'On your turn, move your action token to a section of your mat other than the one it is on. Do that section’s top-row action, its bottom-row action (see Bottom-row actions), or both, top first. The 4 top-row actions:',
+    outro: 'Next player clockwise · there are no rounds',
     steps: [
-      { verb: 'Move', text: 'Move 2 different units ({worker}s, {mech}s, {leader}) 1 territory each, or gain 1 {=coin}. No crossing rivers or entering lakes without a mech ability; all tunnels are adjacent to each other.' },
-      { verb: 'Produce', text: 'Pay the cost shown on your mat (it rises as you place workers). Each {=worker} on up to 2 territories you control produces 1 of that territory’s resource there; on a village it produces a **worker**.' },
-      { verb: 'Trade', text: 'Pay 1 {=coin}: gain any 2 resources (placed with one of your workers), or 1 {popularity}.' },
-      { verb: 'Bolster', text: 'Pay 1 {=coin}: gain 2 {power} or 1 {combat}.' },
+      { verb: 'Move', text: 'Move **up to 2** different units ({worker}s, {mech}s, your {leader}) 1 territory each, finishing one unit’s move before starting the next; or instead gain 1 {=coin}. Units can’t cross rivers or enter lakes unless a mech ability allows it. Every tunnel territory counts as next to every other tunnel.' },
+      { verb: 'Produce', text: 'Pay the cost shown in your Produce section (it rises as you get more workers onto the map). Choose up to 2 territories with your workers: each {=worker} there produces 1 of that territory’s resource, placed on that territory. On a village, each worker produces 1 new **worker** instead.' },
+      { verb: 'Trade', text: 'Pay 1 {=coin}: gain any 2 resources, placed together on 1 territory with one of your workers; or gain 1 {popularity}.' },
+      { verb: 'Bolster', text: 'Pay 1 {=coin}: gain 2 {power}, or 1 {combat}.' },
     ],
   },
 
@@ -47,21 +47,21 @@ defineGame({
 
   structure: [
     { label: 'Setup', text: 'Each faction starts at its home base on the map edge. The lowest player-mat number goes first; play is clockwise.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'One mat section per turn. A {mech} or {leader} that enters a territory with rival units stops there; after all moves, it fights **combat** against any rival {=mech} or {=leader} there.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'One mat section per turn. A {mech} or your {leader} that moves into a territory with another player’s units must stop there. After you finish all your moves that turn, it fights a **combat** if that territory holds the other player’s {=mech} or {=leader}.' },
     { label: '6th star', text: 'The moment anyone places their 6th {=star}, the game ends.' },
     { label: 'Final scoring', text: 'Everyone counts coins at their **popularity** tier’s rates (below). Most coins wins.' },
   ],
 
   points: [
-    ['{=popularity} Tier', 'Popularity 0–6 / 7–12 / 13–18 pays the 1st / 2nd / 3rd rate below'],
+    ['{=popularity} Tier', 'Your final popularity picks your rate in each row below: 0–6 uses the 1st number, 7–12 the 2nd, 13–18 the 3rd'],
     ['{=star} Each star', '3 / 4 / 5 {=coin}'],
     ['Each territory you control', '2 / 3 / 4 {=coin} (lakes count; the Factory counts as 3; home bases don’t)'],
-    ['Every 2 resources you control', '1 / 2 / 3 {=coin}'],
+    ['Every 2 resources you control', '1 / 2 / 3 {=coin} per pair (only resources on territories you control)'],
     ['{=structure} Structure bonus', 'coins per the bonus tile drawn at setup (same for every tier; your structures count even on territories you don’t control)'],
     ['{=coin} Coins in hand', '1 each'],
   ],
 
-  end: { trigger: 'someone places their 6th star', detail: 'Play stops at once. Stars come from: all 6 upgrades, all 4 mechs, all 4 structures, all 4 recruits, all 8 workers, 1 objective, each combat win (max 2), 16 power, 18 popularity. Saxony has no limit on objective and combat stars. Ties: most workers + mechs + structures, then power, popularity, resources, territories, stars.' },
+  end: { trigger: 'someone places their 6th star', detail: 'Play stops at once. You place a star for each of: making all 6 upgrades, deploying all 4 mechs, building all 4 structures, enlisting all 4 recruits, having all 8 workers on the map, completing 1 objective, each combat win (only your first 2 count), reaching 16 power, reaching 18 popularity. Saxony has no limit on objective and combat stars. Tie: the tied player with the most workers, mechs and structures combined wins; if still tied, then most power, popularity, resources, territories, stars, in that order.' },
   scoring: [
     { label: '{=star} Stars', share: 4 },
     { label: 'Territories', share: 4 },
@@ -72,35 +72,35 @@ defineGame({
   ref: {
     title: 'Bottom-row actions',
     rows: [
-      ['Upgrade', '{oil} → move a cube: better top action, cheaper bottom'],
-      ['Deploy', '{metal} → {mech} on a territory you control with your worker; unlocks a mech ability'],
-      ['Build', '{wood} → {structure} on a territory you control with your worker; not lakes, 1 per territory'],
-      ['Structures', 'Mill: its territory is a bonus Produce territory and produces like a worker. Armory: +1 {=power} on Trade. Monument: +1 {=popularity} on Bolster. Mine: a tunnel only you use'],
-      ['Enlist', '{food} → recruit: one-time bonus now, then you gain a bonus whenever you or a neighbour takes that bottom action'],
-      ['{=coin} bonus', 'printed on each bottom action; costs vary by mat'],
+      ['Upgrade', 'pay {oil}: move 1 cube from any top-row action to any bottom-row cost space. That top action gets stronger and that bottom action cheaper'],
+      ['Deploy', 'pay {metal}: place 1 {mech} on a territory where you have a worker; unlock 1 mech ability'],
+      ['Build', 'pay {wood}: place 1 {structure} on a territory where you have a worker; not on lakes, at most 1 structure per territory'],
+      ['Structures', 'Mill: on each Produce, its territory produces as if 1 more worker were there, on top of your 2 chosen territories. Armory: +1 {=power} each time you Trade. Monument: +1 {=popularity} each time you Bolster. Mine: a tunnel only you can use'],
+      ['Enlist', 'pay {food}: place 1 recruit. Take its one-time bonus now; afterwards, whenever you or the player on your left or right takes that bottom action, you gain the bonus shown'],
+      ['{=coin} bonus', 'printed on each bottom action, gained when you take it; costs and bonuses vary by mat'],
     ],
   },
 
   example: 'Last turn you used **Produce**, so you can’t pick it again; you pick Trade. Top: pay 1 {=coin} for {=wood}{=wood}. Bottom (**Build**): spend {=wood}{=wood}{=wood} to put a mill ({=structure}) on your farm and take the printed {=coin} bonus. From now on the mill produces like a worker.',
 
   setup: [
-    'Each player takes a random faction board and player mat. Put your {leader} on your home base and 2 {worker}s on the 2 land territories next to it.',
-    'Set {power}, {popularity}, {coin}s and starting {combat}s as the boards show. Take 2 objective cards (you may complete 1).',
-    'Draw 1 structure bonus tile. Put an encounter token on each of the 11 encounter territories and (players + 1) random Factory cards face down on the Factory.',
+    'Each player takes a random faction board and player mat. Put your {leader} on your home base and 1 {worker} on each of the 2 land territories next to it.',
+    'Set {power}, {popularity}, {coin}s and starting {combat}s as the boards show. Take 2 objective cards; you may complete only 1 of them.',
+    'Draw 1 structure bonus tile. Put an encounter token on each of the 11 encounter territories, and 1 more random Factory card than the number of players face down on the Factory.',
   ],
 
   terms: [
-    ['{=power} Combat', 'Each side secretly dials 0–7 {=power} (no more than it has) and adds up to 1 {combat} per {=mech}/{=leader} there. Higher total wins; the attacker wins ties.'],
+    ['{=power} Combat', 'Each side secretly dials 0–7 {=power} (no more than it has) and adds up to 1 {combat} for each of its {mech}s and its {=leader} in that territory. Both reveal; higher total wins; the attacker wins ties.'],
     ['Control', 'You control a territory with your unit on it, or only your {=structure}. Resources stay on the map: you spend and score only those on territories you control.'],
     ['{=mech} Mech', 'Fighting unit that can carry workers. Each one deployed unlocks a mech ability.'],
-    ['Factory', 'Centre hex. Counts as 3 territories at the end. The first time your character ends a Move there (after combat), take 1 Factory card: a 5th mat section.'],
+    ['Factory', 'Centre hex. Counts as 3 territories at the end. The first time your character ends a Move action there (after any combat), take 1 Factory card: it is a 5th section for your mat.'],
     ['Home base', 'Where you start and where defeated units retreat. Units there are not on the map.'],
   ],
 
   gotchas: [
-    'After combat both sides lose the dialled {=power} and discard their cards. The winner gets a {=star} (max 2) and the resources there; an attacker who wins loses 1 {=popularity} per enemy worker sent home. All the loser’s units retreat home; it gains 1 {combat} if it revealed any power (dial or cards).',
-    'Moving a {=mech} or {=leader} onto territory with only **enemy workers** ends its move and sends them home; you lose 1 {=popularity} per worker.',
-    'Only your {=leader} triggers **encounters**: its move ends; after any combat, draw a card and choose 1 option. Workers can’t move on their own into a territory with enemy units (a {=mech} can carry them).',
+    'After combat both sides lose the {=power} they dialled and discard the combat cards they played. All the loser’s units in that territory retreat to its home base; if the loser revealed any power (dial above 0 or a card), it gains 1 {combat}. The winner places a {=star} (only for their first 2 combat wins) and now controls the resources there; an attacker who wins loses 1 {=popularity} per enemy worker sent home.',
+    'Moving a {=mech} or {=leader} into a territory with only **enemy workers** ends its move and sends those workers to their home base; you lose 1 {=popularity} per worker.',
+    'Only your {=leader} triggers **encounters**: when it moves onto an encounter token, its move ends; after any combat, draw an encounter card and choose 1 of its options. Workers can’t move on their own into a territory with enemy units (a {=mech} can carry them).',
   ],
 
   tips: [

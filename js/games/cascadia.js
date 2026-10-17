@@ -23,37 +23,37 @@ defineGame({
 
   pitch: 'Draft a habitat tile and wildlife token each turn; score animal patterns and your largest habitat areas.',
 
-  goal: { big: 'Most points', text: 'Most points from **wildlife patterns** (one scoring card per animal) and your **largest area** of each habitat.' },
+  goal: { big: 'Most points', text: 'Score the most points from **wildlife patterns** (each animal has one scoring card saying which pattern scores) and from your **largest area** of each habitat.' },
 
   turn: {
     type: 'sequence',
     steps: [
-      { verb: 'Pick', text: 'Take one of the 4 **tile + token pairs** on display, or spend a {nature} to take any tile with any token.' },
-      { verb: 'Place tile', text: 'Add the habitat tile touching at least one of your tiles, in any rotation.' },
-      { verb: 'Place animal', text: 'Put the token on an **empty** tile that shows that animal, or return it to the bag. On a keystone tile, take a {=nature}.' },
-      { verb: 'Refill', text: 'Fill the empty display slot with a new tile and token.' },
+      { verb: 'Pick', text: 'Take one of the 4 **pairs** on display (a habitat tile and the wildlife token beside it). Or spend 1 {nature} to take any one display tile together with any one display token.' },
+      { verb: 'Place tile', text: 'Add the habitat tile so it touches at least one of your tiles; you may turn it any way.' },
+      { verb: 'Place animal', text: 'Put the wildlife token on any one of your tiles that shows that animal and has **no token** yet, or return it to the bag. If that tile is a keystone tile, take 1 {nature}.' },
+      { verb: 'Refill', text: 'Fill the empty display slot with the top tile of the stack and a token drawn from the bag.' },
     ],
   },
 
   tension: 'The tile you want usually comes with the wrong animal, so each pick trades habitat growth against wildlife patterns.',
 
   structure: [
-    { label: 'Setup', text: 'A 3-tile starter habitat each; stack 20 tiles per player + 3; display 4 tile + token pairs.' },
+    { label: 'Setup', text: 'Each player takes a 3-tile starter habitat. Stack 20 tiles per player plus 3 face down. Display 4 pairs.' },
     { label: 'Turns', repeat: '20 each', text: 'Pick a pair, place the tile, place or return the token, refill the display.' },
-    { label: 'Final scoring', text: 'When the tile stack runs out: wildlife cards, largest habitat areas and bonuses, unspent {=nature}.' },
+    { label: 'Final scoring', text: 'When the tile stack runs out, score the wildlife cards, each largest habitat area and its bonus, and each unspent {=nature}.' },
   ],
 
   points: [
-    ['{=bear} Bears (A)', 'groups of exactly 2: 1 / 2 / 3 / 4 pairs = 4 / 11 / 19 / 27'],
-    ['{=elk} Elk (A)', 'each straight line, by length 1 / 2 / 3 / 4 = 2 / 5 / 9 / 13'],
-    ['{=salmon} Salmon (A)', 'each run (every salmon touches ≤ 2 others), by length 1–7+ = 2 / 5 / 8 / 12 / 16 / 20 / 25'],
-    ['{=hawk} Hawks (A)', 'hawks touching no other hawk: 1–8+ = 2 / 5 / 8 / 11 / 14 / 18 / 22 / 26'],
-    ['{=fox} Foxes (A)', '1 per different animal type next to each fox (foxes count)'],
-    ['Habitats', '1 per tile in your largest area of each; +3 for the biggest at the table, +1 second. Tied biggest: 2 each (1 each if 3+ tie), no second. 2 players: +2 biggest, 1 each if tied'],
-    ['{=nature} Nature tokens', '1 each, unspent'],
+    ['{=bear} Bears (A)', 'count your groups of exactly 2 bears touching no other bear: 1 / 2 / 3 / 4 such pairs = 4 / 11 / 19 / 27'],
+    ['{=elk} Elk (A)', 'each straight line of touching elk scores by its length: 1 / 2 / 3 / 4 = 2 / 5 / 9 / 13'],
+    ['{=salmon} Salmon (A)', 'each run (a group of touching salmon in which no salmon touches more than 2 others) scores by its length 1 / 2 / 3 / 4 / 5 / 6 / 7+ = 2 / 5 / 8 / 12 / 16 / 20 / 25'],
+    ['{=hawk} Hawks (A)', 'count your hawks that touch no other hawk: 1 / 2 / 3 / 4 / 5 / 6 / 7 / 8+ = 2 / 5 / 8 / 11 / 14 / 18 / 22 / 26'],
+    ['{=fox} Foxes (A)', 'each fox scores 1 per different animal type on the tiles around it (other foxes count as a type)'],
+    ['Habitats', 'for each of the 5 habitats, 1 per tile in your largest area of it. Bonus per habitat: +3 for the largest such area at the table, +1 for the second largest. If 2 players tie for largest: +2 each; if 3 or more tie: +1 each; then no second-place bonus. With 2 players: +2 for the largest only, +1 each if tied'],
+    ['{=nature} Nature tokens', '1 per unspent token'],
   ],
 
-  end: { trigger: 'the tile stack runs out', detail: 'Exactly 20 turns each. Ties: most nature tokens.' },
+  end: { trigger: 'the tile stack runs out', detail: 'By then each player has had exactly 20 turns. If tied, the player with more unspent nature tokens wins.' },
   scoring: [
     { label: 'Wildlife cards', share: 6 },
     { label: 'Habitat areas', share: 3 },
@@ -66,8 +66,8 @@ defineGame({
     rows: [
       ['Wildlife', '{bear} {elk} {salmon} {hawk} {fox}'],
       ['Habitats', '{mountain} {forest} {prairie} {wetland} {river}'],
-      ['{=nature} Unpair', 'take any display tile with any display token'],
-      ['{=nature} Wipe', 'return any number of display tokens; draw new ones'],
+      ['{=nature} Spend: unpair', 'take any one display tile with any one display token'],
+      ['{=nature} Spend: wipe', 'return any number of display tokens to the bag and draw replacements'],
     ],
   },
 
@@ -75,22 +75,24 @@ defineGame({
 
   setup: [
     'Each player takes a random 3-tile starter habitat.',
-    'Choose one scoring card per animal (all “A” cards for a first game). Stack 20 tiles per player + 3 face down.',
-    'Reveal 4 tiles; pair each with a token drawn from the bag.',
+    'Choose one scoring card per animal (all “A” cards for a first game). Shuffle the habitat tiles and stack 20 per player plus 3 face down.',
+    'Turn up 4 tiles from the stack and put a token drawn from the bag beside each: this is the display.',
+    'Return unused habitat tiles to the box. Pick a random first player; turns pass clockwise.',
   ],
 
   terms: [
     ['Pair', 'A display tile with the token beside it.'],
     ['{=nature} Nature token', 'Earned by placing a token on a keystone tile. Spend it (table) or keep it for 1 point.'],
     ['Keystone tile', 'Single-habitat tile showing one animal.'],
-    ['Overpopulation', '3 or 4 matching tokens in the display.'],
+    ['Overpopulation', '3 or 4 display tokens of the same animal (see Rules people miss).'],
+    ['Area', 'Your tiles of one habitat joined by edges showing that habitat.'],
   ],
 
   gotchas: [
     'Each tile holds **one** token, and only an animal pictured on that tile. Placed tokens never move.',
     'The token may go on any of your tiles, not only the one you just placed.',
-    'Edges needn’t match; mismatched edges just don’t join habitat areas.',
-    'If all 4 display tokens match, replace them automatically. If **3** match, you may replace those 3 for free before your turn.',
+    'Tile edges don’t have to match. Touching edges of different habitats just don’t join areas.',
+    'If all 4 display tokens show the same animal, return them to the bag and draw 4 new ones at once. If exactly **3** match, at the start of your turn you may return those 3 and draw 3 new ones for free.',
     'You may spend several nature tokens in one turn.',
   ],
 

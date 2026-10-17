@@ -39,33 +39,33 @@
 
     pitch: 'Beat the last play with the same number of higher cards; first to empty your hand becomes President.',
 
-    goal: { big: 'Go out first', text: 'Empty your hand first. Finishing order sets ranks for the next hand, from {president} down to {scum}.' },
+    goal: { big: 'Go out first', text: 'Be the first to play all your cards (**go out**). The order in which players go out sets everyone’s rank for the next hand, from {president} (first out) down to {scum} (last).' },
 
     turn: {
       type: 'round',
       intro: 'Each hand:',
       steps: [
-        { verb: 'Swap', text: '{=scum} Scum gives their **highest** card to {=president} President, who returns any 1 card. No swap in the first hand.' },
-        { verb: 'Lead', text: 'The leader plays a single, pair, triple or four of a kind.' },
-        { verb: 'Beat or pass', text: 'Clockwise, play the **same number** of cards of a **higher** rank, or pass. A pass doesn’t stop you playing when your turn comes round again.' },
-        { verb: 'Clear', text: 'When everyone passes, the last player to play clears the pile and leads anything.' },
-        { verb: 'Go out', text: 'First to empty their hand is {=president} President, second Vice-President; last is {=scum} Scum.' },
+        { verb: 'Swap', text: 'Before play (not in the first hand): the {=scum} Scum gives their **highest** card to the {=president} President, who then gives the Scum any 1 card of their choice.' },
+        { verb: 'Lead', text: 'The **leader** (first hand: the player to the dealer’s left; later hands: the {=president} President) starts a pile by playing 1 card, or 2, 3 or 4 cards of the same rank, face up in the middle.' },
+        { verb: 'Beat or pass', text: 'Going clockwise, each player either plays the **same number** of cards, all of one rank **higher** than the last play, onto the pile, or passes. Passing does not stop you from playing when your turn comes round again.' },
+        { verb: 'Clear', text: 'When every other player still holding cards passes in a row, the last player to play **clears** the pile (sets it aside) and leads any new play. If that player has gone out, the next player still holding cards leads.' },
+        { verb: 'Go out', text: 'Players drop out as their hands empty. The first out becomes {=president} President, the second Vice-President, and the last player still holding cards {=scum} Scum.' },
       ],
     },
 
     tension: 'Spend high cards early to keep control of the lead, or save them so you can still beat plays when your hand is small.',
 
     structure: [
-      { label: 'Deal', text: 'Deal all the cards clockwise. First hand: the player left of the dealer leads.' },
-      { label: 'Swap', text: 'From the second hand: {scum} gives their highest card to {president}, who returns any 1.' },
-      { label: 'Piles', repeat: 'until hands empty', text: 'Lead, beat or pass, clear. Players drop out as their hands empty.' },
-      { label: 'New ranks', text: 'Finishing order sets ranks. Reseat: President picks a seat, Vice-President sits on their left, and so on round to Scum on their right.' },
-      { label: 'Next hand', repeat: 'as long as you like', text: '{scum} deals; {president} leads.' },
+      { label: 'Deal', text: 'Deal all the cards clockwise. First hand: the player to the dealer’s left leads.' },
+      { label: 'Swap', text: 'From the second hand on: the {scum} gives their highest card to the {president}, who gives back any 1 card.' },
+      { label: 'Piles', repeat: 'until hands empty', text: 'Lead, beat or pass, clear, then lead again. Players drop out as their hands empty.' },
+      { label: 'New ranks', text: 'The order players went out sets their ranks. Everyone changes seats: the President picks a seat, the Vice-President sits on the President’s left, and so on clockwise in finishing order, so the Scum sits on the President’s right.' },
+      { label: 'Next hand', repeat: 'as long as you like', text: 'The {scum} deals; after the swap, the {president} leads.' },
     ],
 
     end: {
       trigger: 'the group stops; there is no fixed end',
-      detail: 'Play any number of hands, or score each hand (President 2, Vice-President 1, others 0) and play to 11.',
+      detail: 'Play any number of hands. Or score each hand (President 2 points, Vice-President 1, everyone else 0); the first player to reach 11 points wins.',
       results: [{ side: 'Winner', text: 'whoever is {president} when you stop, or has the most points if you keep score.' }],
     },
 
@@ -73,9 +73,9 @@
       title: 'Ranks & swaps',
       rows: [
         ['Low → high', '{=r3} {=r4} … {=rk} {=ra} {=r2}'],
-        ['Legal plays', 'single {=r9}, pair {=r9}{=r9}, triple, four of a kind'],
-        ['To beat', 'same count, higher rank'],
-        ['{=scum} → {=president}', 'Scum gives highest card; President returns any 1'],
+        ['Legal plays', '1 card {=r9}, or 2, 3 or 4 cards of one rank {=r9}{=r9}'],
+        ['To beat', 'same number of cards, higher rank'],
+        ['{=scum} → {=president}', 'Scum gives their highest card; President gives back any 1 card'],
         ['Everyone else', 'No swap'],
         ['Next hand', 'Scum deals; President leads'],
       ],
@@ -85,21 +85,22 @@
 
     setup: [
       'Use a standard 52-card deck; suits don’t matter.',
-      'Deal all the cards clockwise; some players get one more.',
-      'First hand: the player left of the dealer leads. Later hands: {president} leads.',
+      'Choose a dealer, who deals all the cards clockwise; some players may get 1 more card than others.',
+      'First hand: the player to the dealer’s left leads. Later hands: the {president} leads.',
     ],
 
     terms: [
       ['{=president} President', 'First out. Receives the Scum’s highest card and leads the next hand.'],
       ['{=scum} Scum', 'Last out. Gives away their highest card and deals the next hand.'],
-      ['Clear', 'Everyone passed: the pile is removed and the last player to play leads. If they are out, the next player still in leads.'],
+      ['Lead', 'Play the first cards onto an empty pile. Any legal play is allowed.'],
+      ['Clear', 'Everyone else passed: the pile is set aside and the last player to play leads. If they are out, the next player still holding cards leads.'],
       ['Citizens', 'Everyone between Vice-President and Scum. They swap nothing.'],
     ],
 
     gotchas: [
-      '**2s** are the highest card. A play must match the count: a single 2 can’t beat a pair of 3s.',
-      'Passing doesn’t lock you out: if play comes back to you before the pile clears, you may play.',
-      'Common house rules (agree before dealing): Scum and President swap 2 and Vice-Scum and Vice-President swap 1; a pass locks you out until the pile clears; an equal rank may be played and skips the next player; jokers rank above 2s; the 3{=club} holder leads the first hand.',
+      '**2s** are the highest rank. A play must have the same number of cards as the last play: a single 2 can’t beat a pair of 3s.',
+      'Passing doesn’t lock you out: if your turn comes round again before the pile is cleared, you may play.',
+      'Common house rules (agree before dealing): Scum and President swap 2 cards each way, and Vice-Scum (second to last) and Vice-President swap 1; a pass locks you out until the pile clears; an equal rank may be played and skips the next player; jokers rank above 2s; the 3{=club} holder leads the first hand.',
     ],
 
     tips: [

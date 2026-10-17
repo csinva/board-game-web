@@ -22,33 +22,33 @@ defineGame({
 
   pitch: 'Two players buy patches with buttons and time to fill a 9×9 quilt; most buttons minus empty squares wins.',
 
-  goal: { big: 'Most buttons', text: 'Final score: **buttons** minus **2 per empty square** on your 9×9 quilt, +7 for the 7×7 bonus tile.' },
+  goal: { big: 'Most buttons', text: 'Have the higher final score: your **buttons**, minus **2 per empty square** on your 9×9 quilt board, plus 7 if you hold the 7×7 bonus tile.' },
 
   turn: {
     type: 'choose',
-    intro: 'Whoever is <b>behind</b> on the time track takes a turn and does <b>one</b> of:',
+    intro: 'Whoever is **behind** on the time track takes a turn and does **one** of:',
     outro: 'Whoever is behind on time goes next',
     steps: [
-      { verb: 'Buy a patch', text: 'Choose one of the **3** patches after the neutral pawn, pay its {=button} cost, sew it on your quilt (rotate or flip freely) and move your time token forward by its {=time} cost.' },
-      { verb: 'Advance', text: 'Move your time token to the space just **ahead** of your opponent’s; take 1 {=button} per space moved.' },
+      { verb: 'Buy a patch', text: 'Choose one of the **3** patches directly after the neutral pawn, going clockwise. Pay its {=button} cost, move the neutral pawn to that patch’s spot, place the patch on your quilt (you may rotate or flip it), and move your time token forward by its {=time} cost.' },
+      { verb: 'Advance', text: 'Move your time token to the space just **ahead** of your opponent’s time token; take 1 {=button} per space moved.' },
     ],
   },
 
   tension: 'Each patch costs buttons and time: big button-earning patches cost so much time that your opponent gets several turns in a row.',
 
   structure: [
-    { label: 'Setup', text: 'Patches in a circle, neutral pawn after the 2×1 patch; 5 {=button} each; time tokens on the start.' },
-    { label: 'Turns', repeat: 'whoever is behind', text: 'Buy a patch or advance. Passing a {=button} space on the track pays income; passing a {=leather} gives you a free 1×1 patch.' },
-    { label: 'Game end', text: 'Both tokens on the final space: buttons − 2 per empty square, +7 for the bonus tile.' },
+    { label: 'Setup', text: 'Patches in a circle with the neutral pawn just after the 2×1 patch; 5 {=button} each; both time tokens on the start space.' },
+    { label: 'Turns', repeat: 'whoever is behind', text: 'The player behind on the time track buys a patch or advances. When your time token passes a {=button} space on the track, collect your button income. The first player to pass a {=leather} takes it as a free 1×1 patch.' },
+    { label: 'Game end', text: 'When both time tokens are on the final space, score: buttons − 2 per empty square, + 7 for the bonus tile.' },
   ],
 
   points: [
     ['{=button} Buttons', '1 point each'],
     ['{=empty} Empty square', '−2 each'],
-    ['{=bonus} 7×7 bonus', '+7 to the first player to fill a complete 7×7 area'],
+    ['{=bonus} 7×7 bonus', '+7 to the first player whose quilt has a 7×7 square with every space filled'],
   ],
 
-  end: { trigger: 'both time tokens reach the final space', detail: 'A move that would overshoot stops there. Ties: whoever got there first.' },
+  end: { trigger: 'both time tokens reach the final space', detail: 'A time token that would move past the final space stops on it. If tied, the player who reached the final space first wins.' },
   scoring: [
     { label: '{=button} Button income', share: 4 },
     { label: 'Buttons from advancing', share: 1 },
@@ -59,32 +59,32 @@ defineGame({
     title: 'Numbers to know',
     rows: [
       ['Start', '5 {=button} each'],
-      ['{=patch} Patch label', '{=button} cost · {=time} cost · {=button} printed on it'],
-      ['Button income', 'pass a {=button} space on the track: +1 per {=button} printed on your quilt'],
-      ['{=leather} Leather patch', 'first to pass it takes it and sews it on at once (free 1×1)'],
+      ['{=patch} Patch label', 'its {=button} cost · its {=time} cost · the {=button} printed on the patch itself (its income)'],
+      ['Button income', 'each time your time token passes a {=button} space on the track: take 1 button per {=button} printed on the patches in your quilt'],
+      ['{=leather} Leather patch', 'the first player whose time token passes its space takes it and places it on their quilt at once (a free 1×1 patch)'],
     ],
   },
 
-  example: 'You’re 4 spaces behind Maya. You buy a 5-square patch for **3** {=button} and **4** {=time}, sew it in a corner and move 4 spaces onto her space, on top, so you go again. Then you advance 1 space past her and take **1** {=button}.',
+  example: 'You’re 4 spaces behind Maya. You buy a 5-square patch for **3** {=button} and **4** {=time}, place it in a corner of your quilt and move your time token 4 spaces onto her space. Yours goes on top, so you go again. Then you advance 1 space past her and take **1** {=button}.',
 
   setup: [
-    'Arrange the 33 patches in a circle; put the neutral pawn just after the small 2×1 patch.',
-    'Each player takes a quilt board, 5 {button}s and a time token on the track’s start.',
-    'Put the 5 leather patches {=leather} on their marked track spaces and the {bonus} nearby.',
+    'Arrange the 33 patches in a circle; put the neutral pawn just after the small 2×1 patch (going clockwise).',
+    'Each player takes a quilt board and 5 {button}s, and puts a time token on the start space of the time track. The player who most recently used a needle goes first: put their token on top.',
+    'Put the 5 leather patches {=leather} on their marked track spaces and the {bonus} beside the board.',
   ],
 
   terms: [
     ['{=button} Buttons', 'Money and final score.'],
-    ['Time track', 'Shared spiral; your token shows the time you have used.'],
-    ['Neutral pawn', 'Marks your place in the patch circle; you may buy only the 3 patches after it.'],
-    ['Button income', 'Buttons printed on your patches; they pay when you pass income spaces.'],
+    ['Time track', 'Shared spiral track; your time token shows how much time you have used.'],
+    ['Neutral pawn', 'Marks the current place in the patch circle; you may buy only the 3 patches directly after it, going clockwise.'],
+    ['Button income', 'The buttons printed on the patches in your quilt; they pay out each time your time token passes a {=button} space on the track.'],
   ],
 
   gotchas: [
-    'Turns don’t alternate: whoever is **behind** on time goes next, so you can take several turns in a row. On the same space, the token on top goes first.',
+    'Turns don’t alternate: whoever is **behind** on time goes next, so you can take several turns in a row. If both time tokens are on the same space, the one on top (the one that arrived last) goes first.',
     'Each **empty square** costs 2 at the end; holes add up fast.',
     'Income pays only when your token **passes** a button space, and counts only buttons already on your quilt.',
-    'A patch must fit wholly on your quilt without overlapping; you can’t move it later. Can’t pay or can’t fit: you must advance instead.',
+    'A patch must fit wholly on your quilt without overlapping; you can’t move it later. If you can’t pay for or can’t fit any of the 3 patches, you must advance instead.',
     'The {=bonus} goes only to the **first** player to fill a 7×7 square; the other player can’t take it later.',
   ],
 
@@ -129,7 +129,7 @@ defineGame({
     return [
       { step: 0, say: 'You’re **4 spaces behind** Maya on the time track. Whoever is behind goes, so it’s you.', svg: board + pawn(38) + lMarket + coins(5) + tok('you', 1, '#4fae5a') + A.k('gap', A.rect(sp(1)[0] - 10, sp(1)[1] - 10, 4 * 17 + 20, 20, 'none', { rx: 4, stroke: '#ffcf3f', sw: 3 })) },
       { step: 0, say: 'Buy the **5-square patch** after the pawn: **3** {=button} and **4** {=time}, with 1 {=button} printed on it.', svg: board + pawn(38) + lMarket + coins(5) + tok('you', 1, '#4fae5a') + A.glow(64, 37, 20, 'g-L') },
-      { step: 0, say: 'Pay 3 buttons and sew it into a corner. The pawn moves to that patch’s old spot.', svg: board + pawn(64) + lQuilt + coins(2) + tok('you', 1, '#4fae5a') },
+      { step: 0, say: 'Pay 3 buttons and place it in a corner of your quilt. The neutral pawn moves to that patch’s old spot.', svg: board + pawn(64) + lQuilt + coins(2) + tok('you', 1, '#4fae5a') },
       { step: 0, say: 'Move your time token **4 spaces**: onto Maya’s space, **on top**.', svg: board + pawn(64) + lQuilt + coins(2) + tok('you', 5, '#4fae5a', 6) },
       { step: 1, say: 'On top goes first, so you go again. **Advance** to just ahead of Maya: 1 space, **1** {=button}.', svg: board + pawn(64) + lQuilt + coins(3) + tok('you', 6, '#4fae5a') + A.glow(...sp(6), 12, 'g-6') },
       { step: 1, say: 'Maya is behind now, so she goes next.', svg: board + pawn(64) + lQuilt + coins(3) + tok('you', 6, '#4fae5a') + A.glow(...sp(5), 12, 'g-5') },

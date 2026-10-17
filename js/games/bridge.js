@@ -23,40 +23,40 @@ defineGame({
       A.circle(4 + c * 5.4, 18.5, 1.7, c === 1 || c === 2 ? '#c8423b' : '#2a2420', { sw: 0 })).join('') },
   },
 
-  pitch: 'Partners bid for the right to name trump; declarer then plays both hands to make the contract. First to 2 games wins.',
+  pitch: 'Partners bid how many tricks they will win and which suit is trump, then try to win them. First side to 2 games wins.',
 
-  goal: { big: 'Win the rubber', text: 'First side to win **2 games** takes the rubber. A game is **100 points below the line**, scored only from contracts bid and made.' },
+  goal: { big: 'Win the rubber', text: 'Play as 2 partnerships (**sides**). The score pad has a line across it: tricks you bid and won score **below the line**; everything else scores above it. A side with **100** points below the line wins a **game**. The first side to win **2 games** wins the **rubber** and a bonus; then the higher total wins.' },
 
   turn: {
     type: 'round',
     intro: 'Each deal goes through these phases:',
     steps: [
-      { verb: 'Deal', text: 'Deal all 52 cards: **13** each.' },
-      { verb: 'Bid', text: 'Dealer first, clockwise: bid a level and strain (1{=club} up to 7{=nt}), {pass}, {dbl} or {rdbl}. Each bid must outrank the last; **3 passes** in a row after a bid end the auction.' },
-      { verb: 'Lead & dummy', text: 'The player left of the **declarer** leads; then declarer’s partner lays their hand face up as {=dummy} **dummy**.' },
-      { verb: 'Play tricks', text: 'Follow suit if you can. Highest trump wins, else highest card of the suit led. The winner leads next. Declarer plays dummy’s cards too.' },
-      { verb: 'Score', text: 'Made: trick points below the line. Down: defenders score a penalty above the line.' },
+      { verb: 'Deal', text: 'The dealer deals all 52 cards clockwise: **13** each.' },
+      { verb: 'Bid', text: 'Starting with the dealer and going clockwise around the table as many times as needed, each player makes one call per turn: a **bid**, {pass}, {dbl} (only on an opponent’s bid) or {rdbl} (only on an opponent’s double). A bid is a **level** (1–7: the number of tricks over 6 your side will win) plus a **strain** (a trump suit, or {=nt} no trump), e.g. 2{=heart} = win 8 tricks with hearts as trump. Each bid must be higher than the last bid (see Bidding). After any bid, **3 passes** in a row end the auction; the last bid is the **contract**.' },
+      { verb: 'Lead & dummy', text: 'The **declarer** is the player on the contract’s side who first bid its strain. The player to the declarer’s left **leads** (plays the first card of) the first trick. Then the declarer’s partner lays their whole hand face up, sorted by suit: this is the {=dummy} **dummy**.' },
+      { verb: 'Play tricks', text: 'A **trick** is 1 card from each hand, played clockwise. Each player must **follow suit** (play a card of the suit led) if able; otherwise they may play any card. The highest **trump** (card of the trump suit) wins the trick; if none was played, or the contract is {=nt}, the highest card of the suit led wins. The winner leads the next trick. On the dummy’s turn, the declarer chooses which dummy card to play. Play all 13 tricks.' },
+      { verb: 'Score', text: 'If the declarer’s side won at least level + 6 tricks, it scores the bid tricks below the line and any extra tricks above it. If not (**going down**), the other side (the **defenders**) scores a penalty for each missing trick, above the line. See Scoring.' },
     ],
   },
 
   tension: 'Bids are your only way to describe your hand, so each one is both a message and a promise: stop too low and you miss game, go too high and you go down.',
 
   structure: [
-    { label: 'Deals', repeat: 'until a rubber', text: 'Deal 13 each, auction, play 13 tricks, score above or below the line. If all 4 pass at once, redeal. Deal passes clockwise.' },
-    { label: 'Game', text: '100+ below the line wins a game. Draw a new line: part-scores below it no longer count toward the next game.' },
-    { label: 'Rubber', text: 'First side to win **2 games** gets the rubber bonus. Then total everything; higher wins.' },
+    { label: 'Deals', repeat: 'until a rubber', text: 'Deal 13 cards each, hold the auction, play 13 tricks, score. If all 4 players pass on their first call, the next dealer in turn redeals. The deal passes clockwise (to the left) after each hand.' },
+    { label: 'Game', text: 'A side with 100 or more points below the line (added across hands) wins a game. Draw a new line under both sides’ scores: any **part-score** (below-the-line points short of 100) above that new line no longer counts toward the next game.' },
+    { label: 'Rubber', text: 'The first side to win **2 games** gets the rubber bonus. Then add up each side’s points above and below the line; the higher total wins.' },
   ],
 
   points: [
-    ['Per trick bid {=club} {=diamond}', '20 below the line'],
-    ['Per trick bid {=heart} {=spade}', '30 below the line'],
-    ['Per trick bid {=nt}', '40 for the first, 30 each after'],
-    ['Overtrick', 'same rate, above the line'],
-    ['Undertrick', '50 each to defenders (100 vulnerable), above'],
-    ['Slam / rubber', 'slam 500–1500; rubber +700 (2–0) or +500 (2–1)'],
+    ['Each bid trick in {=club} {=diamond}', '20 below the line (e.g. 3{=club} made = 60)'],
+    ['Each bid trick in {=heart} {=spade}', '30 below the line'],
+    ['Each bid trick in {=nt}', '40 for the first, 30 for each after it, below the line'],
+    ['Overtrick', 'each trick won beyond the contract: same rate, above the line'],
+    ['Undertrick', 'each trick short of the contract: 50 to the defenders (100 if declarer’s side is vulnerable; more if doubled), above the line'],
+    ['Slam / rubber', 'level-6 contract made: 500 (750 vulnerable); level 7: 1000 (1500 vulnerable). Rubber: +700 if won 2 games to 0, +500 if 2 games to 1'],
   ],
 
-  end: { trigger: 'one side wins two games (a rubber)', detail: 'Then total all points above and below the line; the higher total wins, usually the side that took the rubber.' },
+  end: { trigger: 'one side wins two games (a rubber)', detail: 'Then total all points above and below the line; the higher total wins. This is usually, but not always, the side that won the rubber.' },
   scoring: [
     { label: 'Contract tricks', share: 4 },
     { label: 'Rubber bonus', share: 3 },
@@ -67,39 +67,42 @@ defineGame({
   ref: {
     title: 'Bidding',
     rows: [
-      ['Bid ladder', '1{=club} 1{=diamond} 1{=heart} 1{=spade} 1{=nt} 2{=club} … 7{=nt} (higher level, or same level and higher strain)'],
-      ['Contract', 'level + 6 tricks: 4{=heart} = 10 tricks'],
+      ['Bid ladder', '1{=club} 1{=diamond} 1{=heart} 1{=spade} 1{=nt} 2{=club} … 7{=nt}, low to high. A new bid must be a higher level, or the same level in a higher strain'],
+      ['Tricks needed', 'level + 6: 4{=heart} = 10 tricks'],
       ['Other calls', '{pass} · {dbl} an opponent’s bid · {rdbl} an opponent’s double'],
-      ['Game contracts', '3{=nt} · 4{=heart} 4{=spade} · 5{=club} 5{=diamond}'],
-      ['Hand value', 'A 4 · K 3 · Q 2 · J 1; open with 12+'],
+      ['Game contracts', 'worth 100+ below the line alone: 3{=nt} · 4{=heart} 4{=spade} · 5{=club} 5{=diamond}'],
+      ['Hand value', 'A 4 · K 3 · Q 2 · J 1; make your side’s first bid with 12+ (a guideline)'],
     ],
   },
 
-  example: 'South opens **1{=heart}**, North raises to **4{=heart}**, and all pass. South is declarer: West leads, then North lays her hand face up as {=dummy} dummy. South takes 11 tricks: 4 × 30 = **120** below the line (a game) plus 30 above for the overtrick.',
+  example: 'South makes the first bid, **1{=heart}**; North later bids **4{=heart}**, and the next 3 calls are passes. South is declarer: West leads, then North lays her hand face up as {=dummy} dummy. South’s side wins 11 tricks: 4 × 30 = **120** below the line (a game) plus 30 above for the overtrick.',
 
   setup: [
-    'Partners sit across: North–South against East–West. Deal 13 cards each.',
-    'Score pad: a WE and a THEY column, with a horizontal line across the middle.',
+    '4 players: partners sit across from each other, North–South against East–West. Choose a first dealer, who deals 13 cards each.',
+    'Score pad: a WE column and a THEY column, with a horizontal line across the middle.',
     'The deal passes clockwise after each hand.',
   ],
 
   terms: [
     ['Strain', 'The trump suit named in a bid, or {=nt} notrump.'],
-    ['Declarer', 'Plays the contract: whoever on the winning side first named its strain.'],
+    ['Contract', 'The final bid: the side that made it must win level + 6 tricks.'],
+    ['Declarer', 'Plays the contract: of the two partners who won the auction, the one who first bid its strain.'],
     ['{=dummy} Dummy', 'Declarer’s partner: lays cards face up and takes no part in the play.'],
-    ['Vulnerable', 'A side that has won a game: bigger bonuses and bigger penalties.'],
+    ['Vulnerable', 'A side that has won a game in the current rubber: bigger bonuses and bigger penalties.'],
+    ['{=dbl} Double', 'A call on an opponent’s bid that raises what that contract scores if made or failed. {=rdbl} Redouble raises it again.'],
+    ['Part-score', 'Below-the-line points that have not yet reached 100; they add up toward the current game.'],
     ['High-card points', 'A = 4, K = 3, Q = 2, J = 1 (40 in the deck). A quick hand count.'],
   ],
 
   gotchas: [
     'Declarer is whoever **first** named the final strain for their side, not whoever made the last bid.',
-    'Going down costs **50** a trick (100 if vulnerable), more when doubled, scored above the line for the defenders.',
+    'Each trick short of the contract gives the defenders **50** (100 if the declarer’s side is vulnerable), more when doubled, scored above the line.',
     'Only tricks you **bid** count toward game; overtricks go above the line. Part-scores below the line add up toward game.',
   ],
 
   tips: [
-    'Open with 12+ high-card points. Partners with ~25 together should reach game: 3{=nt}, 4{=heart} or 4{=spade}.',
-    'Look for an **8-card fit** in {=heart} or {=spade}; it is usually the safest trump suit.',
+    'Make your side’s first bid with 12+ high-card points. Partners with about 25 between them should bid a game contract: 3{=nt}, 4{=heart} or 4{=spade}.',
+    'Look for an **8-card fit** (8+ cards of one suit between you and partner) in {=heart} or {=spade}; it is usually the safest trump suit.',
     'As declarer, before trick one: count sure winners and plan where the rest come from.',
   ],
 
@@ -131,23 +134,23 @@ defineGame({
       A.line(160, 84, 160, 160, { sw: 0.8 }) + A.line(106, 124, 214, 124, { sw: 1.8 }) + A.text(132, 110, '30', { size: 11, weight: 800 }) + A.text(132, 142, '120', { size: 13, weight: 800, fill: R }));
     return [
       { step: 0, say: 'Deal 13 each. You are **South**; North, across, is your partner.', svg: board + northBacks + hand() },
-      { step: 1, say: 'You open **1{=heart}**: “12+ points and at least 5 hearts.”', svg: board + northBacks + hand() + bids(['1♥']) },
-      { step: 1, say: 'West {=pass}, North jumps to **4{=heart}**, then 3 passes end the auction. Contract 4{=heart}: **10 tricks**.', svg: board + northBacks + hand() + bids(['1♥', 'P', '4♥', 'P', 'P', 'P']) + A.glow(165, 76, 20) },
+      { step: 1, say: 'You make the first bid, **1{=heart}**. It tells partner: “12+ points and at least 5 hearts.”', svg: board + northBacks + hand() + bids(['1♥']) },
+      { step: 1, say: 'West {=pass}, North bids **4{=heart}**, then 3 passes end the auction. Contract 4{=heart}: **10 tricks**.', svg: board + northBacks + hand() + bids(['1♥', 'P', '4♥', 'P', 'P', 'P']) + A.glow(165, 76, 20) },
       { step: 2, say: 'You named hearts first, so you are **declarer**. West, on your left, leads K{=spade}.', svg: board + northBacks + hand() + lead },
       { step: 2, say: 'North lays her cards **face up**, sorted by suit: the {dummy}. You play her cards too.', svg: board + dummy() + hand() + lead + A.glow(171, 42, 46) },
       { step: 3, say: 'You play dummy’s **A{=spade}**, East 3{=spade}, you 4{=spade}. The ace wins.', svg: board + dummy(true) + hand('4♠') + lead + A.k('dA♠', face(146, 74, 'A', '♠')) + A.k('e3', face(180, 88, '3', '♠')) + A.k('s4♠', face(146, 104, '4', '♠')) + A.glow(160, 94, 26) },
-      { step: 4, say: 'You take **11**. Bid 4{=heart} = 4 × 30 = **120** below the line: a game. The overtrick scores 30 above.', svg: board + dummy(true) + pile + pad },
+      { step: 4, say: 'Your side wins **11** tricks. Bid 4{=heart} = 4 × 30 = **120** below the line: a game. The overtrick scores 30 above the line.', svg: board + dummy(true) + pile + pad },
     ];
   },
 
   extended: [
     { title: 'Valuing a hand', text: 'Count high-card points (A 4, K 3, Q 2, J 1). Add 1 for each card over four in a long suit. With 12–13+ you usually open; partners with about 25 between them belong in game, 33 in a small slam, 37 in a grand slam.' },
-    { title: 'Opening bids (a simple standard system)', items: ['**1{=heart} / 1{=spade}**: 12–21 points with 5+ cards in the suit.', '**1{=club} / 1{=diamond}**: 12–21 points without a 5-card major; bid your longer minor.', '**1{=nt}**: 15–17 points, balanced hand (no singleton or void).', '**2{=club}**: 22+ points, artificial and forcing: “partner, don’t pass.”', '{=pass}: under about 12 points.'] },
-    { title: 'Responding to partner', items: ['With 6+ points, don’t pass partner’s opening of one in a suit.', 'Raise partner’s major with 3+ card support: to 2 with 6–10, to 4 with a weak hand and many trumps, or show a strong raise.', 'A new suit by responder is **forcing**: opener must bid again.', 'Over 1{=nt}, add your points to 15–17 and place the contract (pass, 2 of a long suit, 3{=nt}, 4 of a major).'] },
+    { title: 'Opening bids (a simple standard system)', items: ['**1{=heart} / 1{=spade}**: 12–21 points with 5+ cards in the suit.', '**1{=club} / 1{=diamond}**: 12–21 points without 5+ cards in {=heart} or {=spade} (the **majors**); bid the longer of {=club} and {=diamond} (the **minors**).', '**1{=nt}**: 15–17 points, balanced hand (no suit with only 0 or 1 card).', '**2{=club}**: 22+ points. It says nothing about clubs (**artificial**) and is **forcing**: partner must not pass.', '{=pass}: under about 12 points.'] },
+    { title: 'Responding to partner', items: ['If partner made the first bid at level 1 in a suit and you have 6+ points, don’t pass.', 'When partner opened 1{=heart} or 1{=spade} and you hold 3+ cards of that suit, bid the same suit higher (**raise**): to 2 with 6–10 points, to 4 with a weak hand and many trumps, or show a strong raise.', 'If the opener’s partner (the **responder**) bids a new suit, it is **forcing**: the opener must bid again.', 'When partner opened 1{=nt}, add your points to their 15–17 and choose the final contract (pass, 2 of a long suit, 3{=nt}, or 4{=heart}/4{=spade}).'] },
     { title: 'Doubles and redoubles', text: 'A {=dbl} double of an opponent’s bid can be for **penalty** (you expect them to go down) or, at a low level, for **takeout** (asking partner to bid their best suit). Doubling doubles the trick score and raises undertrick penalties; a made doubled contract also earns 50 (“for the insult”). The declaring side may {=rdbl} redouble to raise the stakes again.' },
     { title: 'Penalties and bonuses (rubber)', items: ['Undertricks, undoubled: 50 each not vulnerable, 100 each vulnerable.', 'Doubled undertricks, not vulnerable: 100, 200, 200, then 300 each. Vulnerable: 200, then 300 each. Redoubled: twice these.',
-      'Made doubled: trick points ×2, overtricks 100 each (200 vulnerable), +50. Redoubled: trick points ×4, overtricks 200 (400), +100.', 'Small slam (12 tricks) bonus: 500, or 750 vulnerable. Grand slam (13): 1000 or 1500.', 'Honors: 4 of the 5 top trumps in one hand scores 100; all 5 (or all 4 aces in {=nt}) scores 150.', 'Unfinished rubber: a side that has won one game scores 300; a side with the only part-score in an unfinished game scores 100.'] },
-    { title: 'Declarer play basics', items: ['Before trick one, count sure winners (in NT) or losers (in a suit) and plan how to fix the gap.', '**Draw trumps** early unless you need them to ruff losers in dummy.', '**Finesse**: lead toward a broken honour (e.g. A-Q) hoping the missing king sits in front of it.', 'Establish a long suit by giving up a trick early while you still have control elsewhere.'] },
+      'Made doubled: trick points ×2, overtricks 100 each (200 vulnerable), +50. Redoubled: trick points ×4, overtricks 200 (400), +100.', 'Small slam (12 tricks) bonus: 500, or 750 vulnerable. Grand slam (13): 1000 or 1500.', 'Honors: 4 of the 5 highest trumps (A K Q J 10) in one hand scores 100; all 5 (or all 4 aces in a {=nt} contract) scores 150.', 'Unfinished rubber: a side that has won one game scores 300; a side with the only part-score in an unfinished game scores 100.'] },
+    { title: 'Declarer play basics', items: ['Before trick one, count sure winners (in NT) or losers (in a suit) and plan how to fix the gap.', '**Draw trumps**: lead trumps early to remove the defenders’ trumps, unless you need dummy’s trumps to win tricks in a suit dummy has run out of (**ruffing**).', '**Finesse**: lead toward two high cards with a gap (e.g. A-Q), hoping the missing card (the K) is held by the defender who plays before that hand.', 'Set up a long suit: give up a trick in it early so its remaining low cards become winners, while you still hold winners in the other suits.'] },
     { title: 'Rubber vs duplicate', text: 'This sheet teaches rubber bridge, the social form. Clubs and tournaments play **duplicate**: the same deals are replayed at other tables and you are scored against others who held your cards, which removes most of the luck. Each deal is scored on its own with fixed game and part-score bonuses instead of a running rubber.' },
   ],
 

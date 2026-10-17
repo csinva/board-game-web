@@ -26,36 +26,36 @@ defineGame({
 
   pitch: 'Give a clue for a picture card; others add look-alikes and vote. Score when some, but not all, find your card.',
 
-  goal: { big: '30 points', text: 'Most points wins. Score by **finding** the storyteller’s card and by drawing votes to your own card.' },
+  goal: { big: '30 points', text: 'The player with the most points at the end wins. Score by **finding** the storyteller’s card and by drawing votes to the card you played.' },
 
   turn: {
     type: 'round',
-    intro: 'Each round one player is the storyteller (it passes left):',
+    intro: 'Each round, one player is the storyteller:',
     steps: [
-      { verb: 'Tell', text: 'The {storyteller} picks a card from their hand of 6 and gives a **clue**: a word, sound, phrase or song.' },
-      { verb: 'Match', text: 'Everyone else secretly gives the storyteller their best-fitting card, face down.' },
-      { verb: 'Vote', text: 'Shuffle and lay the cards out face up, numbered. Everyone but the storyteller secretly sets their {vote} to the card they think is the storyteller’s.' },
-      { verb: 'Score', text: 'Reveal votes, score (see Scoring), discard the played cards and refill hands to 6.' },
+      { verb: 'Tell', text: 'The {storyteller} picks 1 card from their hand, puts it face down without showing it, and says a **clue** about it: a word, sound, phrase or song.' },
+      { verb: 'Match', text: 'Each other player picks the card from their own hand that best fits the clue and gives it to the storyteller face down.' },
+      { verb: 'Vote', text: 'The storyteller shuffles all these cards with their own and lays them out face up in a row, numbered 1, 2, 3… Each other player secretly sets their {vote} to the number of the card they think is the storyteller’s.' },
+      { verb: 'Score', text: 'All votes are revealed at the same time and points are scored (see Scoring). Discard the played cards; every player draws back up to 6 cards.' },
     ],
-    outro: 'Next storyteller',
+    outro: 'Storyteller role passes left',
   },
 
   tension: 'The storyteller scores only if **some but not all** players find their card, so the clue must be half-obvious.',
 
   structure: [
     { label: 'Setup', text: 'Each player takes a {=rabbit} on 0 and the {vote} in their colour; deal 6 {=picture} each.' },
-    { label: 'Rounds', repeat: 'storyteller passes left', text: 'Clue, match, vote, score, refill to 6. If the deck runs short, shuffle the discards into it.' },
-    { label: 'Game end', text: 'After a round in which a {=rabbit} reaches 30 or more, most points wins.' },
+    { label: 'Rounds', repeat: 'storyteller passes left', text: 'Clue, match, vote, score, everyone draws back up to 6. If the deck runs short, shuffle the discards into it.' },
+    { label: 'Game end', text: 'Finish the round in which any {=rabbit} reaches 30 or more; then the player with the most points wins.' },
   ],
 
   points: [
     ['{=storyteller} Storyteller', '3 if some but not all players find your card; 0 if all or none do'],
-    ['Finding the card', '3 to each player who finds it (some but not all found it)'],
-    ['All or none found it', '2 to every player except the storyteller'],
-    ['{=vote} Votes on your card', '+1 per vote it drew (not for the storyteller)'],
+    ['Finding the card', '3 to each player who voted for the storyteller’s card, if some but not all players did'],
+    ['All or none found it', 'if every voter or no voter found it, 2 to every player except the storyteller'],
+    ['{=vote} Votes on your card', 'every player except the storyteller scores +1 for each vote on the card they played'],
   ],
 
-  end: { trigger: 'A round ends with any player on 30 or more points', detail: 'Most points wins; tied players share the win.' },
+  end: { trigger: 'a round ends with any player on 30 or more points', detail: 'The player with the most points wins; tied players share the win.' },
   scoring: [
     { label: 'Finding the storyteller’s card', share: 4 },
     { label: '{=vote} Votes on your decoys', share: 2 },
@@ -66,20 +66,20 @@ defineGame({
 
   setup: [
     'Each player puts a {rabbit} on 0 on the score track and takes the {vote} of their colour.',
-    'Shuffle the {picture}s and deal **6** to each player (3 players: 7 each).',
+    'Shuffle the {picture}s and deal **6** to each player (3 players: 7 each). Keep your hand secret.',
     'Choose a first storyteller; the role passes left each round.',
   ],
 
   terms: [
     ['{=storyteller} Storyteller', 'The player who gives the clue this round.'],
-    ['Clue', 'Anything you can say or hum about your card.'],
-    ['Decoy', 'A card another player adds to mislead the voters.'],
+    ['Clue', 'A word, sound, phrase or song about your card: anything you can say or hum.'],
+    ['Decoy', 'A card a non-storyteller adds to the storyteller’s card, to draw votes away from it.'],
   ],
 
   gotchas: [
-    'You may **not vote** for your own card.',
+    'You may **not vote** for the card you played.',
     'If **everybody** or **nobody** finds the storyteller’s card, the storyteller scores 0.',
-    'With 3 players, hold 7 cards; each non-storyteller submits **2** cards and draws 2 to refill.',
+    'With 3 players, each player holds 7 cards; each non-storyteller gives **2** cards, and everyone draws back up to 7.',
   ],
 
   tips: [

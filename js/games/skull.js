@@ -34,17 +34,17 @@ defineGame({
 
   pitch: 'Place rose or skull discs face down, then bid how many roses you can flip; win 2 bids or be the last with discs.',
 
-  goal: { big: 'Win 2 challenges', text: 'Win **two challenges** (flip as many roses as you bid), or be the last player with discs.' },
+  goal: { big: 'Win 2 challenges', text: 'Win **two challenges** (as the highest bidder, flip as many discs as you bid without revealing a skull), or be the last player with discs.' },
 
   turn: {
     type: 'round',
     intro: 'Each round goes through these phases:',
-    outro: 'New round: the challenger starts',
+    outro: 'Discs return to hands; the challenger starts the next round',
     steps: [
-      { verb: 'Place', text: 'Everyone places **one disc** face down on their mat at once.' },
-      { verb: 'Add or bid', text: 'In turn, add one disc to your stack or start the bidding with a number. With no discs in hand, you must bid.' },
-      { verb: 'Raise/pass', text: 'In turn, each player **raises** or passes (out until next round). Bids can’t exceed the discs down; a bid of all of them ends bidding.' },
-      { verb: 'Flip', text: 'The top bidder flips that many discs: **all of their own first**, then the top disc of any stacks they choose.' },
+      { verb: 'Place', text: 'All at the same time, each player places **one disc** from their hand face down on their own mat.' },
+      { verb: 'Add or bid', text: 'Clockwise from the round’s first player, each player either adds 1 disc from hand on top of their stack, or starts the bidding by naming how many discs they will flip. A player with no discs in hand **must** bid.' },
+      { verb: 'Raise/pass', text: 'Once bidding starts, no more discs are added. Clockwise, each player must bid **higher** or pass; a player who passes can’t bid again this round. No bid may exceed the total discs on all mats. Bidding ends when everyone else has passed, or when someone bids that total.' },
+      { verb: 'Flip', text: 'The highest bidder (the challenger) flips that many discs one at a time: **every disc in their own stack first**, then discs from the top of any other stacks (several from one stack is fine, top down), in any order they choose. Flipping a skull ends the challenge at once.' },
     ],
   },
 
@@ -52,7 +52,7 @@ defineGame({
 
   structure: [
     { label: 'Setup', text: 'Each player takes a {=mat} and 4 discs in its colour: 3 {=rose} and 1 {=skull}.' },
-    { label: 'Rounds', repeat: 'until someone wins', text: 'Place, add or bid, raise or pass, then the top bidder flips. All discs return to hands.' },
+    { label: 'Rounds', repeat: 'until someone wins', text: 'Place, add or bid, raise or pass, then the highest bidder flips. All discs return to their owners’ hands.' },
     { label: 'Game end', text: 'A second successful challenge wins; so does being the last player with discs.' },
   ],
 
@@ -70,29 +70,29 @@ defineGame({
       ['All {=rose}', 'success: flip your mat to {=mat-won}; a second success wins'],
       ['Another player’s {=skull}', 'its owner takes 1 of your discs at random and discards it unseen'],
       ['Your own {=skull}', 'you discard 1 disc of your choice, unseen'],
-      ['Next round', 'the challenger starts; if eliminated, the skull’s owner starts (own skull: you choose)'],
+      ['Next round', 'the challenger starts. If the challenger was just eliminated, the skull’s owner starts; if it was the challenger’s own skull, the challenger chooses who starts'],
       ['No discs left', 'you are out of the game'],
     ],
   },
 
-  example: 'Five discs are down. Ana bids **3**; Ben raises to 4; Cy and Ana pass. Ben flips his own 2 discs ({=rose}{=rose}), then Cy’s top disc: {=rose}. He flips Ana’s top disc: {=skull}. Ana takes one of Ben’s 4 discs at random and discards it face down, so nobody else knows if it was his skull.',
+  example: 'Five discs are down. Ana bids **3**; Ben raises to 4; Cy and Ana pass. Ben flips his own 2 discs ({=rose}{=rose}), then Cy’s top disc: {=rose}. For his 4th disc he flips Ana’s top disc: {=skull}. Ana takes one of Ben’s 4 discs at random and discards it face down, so nobody else knows if it was his skull.',
 
   setup: [
     'Give each player a {mat} and **4 discs** in its colour: 3 {rose}s and 1 {skull}.',
-    'Mats start plain side up.',
-    'Pick a first player. Keep your discs hidden in hand.',
+    'Each player puts their mat plain side up in front of them.',
+    'Pick a first player for round 1. Each player keeps their discs hidden in hand.',
   ],
 
   terms: [
     ['{=mat} Mat', 'Your coaster. Flips to the rose side ({=mat-won}) after your first success.'],
-    ['{=disc} Stack', 'Your face-down discs played this round.'],
-    ['Challenge', 'The winning bid: flip that many discs without hitting a {=skull}.'],
+    ['{=disc} Stack', 'The face-down discs on your mat this round, one on top of another.'],
+    ['Challenge', 'The highest bidder (the challenger) must flip as many discs as they bid without revealing a {=skull}.'],
   ],
 
   gotchas: [
     'The bidder flips **all of their own** discs first, so their own skull always sinks them.',
-    'Lost discs are taken **at random** and stay hidden, so nobody else knows if you still have your skull.',
-    'Flip only the **top** disc of another stack, one at a time; you choose which stacks.',
+    'A disc lost to another player’s skull is taken **at random** and stays hidden, so nobody else knows if you still have your skull.',
+    'From other stacks, flip only the current **top** disc, one at a time; you choose which stacks.',
   ],
 
   tips: [

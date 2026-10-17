@@ -38,24 +38,24 @@ defineGame({
 
   pitch: 'Start with 10 weak cards, buy better ones each turn, and finish with the most victory points in your deck.',
 
-  goal: { big: 'Most VP in deck', text: 'Most **victory points** among all your cards when the game ends. {=province} Provinces (6 {=vp}) are the big prize.' },
+  goal: { big: 'Most VP in deck', text: 'Have the most **victory points** ({vp}) on all the cards you own (deck, hand, discard pile and cards in play) when the game ends. {=province} Provinces (6 {=vp} each) are worth the most.' },
 
   turn: {
     type: 'sequence',
-    intro: 'Three phases, in order (A-B-C):',
+    intro: 'On your turn, do these three phases in order:',
     steps: [
-      { verb: 'Action', text: 'Play **one** {=action} Action card and follow it: {plus-card} draws, each {plus-action} lets you play one more.' },
-      { verb: 'Buy', text: 'Play {=copper}{=silver}{=gold} Treasures, total the coins, and buy **one** card from the Supply (more with {plus-buy}).' },
-      { verb: 'Clean-up', text: 'Discard all cards in play and in hand, then draw **5**.' },
+      { verb: 'Action', text: 'You **may** play **1** {=action} Action card from your hand and do what it says, top to bottom. {plus-card} = draw 1 card from your deck; each {plus-action} lets you play 1 more Action card this turn.' },
+      { verb: 'Buy', text: 'Play any of your {=copper}{=silver}{=gold} Treasure cards from your hand and add up their coins (plus any coins your Actions gave). You **may** buy **1** card from the Supply that costs no more than that total; each {plus-buy} lets you buy 1 more. Bought cards go on your discard pile.' },
+      { verb: 'Clean-up', text: 'Put every card you played and every card left in your hand on your discard pile, then draw **5** new cards from your deck.' },
     ],
   },
 
   tension: 'Each card you buy dilutes your deck: {=action} Actions make turns stronger, {=victory} Victory cards do nothing in hand, so you must choose when to switch from building to buying points.',
 
   structure: [
-    { label: 'Setup', text: 'Each player shuffles 7 {=copper} + 3 {=estate} into a deck and draws 5.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Action, Buy, Clean-up. When your deck runs out, shuffle your discard pile into a new deck.' },
-    { label: 'Game end', text: 'After the turn that empties the {=province} pile or any 3 Supply piles, count {=vp} in your whole deck.' },
+    { label: 'Setup', text: 'Each player shuffles 7 {=copper} + 3 {=estate} into a face-down deck and draws 5. Pick a random first player.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Each player in turn: Action, Buy, Clean-up. Whenever you must draw and your deck is empty, shuffle your discard pile face down to form a new deck, then keep drawing.' },
+    { label: 'Game end', text: 'When the {=province} pile or any 3 Supply piles are empty, finish that turn. Then everyone counts the {=vp} on all the cards they own.' },
   ],
 
   points: [
@@ -63,10 +63,10 @@ defineGame({
     ['{=duchy} Duchy', '3 {=vp}'],
     ['{=province} Province', '6 {=vp}'],
     ['{=curse} Curse', '−1 {=vp} (given to you by attacks like Witch)'],
-    ['{=victory} Kingdom Victory cards', 'as printed (e.g. Gardens: 1 {=vp} per 10 cards in your deck)'],
+    ['{=victory} Kingdom Victory cards', 'as printed (e.g. Gardens: 1 {=vp} for every full 10 cards you own, rounded down)'],
   ],
 
-  end: { trigger: 'the Province pile empties, or any 3 Supply piles empty', detail: 'Finish that turn. (5–6 players, with a second set: any 4 piles.) Tie: fewer turns wins; still tied, share the win.' },
+  end: { trigger: 'the Province pile empties, or any 3 Supply piles empty', detail: 'The player who emptied the pile finishes their turn, then the game ends. With 5–6 players (needs a second set of cards), it ends when any 4 Supply piles are empty. Tie: the tied player who took fewer turns wins; if still tied, they share the win.' },
   scoring: [
     { label: '{=province} Provinces', share: 6 },
     { label: '{=duchy} Duchies', share: 2 },
@@ -84,32 +84,33 @@ defineGame({
     ],
   },
 
-  example: 'Hand: {=action} Village, {=action} Smithy, {=copper}{=copper}{=estate}. Play **Village** (+1 Card, +2 Actions) and draw {=silver}. Play **Smithy** (+3 Cards) and draw {=gold}{=copper}{=estate}. Treasures: 1+1+2+3+1 = **8 coins**; buy a {province}.',
+  example: 'Hand: {=action} Village, {=action} Smithy, {=copper}{=copper}{=estate}. Play **Village** (+1 Card, +2 Actions): draw {=silver}; you now have 2 Actions. Spend 1 to play **Smithy** (+3 Cards): draw {=gold}{=copper}{=estate}. In the Buy phase play all 5 Treasures: 1+1+2+3+1 = **8 coins**; buy a {province} (cost 8).',
 
   setup: [
-    'Each player shuffles 7 {copper}s and 3 {estate}s into a deck and draws 5.',
-    'Lay out 10 {=action} Kingdom piles (10 cards each) plus the {=copper}{=silver}{=gold} Treasure, {=estate}{=duchy}{=province} Victory and {=curse} Curse piles, and a Trash spot.',
-    'Victory piles (including Kingdom ones like Gardens): 8 cards each with 2 players, 12 with 3–4. Curses: 10 per player beyond the first.',
+    'Each player shuffles 7 {copper}s and 3 {estate}s into a face-down deck and draws 5 cards. Pick a random first player; turns go clockwise.',
+    'Lay out face up: 10 {=action} Kingdom piles (10 cards each), the {=copper}{=silver}{=gold} Treasure piles, the {=estate}{=duchy}{=province} Victory piles and the {=curse} Curse pile. Leave space for a shared Trash pile.',
+    'Each Victory pile (including Kingdom Victory cards like Gardens) has 8 cards with 2 players, 12 with 3–4. The Curse pile has 10 cards with 2 players, 20 with 3, 30 with 4.',
   ],
 
   terms: [
-    ['Supply', 'The face-up piles you buy from.'],
+    ['Supply', 'All the face-up piles on the table that anyone can buy from.'],
+    ['Deck', 'Your own face-down draw pile. Never look through it.'],
     ['{=action} Kingdom cards', 'The 10 piles (mostly Actions) chosen for this game.'],
-    ['{=plus-action} +Action', 'Lets you play one more Action card this turn.'],
-    ['{=trash} Trash', 'Remove a card from the game; it leaves your deck for good.'],
-    ['Attack', 'Action that hurts other players (e.g. Militia: each discards down to 3). A Reaction such as Moat, revealed from hand, blocks it.'],
+    ['{=plus-action} +Action', 'Lets you play 1 more Action card this turn.'],
+    ['{=trash} Trash', 'Put a card on the shared Trash pile. It is out of the game and no longer yours.'],
+    ['Attack', 'An Action card that harms the other players (e.g. Militia: each other player discards until they have 3 cards in hand). When someone plays an Attack, you may reveal a Reaction card such as Moat from your hand; Moat makes the Attack not affect you.'],
   ],
 
   gotchas: [
-    'Bought cards go to your **discard pile**, not your hand. They reach your hand after a shuffle.',
-    'Each Action played uses your 1 Action; “+1 Action” only replaces it. Play Villages **before** draw cards.',
-    'Unspent coins are lost at Clean-up. Draw your next hand **before** the next player starts.',
+    'Cards you buy go to your **discard pile**, not your hand. You can draw them only after your discard pile is shuffled into a new deck.',
+    'You get 1 Action per turn, and playing any Action card spends 1. “+1 Action” only replaces the one you spent; “+2 Actions” (Village) gives 1 extra. So play Villages **before** cards like Smithy that only draw.',
+    'Coins you do not spend are lost at Clean-up. You draw your next 5 cards at the end of your own turn, **before** the next player starts.',
   ],
 
   tips: [
     'First-game plan: 6–7 coins → **Gold**, 8 → **Province**, plus 1–2 good Actions early.',
     'Skip Estates and Duchies early; they clog your hand. Buy them once Provinces run low.',
-    'Actions without +Action (terminals) collide in one hand. Pair them with Villages.',
+    'An Action card without +Action (a “terminal”, e.g. Smithy) uses up your last Action. Two terminals in one hand means you can play only one, unless you first play a Village.',
   ],
 
   walk(A) {
@@ -147,13 +148,13 @@ defineGame({
         show([...deck(['silver', 'gold', 'c3', 'e2', ...NEW]), prov, ['village', H(0), 'village'], ['smithy', H(1), 'smithy'], ['c1', H(2), 'copper'], ['c2', H(3), 'copper'], ['e1', H(4), 'estate']]) + A.glow(63, 167, 24, 'g-hand') },
       { step: 0, say: 'Play **Village**: +1 Card (a Silver), +2 Actions.', svg: base + status(2, 1, 0, 1) +
         show([...deck(['gold', 'c3', 'e2', ...NEW]), prov, ['village', P(0), 'village'], ['smithy', H(0), 'smithy'], ['c1', H(1), 'copper'], ['c2', H(2), 'copper'], ['e1', H(3), 'estate'], ['silver', H(4), 'silver']]) },
-      { step: 0, say: 'Spend an Action on **Smithy**: +3 Cards ({=gold}{=copper}{=estate}).', svg: base + status(1, 1, 0) +
+      { step: 0, say: 'Spend 1 of your 2 Actions on **Smithy**: +3 Cards ({=gold}{=copper}{=estate}).', svg: base + status(1, 1, 0) +
         show([...deck(NEW), prov, ['village', P(0), 'village'], ['smithy', P(1), 'smithy'], ['c1', H(0), 'copper'], ['c2', H(1), 'copper'], ['e1', H(2), 'estate'], ['silver', H(3), 'silver'], ['gold', H(4), 'gold'], ['c3', H(5), 'copper'], ['e2', H(6), 'estate']]) },
-      { step: 1, say: '**Buy phase.** Play Treasures: {=copper}{=copper}{=silver}{=gold}{=copper} = **8 coins**. Estates do nothing.', svg: base + status(1, 1, 8, 3) +
+      { step: 1, say: '**Buy phase.** Play all 5 Treasures: {=copper}{=copper}{=silver}{=gold}{=copper} = **8 coins**. Estates do nothing in your hand.', svg: base + status(1, 1, 8, 3) +
         show([...deck(NEW), prov, ['village', P(0), 'village'], ['smithy', P(1), 'smithy'], ['c1', P(2), 'copper'], ['c2', P(3), 'copper'], ['silver', P(4), 'silver'], ['gold', P(5), 'gold'], ['c3', P(6), 'copper'], ['e1', H(0), 'estate'], ['e2', H(1), 'estate']]) },
-      { step: 1, say: 'Buy a {province} (6 {=vp}). It goes to your **discard pile**, not your hand.', svg: base + status(1, 0, 0) +
+      { step: 1, say: 'Spend 8 coins to buy a {province} (6 {=vp}). It goes to your **discard pile**, not your hand.', svg: base + status(1, 0, 0) +
         show([...deck(NEW), ['village', P(0), 'village'], ['smithy', P(1), 'smithy'], ['c1', P(2), 'copper'], ['c2', P(3), 'copper'], ['silver', P(4), 'silver'], ['gold', P(5), 'gold'], ['c3', P(6), 'copper'], ['e1', H(0), 'estate'], ['e2', H(1), 'estate'], ['prov', DISC, 'province']]) + A.glow(297, 167, 21, 'g-disc') },
-      { step: 2, say: '**Clean-up.** Discard everything played and held. Draw **5**.', svg: base + status(1, 1, 0) +
+      { step: 2, say: '**Clean-up.** Put all played cards and both Estates from your hand on your discard pile. Draw **5** new cards.', svg: base + status(1, 1, 0) +
         show([['prov', DISC, 'province'], ...['village', 'smithy', 'c1', 'c2', 'silver', 'gold', 'c3', 'e1'].map((k, i) => [k, DISC, ['village', 'smithy', 'copper', 'copper', 'silver', 'gold', 'copper', 'estate'][i]]), ['e2', DISC, 'estate'],
           ...NEW.map((k, i) => [k, H(i), NEWT[i]])]) },
     ];
@@ -189,7 +190,7 @@ defineGame({
     });
     o += A.note(212, 42, 268, 14, 'Province = 6 VP');
     o += A.note(210, 84, 268, 42, 'Buy from Supply');
-    o += A.note(265, 104, 276, 128, 'Draw & discard');
+    o += A.note(265, 104, 276, 128, 'Deck & discard pile');
     o += A.note(62, 160, 44, 120, 'Hand of 5');
     return o;
   },

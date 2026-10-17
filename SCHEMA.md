@@ -93,7 +93,10 @@ defineGame({
   Prefer numbers and nouns to adjectives. One idea per sentence.
 - `pitch` = one plain sentence of what you do and how you win, ≤ 120 chars, no flavor.
   ("Collect sets of train cards to claim routes between cities; longest routes and completed tickets score.")
-- Plain words. Define any jargon in `terms`.
+- **Unambiguous.** Every rule must read exactly one way: say who acts, when, exactly how many, where things
+  go, in what order, and whether it is "may" or "must". No shorthand like "snake order": spell it out
+  ("clockwise, then counter-clockwise, so the last player places twice in a row").
+- Plain words. Define any jargon in `terms`, or where it is first used.
 - `**bold**` is the only markup. Use it for the one word that matters in a sentence.
 - Captions, callouts (`A.note`) and walkthrough `say` text follow the same rules.
 - Keep the profile scores comparable across games. Calibrate against Catan:

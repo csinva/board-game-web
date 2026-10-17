@@ -33,29 +33,29 @@ defineGame({
   turn: {
     type: 'sequence',
     steps: [
-      { verb: 'Roll', text: 'Roll **6 dice**, then reroll any of them up to **2 more** times.' },
-      { verb: 'Resolve', text: 'Score triples of {=k1}{=k2}{=k3}; take 1 {=cube} per {=energy}; heal 1 per {=heal}; deal 1 damage per {=claw}.' },
-      { verb: 'Tokyo', text: 'If {=tokyo} Tokyo is empty, you **must** move in (+1 {=vp}). With 5–6 players, if Tokyo City is taken but Tokyo Bay is empty, move into the Bay.' },
-      { verb: 'Buy', text: 'Spend {=cube} on any of the 3 face-up power cards (or 2 {=cube} to replace all 3).' },
+      { verb: 'Roll', text: 'Roll all **6 dice**. Then you may reroll any or all of them, up to **2 more** times; you may stop early.' },
+      { verb: 'Resolve', text: 'Use your final dice: score each set of 3+ matching {=k1}{=k2}{=k3} (see Scoring); take 1 {=cube} per {=energy}; heal 1 {=hp} per {=heal}; deal 1 damage per {=claw}.' },
+      { verb: 'Tokyo', text: 'If no monster is in {=tokyo} Tokyo, you **must** move in and score 1 {=vp}. With 5–6 players, if Tokyo City is occupied but Tokyo Bay is empty, you must move into the Bay.' },
+      { verb: 'Buy', text: 'You may spend {=cube} to buy any of the 3 face-up power cards (cost printed on each); a new card replaces each one bought. You may also pay 2 {=cube} to discard all 3 and deal 3 new ones.' },
     ],
   },
 
   tension: 'Tokyo pays the most points but makes you everyone’s target, and you can’t heal there.',
 
   structure: [
-    { label: 'Setup', text: 'Monsters at 10 {=hp} and 0 VP; 3 power cards face up; Tokyo empty.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Each turn: roll up to 3 times, resolve dice, enter Tokyo if empty, buy cards.' },
+    { label: 'Setup', text: 'Every monster starts at 10 {=hp} and 0 VP; deal 3 power cards face up; Tokyo starts empty.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Each turn: roll up to 3 times, resolve the dice, enter Tokyo if it is empty, then buy cards if you want.' },
     { label: 'Game end', text: 'A monster reaches **20 VP**, or only one monster is left.' },
   ],
 
   points: [
-    ['{=k1} {=k2} {=k3} triples', '1 / 2 / 3 VP; +1 per extra matching die'],
-    ['{=tokyo} Enter Tokyo', '+1 VP'],
-    ['Start turn in Tokyo', '+2 VP'],
-    ['Power cards', 'VP as printed'],
+    ['{=k1} {=k2} {=k3} triples', 'three 1s = 1 VP, three 2s = 2 VP, three 3s = 3 VP; +1 VP for each extra matching die'],
+    ['{=tokyo} Move into Tokyo', '+1 VP'],
+    ['Start your turn in Tokyo', '+2 VP'],
+    ['Power cards', 'VP as printed on the card'],
   ],
 
-  end: { trigger: 'a turn ends with a monster at 20 VP or only one monster left', detail: 'A monster at 0 health is out immediately and discards its cards and {=cube}. You must survive your turn to win; if every remaining monster is eliminated at once, everyone loses.' },
+  end: { trigger: 'a turn ends with a monster at 20 VP or only one monster left', detail: 'A monster that drops to 0 health is out immediately and discards its cards and {=cube}. To win, a monster must still be in the game at the end of that turn. If every remaining monster is eliminated at once, everyone loses.' },
   scoring: [
     { label: '{=tokyo} Holding Tokyo', share: 4 },
     { label: '{=k3} Number triples', share: 3 },
@@ -65,10 +65,10 @@ defineGame({
   ref: {
     title: 'Dice faces',
     rows: [
-      ['{=k1} {=k2} {=k3}', 'Score only as three (or more) of a kind'],
-      ['{energy}', '1 {cube} each'],
-      ['{heal}', 'heal 1 {=hp} (max 10); not in Tokyo'],
-      ['{claw}', '1 damage to each monster on the other side (in / out of Tokyo)'],
+      ['{=k1} {=k2} {=k3}', 'Score only as 3 or more of the same number'],
+      ['{energy}', 'take 1 {cube} each'],
+      ['{heal}', 'heal 1 {=hp} each (never above 10); no healing while you are in Tokyo'],
+      ['{claw}', '1 damage each. If you are outside Tokyo, it hits the monster(s) in Tokyo; if you are in Tokyo, it hits every monster outside'],
     ],
   },
 
@@ -76,23 +76,23 @@ defineGame({
 
   setup: [
     'Each player picks a monster: health dial at **10**, VP dial at **0**.',
-    'Shuffle the power cards, deal 3 face up, and pile the {=cube} energy cubes.',
-    'With 5–6 players, also use **Tokyo Bay**, a second spot in Tokyo that works like Tokyo City. Once 4 or fewer monsters remain, its monster leaves (or moves to an empty Tokyo City).',
-    'Everyone rolls the 6 dice; most {=claw} goes first. No one starts in Tokyo.',
-    'Optional 2-player rule: entering Tokyo or starting a turn there gives 1 {=cube} instead of VP.',
+    'Shuffle the power cards into a face-down deck, deal 3 face up, and put the {=cube} energy cubes in a pile within reach.',
+    'With 5–6 players, also use **Tokyo Bay**, a second spot in Tokyo that works like Tokyo City. As soon as only 4 monsters remain, stop using the Bay: its monster leaves Tokyo, or moves into Tokyo City if that is empty.',
+    'Each player rolls the 6 dice; the player with the most {=claw} goes first, then play goes clockwise. No one starts in Tokyo.',
+    'Optional 2-player rule: moving into Tokyo or starting your turn there gives 1 {=cube} instead of VP.',
   ],
 
   terms: [
     ['{=tokyo} Tokyo', 'The centre spot. Its monster is hit by every other monster’s {=claw} and can’t heal with {=heal}.'],
-    ['Yield', 'When hit in Tokyo you may leave; the attacker must take your place.'],
-    ['{=cube} Energy', 'Cubes that buy power cards.'],
-    ['Keep / Discard card', 'Keep cards are permanent powers; Discard cards work once.'],
+    ['Yield', 'When you lose health to another monster’s {=claw} while in Tokyo, you may leave Tokyo; the monster that hit you must then move in.'],
+    ['{=cube} Energy', 'Green cubes you spend to buy power cards.'],
+    ['Keep / Discard card', 'A Keep card stays in front of you and its power lasts all game. A Discard card takes effect **immediately** when you buy it, then is discarded; you cannot save it.'],
   ],
 
   gotchas: [
-    '{=claw} hits **everyone outside** if you are in Tokyo, but only the monster(s) **in Tokyo** if you are outside.',
-    'You can’t heal with {=heal} in Tokyo (cards can still heal you).',
-    'You may yield only right after losing health to another monster’s {=claw} dice (not card damage); the damage still counts.',
+    'Your {=claw} hits **every monster outside** Tokyo if you are in Tokyo, but only the monster(s) **in Tokyo** if you are outside.',
+    'While you are in Tokyo, your {=heal} dice don’t heal you (cards can still heal you).',
+    'You may yield only right after losing health to another monster’s {=claw} dice (not to damage from a card); you still take that damage.',
     'Monsters in Tokyo City and Tokyo Bay never hit each other.',
   ],
 
@@ -175,8 +175,8 @@ defineGame({
     ['3', '3', '3', 'C', 'E', 'H'].forEach((f, i) => { o += face(92 + i * 23, 156, f); });
     // energy cubes
     for (let i = 0; i < 4; i++) o += A.use(this.icons.cube.draw(A), 232 + (i % 2) * 12, 152 + Math.floor(i / 2) * 12, 13.5);
-    o += A.note(110, 140, 64, 14, 'Tokyo: +2 VP a turn');
-    o += A.note(150, 176, 120, 189, '6 dice, 3 rolls');
+    o += A.note(110, 140, 64, 14, 'Start turn in Tokyo: +2 VP');
+    o += A.note(150, 176, 120, 189, '6 dice, up to 3 rolls');
     o += A.note(244, 176, 262, 189, 'Energy buys cards');
     return o;
   },

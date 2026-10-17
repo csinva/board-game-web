@@ -27,31 +27,31 @@ defineGame({
 
   pitch: 'Place a tile each turn and put meeples on roads, cities, monasteries and fields to score; most points wins.',
 
-  goal: { big: 'Most points', text: 'Most points from **roads, cities, monasteries and fields** claimed with your meeples.' },
+  goal: { big: 'Most points', text: 'Score the most points. You score **roads, cities, monasteries and fields** where you have the most meeples.' },
 
   turn: {
     type: 'sequence',
     steps: [
-      { verb: 'Place', text: 'Draw a tile and place it next to at least one tile so **every** touching edge matches: road to road, city to city, field to field. If it fits nowhere, discard it and draw again.' },
-      { verb: 'Claim', text: 'You may put one {meeple} on a {=road} road, {=city} city, {=monastery} monastery or {=field} field **on that tile**, if that whole feature has no meeple yet.' },
-      { verb: 'Score', text: 'Every road, city or monastery the tile **completed** scores now, for whoever holds it; those meeples return.' },
+      { verb: 'Place', text: 'Draw the top tile of a stack and place it edge to edge with at least one tile already down, so that **every** edge it touches matches: road to road, city to city, field to field. If it fits nowhere, discard it and draw another.' },
+      { verb: 'Claim', text: 'You may put one {meeple} from your supply on a {=road} road, {=city} city, {=monastery} monastery or {=field} field **of the tile you just placed**, but only if no meeple (anyone’s) is anywhere on that whole feature yet.' },
+      { verb: 'Score', text: 'Every road, city or monastery your tile **completed** scores now, for whoever has the most meeples on it (any player). Those meeples return to their owners.' },
     ],
   },
 
   tension: 'You have only 7 meeples, and each one in a big project is stuck until it finishes.',
 
   structure: [
-    { label: 'Setup', text: 'Start tile face up; 7 {meeple}s each.' },
-    { label: 'Turns', repeat: 'until tiles run out', text: 'Place a tile, optionally a meeple, then score anything the tile completed.' },
+    { label: 'Setup', text: 'Start tile face up; each player takes 7 {meeple}s.' },
+    { label: 'Turns', repeat: 'until tiles run out', text: 'Place a tile, optionally put a meeple on it, then score anything the tile completed.' },
     { label: 'Final scoring', text: 'After the last tile: unfinished roads, cities and monasteries score; then fields.' },
   ],
 
   points: [
-    ['{=road} Road', '1 per tile, finished or not'],
-    ['{=city} City', 'finished: 2 per tile + 2 per {pennant} (a 2-tile city = 4); unfinished at end: 1 per tile + 1 per {pennant}'],
-    ['{=monastery} Monastery', 'finished (all 8 neighbours placed): 9; unfinished at end: 1 + 1 per neighbouring tile'],
-    ['{=field} Field', 'end only: 3 per **finished** city it touches; unfinished cities give nothing'],
-    ['Majority', 'most meeples in a feature takes all its points; tied players all score in full'],
+    ['{=road} Road', '1 per tile it crosses, completed or not'],
+    ['{=city} City', 'completed: 2 per tile + 2 per {pennant} (a 2-tile city = 4); still unfinished at game end: 1 per tile + 1 per {pennant}'],
+    ['{=monastery} Monastery', 'completed (all 8 surrounding spaces filled): 9; still unfinished at game end: 1 for itself + 1 per surrounding tile'],
+    ['{=field} Field', 'at game end only: 3 per **completed** city it touches; unfinished cities give nothing'],
+    ['Majority', 'the player with the most meeples on a feature scores all its points; if tied, every tied player scores them in full. Others score nothing'],
   ],
 
   end: { trigger: 'the last tile is placed', detail: 'Unfinished roads, cities and monasteries score at a lower rate, then fields score.' },
@@ -72,31 +72,32 @@ defineGame({
     ],
   },
 
-  example: 'You draw a city edge and **close** a 3-tile city with one {=pennant}. Nobody holds it, so you place a knight {=meeple}: 3×2 + 2 = **8 points** now, and the knight returns.',
+  example: 'You draw a tile with a city edge and place it to **complete** a 3-tile city with one {=pennant}. No meeple is in that city, so you place a knight {=meeple} there: 3 × 2 + 2 = **8 points** now, and the knight returns to you.',
 
   setup: [
     'Place the start tile face up; shuffle the other 71 face down in stacks.',
-    'Each player takes 7 {meeple}s of one colour; an 8th goes on 0 of the score track (lay it down after passing 50).',
-    'Youngest player goes first.',
+    'Each player takes 7 {meeple}s of one colour, plus an 8th on space 0 of the score track as their score marker (lay it down when your score passes 50).',
+    'The youngest player goes first; turns then pass clockwise.',
   ],
 
   terms: [
     ['{=meeple} Meeple', 'Your follower. Its role depends on the feature it stands on.'],
     ['Feature', 'One whole road, city, field or monastery, across all its tiles.'],
-    ['{=pennant} Pennant', 'Shield on a city tile; adds points.'],
-    ['Majority', 'Most meeples in a feature takes all its points.'],
+    ['{=pennant} Pennant', 'Shield on a city tile; each one adds points to its city.'],
+    ['Majority', 'Having the most meeples on a feature; ties share in full.'],
+    ['Completed', 'Road: both ends stop at a crossing, city, monastery or loop. City: fully walled, no gaps. Monastery: all 8 spaces around it hold tiles.'],
   ],
 
   gotchas: [
     'Place a meeple only on the tile you **just** placed, and not on a feature that already has a meeple anywhere along it.',
-    'A separately claimed piece can later **join** an occupied feature. Tied for most meeples: **all** tied players score in full.',
+    'Two separately claimed roads or cities can later be **joined** by a tile into one feature with several meeples. If players tie for most meeples there, **all** of them score in full.',
     'You can place a meeple on a feature your tile completes: it scores at once and the meeple comes straight back.',
-    'Farmers {=farmer} never return: they lie in their field until final scoring.',
+    'Farmers {=farmer} never return to your supply during play: they lie in their field until final scoring.',
     'Roads, cities and the edge of the play area split fields. One city can score for several fields.',
   ],
 
   tips: [
-    'Keep 2 meeples free to grab a great tile.',
+    'Keep 2 meeples in your supply so you can claim something when a great tile comes.',
     'Small cities and short roads finish fast and return your meeples.',
     'A farmer in a big field beside several cities can win, but place it mid-game, not turn one.',
   ],
@@ -137,10 +138,10 @@ defineGame({
     const cityMid = [at(1, 1)[0] + 22, at(1, 1)[1] + 22];
     return [
       { step: 0, say: 'Draw a tile. This one has a {=city} **city edge**.', svg: board + newT(246, 66) + knight(...home) + score(0) },
-      { step: 0, say: 'Place it so **every** touching edge matches. Its city edge meets the open end of a 2-tile city and **closes** it.', svg: board + newT(sx, sy) + knight(...home) + score(0) + A.glow(sx + 8, sy + 22, 17, 'g-edge') },
+      { step: 0, say: 'Place it so **every** touching edge matches. Its city edge meets the open end of a 2-tile city and **completes** it.', svg: board + newT(sx, sy) + knight(...home) + score(0) + A.glow(sx + 8, sy + 22, 17, 'g-edge') },
       { step: 1, say: 'The city has no meeple, so place a **knight** {=meeple} in it, on the tile you just played.', svg: board + newT(sx, sy) + knight(...onCity) + score(0) },
-      { step: 2, say: 'City finished: 3 tiles × 2 + 2 for the {=pennant} = **8 points**.', svg: board + newT(sx, sy) + knight(...onCity) + score(8) + A.glow(cityMid[0], cityMid[1], 54, 'g-city') },
-      { step: 2, say: 'A finished feature returns its meeples: the knight goes back to your supply.', svg: board + newT(sx, sy) + knight(...home) + score(8) },
+      { step: 2, say: 'City completed: 3 tiles × 2 + 2 for the {=pennant} = **8 points**.', svg: board + newT(sx, sy) + knight(...onCity) + score(8) + A.glow(cityMid[0], cityMid[1], 54, 'g-city') },
+      { step: 2, say: 'A completed feature returns its meeples to their owners: the knight goes back to your supply.', svg: board + newT(sx, sy) + knight(...home) + score(8) },
     ];
   },
 

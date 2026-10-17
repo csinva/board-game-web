@@ -35,26 +35,26 @@ defineGame({
 
   pitch: 'Flip cards onto a central pile and slap doubles and sandwiches to win it; collect all 52 cards to win.',
 
-  goal: { big: 'All 52 cards', text: 'Win every card. With no cards left you are out, unless you **slap** your way back in.' },
+  goal: { big: 'All 52 cards', text: 'Win all 52 cards. A player with no cards left is out, but may still **slap** (see Your turn) to win a pile and get back in.' },
 
   turn: {
     type: 'sequence',
     intro: 'Players flip in turn, clockwise:',
     outro: 'Next player flips',
     steps: [
-      { verb: 'Flip', text: 'Turn your top card face up onto the pile, away from you, so you see it no sooner than anyone else.' },
-      { verb: 'Answer', text: 'If the card before yours is an {=as}{=kh}{=qc}{=jd} ace or face card, keep flipping until you play one: up to **4** tries after an A, 3 after a K, 2 after a Q, 1 after a J. If you play one, the next player must answer yours.' },
-      { verb: 'Collect', text: 'Tries used up with no face card: whoever played the last face card takes the **whole pile** under their stack and flips next.' },
-      { verb: 'Slap', text: 'Any time, anyone: slap a **double** or **sandwich** to take the pile. The winner flips next. Wrong slap: **burn** 1 card face down under the pile.' },
+      { verb: 'Flip', text: 'Turn the top card of your face-down stack face up onto the central **pile**, flipping it away from you so you see it no sooner than anyone else.' },
+      { verb: 'Answer', text: 'If the previous player flipped an {=as}{=kh}{=qc}{=jd} ace or face card, you must **answer** it: flip cards one at a time until you flip an ace or face card, up to **4** cards (tries) after an A, 3 after a K, 2 after a Q, 1 after a J. If you flip one, stop: the next player must now answer your card.' },
+      { verb: 'Collect', text: 'If you use up your tries without flipping an ace or face card, the player who flipped the last ace or face card takes the **whole pile**, puts it face down under their stack, and flips next.' },
+      { verb: 'Slap', text: 'At any time, any player may **slap** (put a hand flat on the pile) when the top cards show a **double** (2 cards of the same rank in a row) or a **sandwich** (2 cards of the same rank with 1 card between). The first hand down takes the pile and flips next. If you slap when there is neither, **burn** a card: put your top card face down under the pile.' },
     ],
   },
 
   tension: 'Slap fast to win the pile, but a wrong slap costs you a card.',
 
   structure: [
-    { label: 'Setup', text: 'Deal all 52 cards face down.' },
+    { label: 'Setup', text: 'Deal all 52 cards face down among the players.' },
     { label: 'Turns', repeat: 'clockwise', text: 'Flip 1 card, or answer a face card; anyone may slap at any moment.' },
-    { label: 'Knock-outs', text: 'Out of cards: you are out unless you slap back in.' },
+    { label: 'Knock-outs', text: 'A player with no cards is out unless they win a pile by slapping.' },
     { label: 'Game end', text: 'One player holds all **52** cards.' },
   ],
 
@@ -64,7 +64,7 @@ defineGame({
   },
 
   ref: {
-    title: 'Face cards and slaps',
+    title: 'Tries to answer each card, and slaps',
     rows: [
       ['{=as} Ace', '{=back}{=back}{=back}{=back} 4 tries'],
       ['{=kh} King', '{=back}{=back}{=back} 3 tries'],
@@ -80,7 +80,7 @@ defineGame({
   setup: [
     'Deal the whole deck face down, one at a time; uneven stacks are fine.',
     'Square your cards into a face-down stack. Don’t look at them.',
-    'Player left of the dealer flips first.',
+    'The player to the dealer’s left flips first.',
   ],
 
   terms: [
@@ -88,19 +88,20 @@ defineGame({
     ['{=slap} Slap', 'Hand flat on the pile to claim it. The lowest hand (first down) wins.'],
     ['Double', 'Two cards of the same rank in a row: {=9s}{=9h}.'],
     ['Sandwich', 'Same rank with one card between: {=5s}{=kh}{=5d}.'],
-    ['{=back} Burn', 'Penalty for a wrong slap: 1 card face down under the pile.'],
+    ['{=back} Burn', 'Penalty for a wrong slap: put your top card face down under the pile.'],
+    ['Answer', 'After an ace or face card, the next player flips up to 4, 3, 2 or 1 cards (A, K, Q, J) trying to flip an ace or face card.'],
   ],
 
   gotchas: [
-    'A slap beats a challenge: if a double lands during the tries, the **first slapper** takes the pile, not the face-card player.',
+    'A slap beats an answer in progress: if a double or sandwich appears while someone is answering, the **first slapper** takes the pile, not the player who flipped the face card.',
     'Out of cards? You may still **slap** a double or sandwich to get back in.',
-    'Slap rules vary by table: some add top-and-bottom, tens or K-Q. Agree before dealing.',
+    'Slap rules vary by table: some also allow slaps on top-and-bottom (top card matches the bottom card of the pile), tens (two cards in a row that add up to 10) or K-Q (a king and queen in a row). Agree before dealing.',
   ],
 
   tips: [
     'Keep your slapping hand free and near the pile; flip with the other.',
     'Watch for **sandwiches**: new players look only for doubles.',
-    'Count tries aloud during a challenge.',
+    'Count tries aloud while someone answers a face card.',
   ],
 
   walk(A) {

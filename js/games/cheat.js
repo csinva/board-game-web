@@ -33,15 +33,15 @@ defineGame({
 
   pitch: 'Play cards face down claiming the next rank, lying when you must; call out liars; first to empty your hand wins.',
 
-  goal: { big: 'Empty your hand', text: 'First player with **no cards** wins, if their last play survives a challenge.' },
+  goal: { big: 'Empty your hand', text: 'Be the first player with **no cards** left. You win if nobody calls “Cheat!” on your last play, or if the call shows those cards were true.' },
 
   turn: {
     type: 'sequence',
     outro: 'Next player claims the next rank (after K comes A)',
     steps: [
-      { verb: 'Claim', text: 'Play **1–4 cards** {=back} face down on the pile and announce them as the next rank: “two 7s”. The count must be true; the cards need not be.' },
-      { verb: 'Doubt', text: 'Before the next player plays, anyone may call {=call} “**Cheat!**”' },
-      { verb: 'Reveal', text: 'Turn the claimed cards up. Any card not of the claimed rank: the player takes the **whole pile**. All true: the caller takes it.' },
+      { verb: 'Claim', text: 'Play **1–4 cards** {=back} face down on the central pile and announce how many you played as the rank after the previous claim: “two 7s”. The number of cards must be true; the cards may be any rank.' },
+      { verb: 'Doubt', text: 'Before the next player plays, any other player may call {=call} “**Cheat!**” on your claim.' },
+      { verb: 'Reveal', text: 'If someone calls, turn the cards just played face up. If any of them is not the claimed rank, the player who played them adds the **whole pile** to their hand. If all are the claimed rank, the caller takes the whole pile.' },
     ],
   },
 
@@ -49,8 +49,8 @@ defineGame({
 
   structure: [
     { label: 'Setup', text: 'Deal all 52 cards, one at a time. Uneven hands are fine.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Left of the dealer claims aces, the next player 2s, then 3s … K, A, 2 … Each claim may be challenged.' },
-    { label: 'Game end', text: 'A player plays their last cards and nobody catches a lie.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'The player to the dealer’s left claims aces, the next player clockwise claims 2s, then 3s, and so on up to K, then A and 2 again. Any claim may be challenged.' },
+    { label: 'Game end', text: 'A player plays their last cards and is not caught lying on that play.' },
   ],
 
   end: {
@@ -62,7 +62,7 @@ defineGame({
     title: 'Who takes the pile',
     rows: [
       ['Claim “two 7s” → {=7s}{=7h}', 'Truth: the **caller** takes it'],
-      ['Claim “two 7s” → {=7s}{=3d}', 'Lie: the **player** takes it'],
+      ['Claim “two 7s” → {=7s}{=3d}', 'Lie: the **player who played them** takes it'],
       ['No call', 'Cards stay face down in the pile'],
       ['Rank order', 'A 2 3 4 5 6 7 8 9 10 J Q K, then A again'],
     ],
@@ -73,13 +73,14 @@ defineGame({
   setup: [
     'Deal the whole deck. With 5+ players, many tables shuffle two decks together.',
     'Sort your hand by rank.',
-    'Player left of the dealer starts with aces.',
+    'The player to the dealer’s left starts by claiming aces.',
   ],
 
   terms: [
     ['Pile', 'All cards played face down since the last pickup.'],
     ['Claim', 'The count and rank you announce: “three Jacks”.'],
     ['{=call} Call', 'Saying “Cheat!” to challenge the most recent claim.'],
+    ['Next rank', 'One rank above the previous claim: A, 2, 3 … 10, J, Q, K, then A again.'],
   ],
 
   gotchas: [

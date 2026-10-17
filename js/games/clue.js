@@ -41,24 +41,24 @@ defineGame({
 
   pitch: 'Move through rooms making suggestions; deduce the hidden suspect, weapon and room, then accuse correctly to win.',
 
-  goal: { big: 'Solve the case', text: 'First to correctly name the **suspect, weapon and room** in the {=envelope} case file.' },
+  goal: { big: 'Solve the case', text: 'Be the first player to correctly name the **suspect, weapon and room** hidden in the {=envelope} case file.' },
 
   turn: {
     type: 'sequence',
     steps: [
-      { verb: 'Move', text: 'Roll the dice and move that many squares (no diagonals), take a {=passage} **secret passage** from a corner room, or stay in your room. Entering a room ends your move.' },
-      { verb: 'Suggest', text: 'In a room, name a suspect and weapon **with that room**; move both tokens there.' },
-      { verb: 'Disprove', text: 'Going left, the first player holding any named card shows you **one** of them, secretly.' },
-      { verb: 'Accuse', text: 'Optional, once per game, on your turn: name any suspect, weapon and room, then check the {=envelope} secretly.' },
+      { verb: 'Move', text: 'Do one: roll the dice and move your pawn exactly that many squares, not diagonally (you may stop short only by entering a room); or, from a corner room, take its {=passage} **secret passage** instead of rolling; or stay in the room you are in. Entering a room through its door ends your move, even with squares left.' },
+      { verb: 'Suggest', text: 'If you are in a room, you **may** make a suggestion: name any suspect and any weapon, plus **the room you are in**. Move that suspect’s pawn and that weapon into your room.' },
+      { verb: 'Disprove', text: 'Starting with the player on your left and going clockwise, each player checks their hand. The first one holding any of the 3 named cards must secretly show you **1** of them, and checking stops. If no one can, no card is shown.' },
+      { verb: 'Accuse', text: 'Optional, on your turn, only once per game: say “I accuse”, name any suspect, weapon and room, then secretly look at the 3 cards in the {=envelope}.' },
     ],
   },
 
   tension: 'Build each suggestion to learn something new without teaching the others as much.',
 
   structure: [
-    { label: 'Setup', text: 'Hide 1 {=suspect} + 1 {=weapon} + 1 {=room} in the {=envelope}; deal the other 18 cards. {=scarlet} Scarlet starts.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Move; in a room, suggest and get disproved. Accuse when sure.' },
-    { label: 'Game end', text: 'The first correct accusation wins. A wrong accuser stops moving and suggesting but keeps showing cards.' },
+    { label: 'Setup', text: 'Hide 1 {=suspect} + 1 {=weapon} + 1 {=room} card in the {=envelope}; deal the other 18 cards. The player using {=scarlet} Miss Scarlet goes first.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Move. If you are in a room, you may suggest, and the others try to disprove it. You may accuse when you are sure.' },
+    { label: 'Game end', text: 'The first correct accusation wins. A player who accuses wrongly takes no more turns but still shows cards to disprove suggestions.' },
   ],
 
   end: {
@@ -66,7 +66,7 @@ defineGame({
     detail: 'If every player accuses wrongly, no one wins.',
     results: [
       { side: 'Correct accusation', text: 'you win immediately.' },
-      { side: 'Wrong accusation', text: 'return the cards unseen; you no longer move or accuse, but still disprove.' },
+      { side: 'Wrong accusation', text: 'put the 3 cards back in the envelope without showing anyone. You take no more turns, but you still show cards to disprove other players’ suggestions.' },
     ],
   },
 
@@ -85,26 +85,26 @@ defineGame({
   setup: [
     'Shuffle the {=suspect}, {=weapon} and {=room} cards separately; put 1 of each **unseen** in the {=envelope}.',
     'Shuffle the other 18 together and deal them all (some players may get 1 more). Each player takes a {notepad}.',
-    'Put each weapon in a different random room and all 6 suspects on their start spaces, even unplayed ones. {=scarlet} Scarlet moves first, then clockwise.',
-    'Current Hasbro sets use **2 dice**; remove the Clue cards for the classic game (a magnifying-glass face counts as 1). Older sets use 1 die. Some names differ by edition (e.g. Dr Orchid for Mrs White).',
+    'Put each weapon in a different random room and all 6 suspect pawns on their start spaces, including suspects no one is playing (suggestions can still move them). The player using {=scarlet} Miss Scarlet goes first; play continues clockwise.',
+    'Current Hasbro sets use **2 dice**; for the classic game, leave out the extra “Clue” cards, and a die’s magnifying-glass face counts as 1. Older sets use 1 die. Some names differ by edition (e.g. Dr Orchid for Mrs White).',
   ],
 
   terms: [
-    ['Suggestion', 'A test guess using your current room. Others must disprove it if they can.'],
-    ['Accusation', 'Your final answer, checked against the case file. One try.'],
+    ['Suggestion', 'A test guess: any suspect + any weapon + the room you are in. Other players must disprove it if they can.'],
+    ['Accusation', 'Your final answer, checked against the case file. Each player gets only 1 per game.'],
     ['{=envelope} Case file', 'The envelope holding the 3 solution cards.'],
-    ['{=passage} Secret passage', 'Links opposite corner rooms; using it is your whole move.'],
+    ['{=passage} Secret passage', 'Links 2 diagonally opposite corner rooms. Moving through it, instead of rolling, is your whole move.'],
   ],
 
   gotchas: [
     'You may suggest cards **you hold**, to bluff or to test others.',
     'A suggestion must use the room **you are in**; an accusation can name any room.',
-    'You can’t move onto or through a square or doorway occupied by another token, or cross the same square twice in one turn.',
+    'You can’t move onto or through a square or doorway occupied by another suspect pawn, or enter the same square twice in one turn.',
     'Current rules let you stay in a room and suggest there again. Older editions require you to leave first, unless another player’s suggestion moved you there.',
   ],
 
   tips: [
-    'Track **who showed what** and who passed: a pass rules out all three cards for that player.',
+    'Track **who showed what** and who showed nothing: a player who could not disprove holds none of the three cards.',
     'Head for rooms you still need to test; use secret passages to save moves.',
     'Accuse only when all three are certain: a wrong guess ends your chance to win.',
   ],
@@ -146,8 +146,8 @@ defineGame({
     return [
       { step: 0, say: 'Priya rolls {=d2}{=d3} = 5 and heads for the Library door.', svg: base + priya(62, 140) + must(150, 30) + ropeT(30, 170) + lenaRope + die + A.glow(58, 91, 12, 'g-door') },
       { step: 0, say: 'She enters the **Library**; entering a room ends her move.', svg: base + priya(26, 94) + must(150, 30) + ropeT(30, 170) + lenaRope + die },
-      { step: 1, say: 'She suggests “{=mustard} **Mustard** with the {=rope} **rope** in the Library.” His pawn and the rope move into the room.', svg: base + inLib + lenaRope + bub },
-      { step: 2, say: 'Going left, **Tom** checks first: he has none of the three and says so.', svg: base + inLib + lenaRope + bub + A.k('tom-no', A.tag(296, 50, 'none', { fill: C.gray })) },
+      { step: 1, say: 'She suggests “{=mustard} **Mustard** with the {=rope} **rope** in the Library.” Mustard’s pawn and the rope move into the Library.', svg: base + inLib + lenaRope + bub },
+      { step: 2, say: '**Tom**, on Priya’s left, checks first: he has none of the three and says so.', svg: base + inLib + lenaRope + bub + A.k('tom-no', A.tag(296, 50, 'none', { fill: C.gray })) },
       { step: 2, say: '**Lena** holds the rope, so she shows it to Priya alone.', svg: base + inLib + bub + A.k('tom-no', A.tag(296, 50, 'none', { fill: C.gray })) +
         A.k('rope-card', A.card(196, 142, 32, 44, '#d9c49a', { label: 'Rope', size: 6, labelFill: C.ink })) },
       { step: 3, say: 'Priya crosses off the rope and notes Tom has none of the three. Not sure yet: **no accusation**.', svg: base + inLib + A.k('tom-no', A.tag(296, 50, 'none', { fill: C.gray })) +

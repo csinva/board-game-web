@@ -34,34 +34,34 @@ defineGame({
 
   pitch: 'Hold one card, draw one, play one; knock rivals out or hold the highest card to win rounds and favor tokens.',
 
-  goal: { big: 'Win favor tokens', text: 'Win rounds to collect {favor}s. First to the target wins: 6 with 2 players, 5 with 3, 4 with 4, 3 with 5–6.' },
+  goal: { big: 'Win favor tokens', text: 'Win rounds to collect {favor}s. The first player to reach the target wins the game: 6 with 2 players, 5 with 3, 4 with 4, 3 with 5–6.' },
 
   turn: {
     type: 'sequence',
-    intro: 'You always hold 1 card. On your turn:',
+    intro: 'Between turns you hold exactly 1 card. On your turn:',
     steps: [
-      { verb: 'Draw', text: 'Draw the top card, so you hold **two**.' },
-      { verb: 'Play', text: 'Play **one** face up in front of you and do what it says, even if it hurts you.' },
-      { verb: 'Keep', text: 'Keep the other card secret.' },
+      { verb: 'Draw', text: 'Draw the top card of the deck, so you hold **two**.' },
+      { verb: 'Play', text: 'Choose **one** of the two, place it face up in your discard pile in front of you, and do what it says, even if it hurts you.' },
+      { verb: 'Keep', text: 'Keep the other card in your hand, hidden from everyone.' },
     ],
   },
 
   tension: 'Each turn you give up one of two cards, and what you play and keep tells others what you might hold.',
 
   structure: [
-    { label: 'Round setup', text: 'Shuffle, remove 1 card unseen, deal 1 card to each player.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Draw 1, play 1, until 1 player is left or the deck is empty. {priest} and discards reveal hands; {guard}, {baron}, {prince} knock players out.' },
+    { label: 'Round setup', text: 'Shuffle all 21 cards, set the top card aside face down unseen (see Setup for 2 players), and deal 1 card to each player.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Each turn: draw 1, play 1. The round ends when only 1 player is left in it, or after the turn in which the last deck card is drawn. Cards such as {guard} and {baron} knock players out of the round; {priest} shows you a hand.' },
     { label: 'Round end', repeat: 'next round', text: 'Award {favor}s (see Scoring). The winner starts the next round (tie: pick randomly among the winners).' },
     { label: 'Game end', text: 'First to the target number of {=favor} wins: 6 / 5 / 4 / 3 for 2 / 3 / 4 / 5–6 players.' },
   ],
   points: [
-    ['{=favor} Round win', '+1 {=favor}: last player in, or highest card in hand when the deck runs out (tie: every tied player wins the round)'],
-    ['{=spy} Spy', '+1 {=favor} if you are the only player still in who played or discarded a Spy'],
+    ['{=favor} Round win', '+1 {=favor} to the last player left in the round. If the deck runs out first, +1 to the remaining player with the highest card in hand (tie: every tied player gets 1)'],
+    ['{=spy} Spy', '+1 {=favor} at round end if you are still in the round and are the only player who played or discarded a Spy this round'],
   ],
 
   end: {
-    trigger: 'A player reaches the favor tokens needed',
-    detail: 'A round ends when one player is left, or the deck runs out: then the highest card in hand wins the round (ties: all tied players win).',
+    trigger: 'a player reaches the number of favor tokens needed',
+    detail: 'A round ends when only one player is left in it, or after the turn in which the last deck card is drawn. In that case everyone still in reveals their hand and the highest card wins the round (ties: all tied players win).',
   },
   scoring: [
     { label: '{=favor} Round wins', share: 5 },
@@ -72,37 +72,37 @@ defineGame({
     title: 'The 21 cards, 2019 edition (×2 unless noted)',
     rows: [
       ['{spy}', 'no effect when played; may score a bonus {=favor} (see Scoring)'],
-      ['{guard} ×6', 'name a non-Guard card; if that player holds it, they’re out'],
-      ['{priest}', 'look at a player’s hand'],
-      ['{baron}', 'compare hands with a player; lower card is out'],
-      ['{handmaid}', 'no one can target you until your next turn'],
-      ['{prince}', 'a player (you allowed) discards their hand and draws (deck empty: takes the set-aside card)'],
-      ['{chancellor}', 'draw 2, keep 1 of 3, put 2 on the bottom'],
-      ['{king} ×1', 'trade hands with a player'],
-      ['{countess} ×1', 'must be played if you also hold King or Prince'],
-      ['{princess} ×1', 'out if you play or discard her'],
+      ['{guard} ×6', 'choose another player and name any card except Guard; if that player holds it, they are out'],
+      ['{priest}', 'secretly look at another player’s hand'],
+      ['{baron}', 'you and another player secretly compare hands; the one with the lower card is out (tie: nothing happens)'],
+      ['{handmaid}', 'other players’ cards can’t target you until your next turn'],
+      ['{prince}', 'choose any player, you included; they discard their hand and draw a new card (if the deck is empty, they take the face-down set-aside card)'],
+      ['{chancellor}', 'draw 2 cards; keep 1 of the 3 in your hand and put the other 2 on the bottom of the deck in any order'],
+      ['{king} ×1', 'trade hands with another player'],
+      ['{countess} ×1', 'no effect when played, but you **must** play her if your other card is the King or a Prince'],
+      ['{princess} ×1', 'if you play or discard her for any reason, you are out'],
     ],
   },
 
   example: 'Ivy holds a {baron} and draws a {guard}. Last turn her {=priest} showed her Sam’s hand, so she plays the Guard on Sam and names **Countess**. Sam has it, so he is out of the round.',
 
   setup: [
-    'Shuffle the 21 cards. Remove the top card **face down** unseen (with 2 players, also set aside 3 face up).',
-    'Deal each player 1 card.',
-    'Anyone starts round 1; after that, the last round’s winner starts.',
+    'Shuffle the 21 cards. Set the top card aside **face down** without anyone looking. With 2 players, also set the next 3 cards aside face up.',
+    'Deal each player 1 card face down; look only at your own.',
+    'Any player starts round 1; play goes clockwise. Later rounds start with the last round’s winner.',
   ],
 
   terms: [
     ['{=favor} Favor token', 'Won for winning a round, or for the Spy bonus.'],
-    ['Out', 'Knocked out of this round: discard your hand.'],
-    ['{=handmaid} Protected', 'No card can target you until your next turn.'],
+    ['Out', 'Knocked out of this round: discard your hand face up and take no more turns until the next round.'],
+    ['{=handmaid} Protected', 'Other players’ cards can’t target you until your next turn.'],
     ['Discard pile', 'Your played cards, face up in order so everyone can count.'],
   ],
 
   gotchas: [
-    'If every other player is protected, you still play a card; if it needs a target, it does nothing (a {=prince} must target yourself).',
+    'If every other player is protected, you still must play a card. A card that targets another player then has no effect; a {=prince} must then target you.',
     'The {=countess} must be played if your other card is the King or Prince, so playing her doesn’t prove either.',
-    'Discarding the {=princess} for any reason, even forced by a Prince, knocks you out.',
+    'A card discarded because of a Prince, or by a player knocked out, has no effect, except that discarding the {=princess} for any reason knocks you out.',
   ],
 
   tips: [

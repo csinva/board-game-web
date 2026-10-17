@@ -26,23 +26,23 @@ defineGame({
 
   pitch: 'Move one piece per turn, capture enemy pieces, and checkmate the enemy king to win.',
 
-  goal: { big: 'Checkmate', text: '**Checkmate** the enemy {king}: attack it so no move can save it. The king is never actually captured.' },
+  goal: { big: 'Checkmate', text: '**Checkmate** the enemy {king}: attack it so that no legal move can end the attack. The king is never actually captured.' },
 
   turn: {
-    type: 'choose',
-    intro: 'White moves first. On your turn, make exactly one move:',
+    type: 'sequence',
+    intro: 'White moves first; players alternate. Each turn is exactly one move:',
     steps: [
-      { verb: 'Move', text: 'Move **one** piece the way it moves (see the table). Only the {=knight} jumps over pieces. No passing.' },
-      { verb: 'Capture', text: 'Land on an enemy piece to capture it; it leaves the board.' },
-      { verb: 'Stay safe', text: 'Your move may **never** leave your own {=king} attacked. If in check, you must escape now.' },
+      { verb: 'Move', text: 'Move **1** of your pieces in the way that piece moves (see the table). Only the {=knight} may jump over other pieces. You may not skip your turn.' },
+      { verb: 'Capture', text: 'If the piece you moved ended on an enemy piece’s square, that enemy piece is captured and removed from the game. A piece can’t end on a square holding your own piece.' },
+      { verb: 'King safe?', text: 'The move is legal only if it leaves your own {=king} **not** under attack. If your king was attacked (in **check**), your move must end the attack: move the king, block, or capture the attacker.' },
     ],
   },
 
   tension: 'Every attacking move leaves something undefended, so you weigh what you gain against what you expose.',
 
   structure: [
-    { label: 'Setup', text: 'Light square in each player’s right-hand corner; pieces on the back two rows. White moves first.' },
-    { label: 'Moves', repeat: 'alternating', text: 'One move each, no passing. A player in check must get out of it.' },
+    { label: 'Setup', text: 'Turn the board so each player has a light square in their right-hand corner. Each player’s 16 pieces fill the 2 rows nearest them. White moves first.' },
+    { label: 'Moves', repeat: 'alternating', text: 'Players take turns making 1 move each; no one may skip. A player in check must end the check with that move.' },
     { label: 'Game end', text: 'Checkmate or resignation wins. Otherwise it ends in a draw (see How it ends).' },
   ],
 
@@ -50,7 +50,7 @@ defineGame({
     trigger: 'a king is checkmated, a player resigns, or the game is drawn',
     results: [
       { side: 'Win', text: 'if you checkmate the enemy king or your opponent resigns.' },
-      { side: 'Draw', text: 'on stalemate (player to move has no legal move and is not in check), too few pieces to mate, or agreement; or claimed by a player when the same position occurs 3 times (same player to move) or after 50 moves each with no capture or pawn move.' },
+      { side: 'Draw', text: 'on stalemate (the player to move has no legal move and is not in check), when neither side has enough pieces left to checkmate (e.g. king against king), or by agreement. A player may also claim a draw when the same position occurs 3 times with the same player to move, or after 50 moves by each player in a row with no capture and no pawn move.' },
     ],
   },
 
@@ -58,11 +58,11 @@ defineGame({
     title: 'How pieces move',
     rows: [
       ['{=king} King', '1 square, any direction'],
-      ['{=queen} Queen', 'any distance, straight or diagonal'],
-      ['{=rook} Rook', 'any distance, straight'],
-      ['{=bishop} Bishop', 'any distance, diagonal'],
-      ['{=knight} Knight', 'L-shape (2 + 1); jumps over pieces'],
-      ['{=pawn} Pawn', '1 forward (2 from its start square); captures 1 diagonally forward'],
+      ['{=queen} Queen', 'any number of squares in one line: along a row, a column or a diagonal'],
+      ['{=rook} Rook', 'any number of squares along a row or column'],
+      ['{=bishop} Bishop', 'any number of squares along a diagonal'],
+      ['{=knight} Knight', 'L-shape: 2 squares along a row or column, then 1 square sideways; jumps over pieces'],
+      ['{=pawn} Pawn', 'moves 1 square straight forward onto an empty square (or 2 on its first move, if both are empty); captures only 1 square diagonally forward'],
     ],
   },
 
@@ -70,22 +70,23 @@ defineGame({
 
   setup: [
     'Turn the board so each player has a **light square** in the right-hand corner.',
-    'Back row, corners inward: {rook}, {knight}, {bishop}; the {queen} on her own colour, the {king} beside her. 8 {pawn}s fill the row in front.',
-    'White moves first; swap colours between games.',
+    'On your back row, from each corner inward: {rook}, {knight}, {bishop}. Your {queen} goes on the middle square of her own colour (White’s on light, Black’s on dark), your {king} on the last square, beside her. Your 8 {pawn}s fill the row in front.',
+    'Choose colours at random for the first game; swap colours each game after. White moves first.',
   ],
 
   terms: [
-    ['Check', 'Your king is attacked. You must end the attack on this move.'],
-    ['Checkmate', 'In check with no legal escape: game over.'],
-    ['Stalemate', 'Not in check but no legal move: a draw.'],
-    ['Castling', '{=king} moves 2 squares toward a {=rook}; the rook jumps to the king’s other side.'],
-    ['Material', 'Piece values: {=pawn} 1, {=knight} 3, {=bishop} 3, {=rook} 5, {=queen} 9.'],
+    ['Square names', 'Columns are lettered a–h and rows numbered 1–8, both counted from White’s bottom-left corner: White’s queen starts on d1.'],
+    ['Check', 'Your king is attacked. You must end the attack with your next move.'],
+    ['Checkmate', 'Your king is in check and no legal move ends the attack: you lose.'],
+    ['Stalemate', 'The player to move is not in check but has no legal move: the game is a draw.'],
+    ['Castling', 'A single move: your {=king} moves 2 squares along the back row toward a {=rook}, and that rook moves to the square the king crossed.'],
+    ['Material', 'Rough piece values for judging trades (not points): {=pawn} 1, {=knight} 3, {=bishop} 3, {=rook} 5, {=queen} 9.'],
   ],
 
   gotchas: [
-    '**Castling** is legal only if neither the king nor that rook has moved, the squares between are empty, and the king is not in, through or into check.',
-    'A {=pawn} reaching the far row **must promote** to a queen, rook, bishop or knight of its colour (usually a queen), even if that piece is still on the board.',
-    '**En passant**: if a pawn advances 2 squares and lands beside an enemy pawn, that pawn may capture it as if it had moved 1, but only on the very next move.',
+    '**Castling** is legal only if neither the king nor that rook has moved, the squares between them are empty, the king is not in check, and the king does not cross or land on a square an enemy piece attacks.',
+    'A {=pawn} that reaches the far row **must promote**: replace it with a queen, rook, bishop or knight of its colour (usually a queen), even if you still have that piece on the board.',
+    '**En passant**: if a pawn moves 2 squares forward and lands right beside an enemy pawn, the enemy pawn may capture it by moving diagonally onto the square it skipped, as if it had moved only 1. This is allowed only on the very next move.',
   ],
 
   tips: [
@@ -124,7 +125,7 @@ defineGame({
         ar('g5', 'f7', C.blue) + ar('c4', 'f7', C.red, '4 2') },
       { step: 1, say: 'If Ben ignored it, the knight would **capture** on f7 and attack his {=queen} and {=rook} at once.', svg: base + toMove('Black') + knight('f7') + queen('d8') +
         A.k('tray', glyph(222, 106, 'P', false, 17)) + ar('f7', 'd8', C.red) + ar('f7', 'h8', C.red) + A.text(256, 140, '(what if…)', { size: 10, weight: 700, fill: C.red, italic: true }) },
-      { step: 2, say: 'His king couldn’t take back: the bishop guards f7, and a king may **never** move into check.', svg: base + toMove('Black') + knight('f7') + queen('d8') +
+      { step: 2, say: 'His king couldn’t capture the knight on f7: the bishop guards f7, and a king may **never** move into check.', svg: base + toMove('Black') + knight('f7') + queen('d8') +
         A.k('tray', glyph(222, 106, 'P', false, 17)) + ring('f7') + ar('c4', 'f7', C.red, '4 2') + A.glow(...sq('e8'), 13, 'g-k') + A.text(256, 140, '(what if…)', { size: 10, weight: 700, fill: C.red, italic: true }) },
       { step: 0, say: 'So Ben defends: {=queen} **d8 → e7** guards f7 a second time.', svg: base + hl('d8') + hl('e7') + toMove('White') + knight('g5') + queen('e7') + pawn + ar('e7', 'f7', C.green) },
     ];

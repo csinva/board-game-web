@@ -28,33 +28,34 @@ defineGame({
 
   pitch: 'Elect governments to enact laws while hidden Fascists lie; pass your team’s laws, or elect or kill Hitler, to win.',
 
-  goal: { big: 'Win as a team', text: 'Your **secret team** wins together. Liberals: enact 5 liberal policies or execute Hitler. Fascists: enact 6 fascist policies or elect Hitler Chancellor.' },
+  goal: { big: 'Win as a team', text: 'Your **secret team** wins together. Liberals win by enacting 5 liberal policies or executing Hitler. Fascists win by enacting 6 fascist policies, or by getting Hitler elected Chancellor once 3 or more fascist policies are enacted.' },
 
   turn: {
     type: 'round',
     intro: 'Each round is one election:',
     steps: [
-      { verb: 'Nominate', text: 'The {president} (passes clockwise each round) nominates an eligible player as {chancellor}.' },
-      { verb: 'Vote', text: 'Everyone reveals {ja} or {nein} at once. A **majority** of Ja elects them (a tie fails); otherwise the election tracker moves up 1.' },
-      { verb: 'Legislate', text: 'The {=president} draws 3 policies, discards 1 face down and passes 2; the {=chancellor} discards 1 and **enacts** the other.' },
-      { verb: 'Use power', text: 'If the new {fascist} lands on a power, the {=president} uses it: {investigate}, {peek}, {election} or {execute}.' },
+      { verb: 'Nominate', text: 'The {president} nominates any other living player who is not term-limited (see Key terms) as {chancellor}.' },
+      { verb: 'Vote', text: 'All living players, the two candidates included, reveal {ja} or {nein} at the same time. If **more than half** vote Ja, the pair is elected (a tie fails). If the vote fails, move the election tracker up 1 and skip to the next round.' },
+      { verb: 'Legislate', text: 'The {=president} secretly draws the top 3 policies, discards 1 face down and hands the other 2 to the {=chancellor}, who secretly discards 1 face down and **enacts** the last one face up on its track.' },
+      { verb: 'Use power', text: 'If the policy just enacted is a {fascist} placed on a slot that shows a power, the {=president} **must** use that power now: {investigate}, {peek}, {election} or {execute}.' },
     ],
+    outro: 'President placard moves clockwise to the next living player',
   },
 
   tension: 'Liberals judge players only by votes and enacted policies, but the deck is 11 fascist to 6 liberal, so an honest government can be forced to enact a fascist law.',
 
   structure: [
-    { label: 'Setup', text: 'Deal roles. Eyes closed, Fascists see each other. A random player takes the {=president} placard.' },
-    { label: 'Elections', repeat: 'until a team wins', text: 'Nominate, vote {=ja} / {=nein}, enact 1 policy, use any power. The {=president} moves clockwise. Under 3 policies left: shuffle in the discards.' },
-    { label: 'Escalation', text: 'Fascist track slots grant powers: {=investigate} {=peek} {=election} {=execute}. After 5 {=fascist}, veto is allowed.' },
-    { label: 'Game end', text: '5 {=liberal} or {=hitler} executed: Liberals win. 6 {=fascist} or {=hitler} elected Chancellor after 3 {=fascist}: Fascists win.' },
+    { label: 'Setup', text: 'Deal secret roles. With eyes closed, the Fascists see each other (see Setup). A random player takes the {=president} placard.' },
+    { label: 'Elections', repeat: 'until a team wins', text: 'Nominate, vote {=ja} / {=nein}, enact 1 policy, use any power. The {=president} placard then moves clockwise. If fewer than 3 policies are left in the deck at the end of a legislative session, shuffle the discard pile into the deck.' },
+    { label: 'Escalation', text: 'Some fascist track slots grant the President a power: {=investigate} {=peek} {=election} {=execute}. Once 5 {=fascist} are enacted, veto is allowed (see Key terms).' },
+    { label: 'Game end', text: 'Liberals win at 5 {=liberal} enacted or {=hitler} executed. Fascists win at 6 {=fascist} enacted, or when {=hitler} is elected Chancellor while 3 or more {=fascist} are already enacted.' },
   ],
 
   end: {
     trigger: 'a team meets a win condition',
     results: [
-      { side: 'Liberals win', text: 'when **5** {=liberal} are enacted, or {=hitler} is executed.' },
-      { side: 'Fascists win', text: 'when **6** {=fascist} are enacted, or {=hitler} is elected Chancellor after 3+ {=fascist}.' },
+      { side: 'Liberals win', text: 'at once when the **5th** {=liberal} is enacted, or when {=hitler} is executed.' },
+      { side: 'Fascists win', text: 'at once when the **6th** {=fascist} is enacted, or when {=hitler} is elected Chancellor while 3 or more {=fascist} are already enacted.' },
     ],
   },
 
@@ -62,38 +63,38 @@ defineGame({
     title: 'Teams and powers',
     rows: [
       ['Roles', '{lib-role} {fas-role} {hitler}'],
-      ['5–6 players', '{=hitler} {=fas-role}, rest {=lib-role}; Hitler knows his team'],
-      ['7–8 players', '{=hitler} {=fas-role}{=fas-role}, rest {=lib-role}'],
-      ['9–10 players', '{=hitler} {=fas-role}{=fas-role}{=fas-role}, rest {=lib-role}'],
+      ['5–6 players', '{=hitler} + 1 {=fas-role}, rest {=lib-role}. Hitler knows who the Fascist is'],
+      ['7–8 players', '{=hitler} + 2 {=fas-role}{=fas-role}, rest {=lib-role}. Hitler does not know the Fascists'],
+      ['9–10 players', '{=hitler} + 3 {=fas-role}{=fas-role}{=fas-role}, rest {=lib-role}. Hitler does not know the Fascists'],
       ['Policy deck', '6 × {=liberal}  11 × {=fascist}'],
-      ['{investigate}', 'Slot 2 (7–8), slots 1–2 (9–10): President sees 1 player’s party card; never the same player twice'],
-      ['{peek}', 'Slot 3 (5–6): President sees the top 3 policies, keeps their order'],
-      ['{election}', 'Slot 3 (7–10): President picks the next President; then order resumes from the left of the President who picked'],
-      ['{execute}', 'Slots 4 and 5 (all counts): President kills 1 player (if Hitler: Liberals win)'],
+      ['{investigate}', 'Fascist slot 2 (7–8 players); slots 1 and 2 (9–10 players). The President secretly looks at 1 other player’s party card (Hitler’s says Fascist) and may then tell the truth or lie about it. No player can be investigated twice in a game'],
+      ['{peek}', 'Fascist slot 3 (5–6 players). The President secretly looks at the top 3 policies of the deck and puts them back in the same order'],
+      ['{election}', 'Fascist slot 3 (7–10 players). The President chooses any other player to be President for the next round only. After it, the placard goes to the player to the left of the President who used this power'],
+      ['{execute}', 'Fascist slots 4 and 5 (every player count). The President executes 1 other player. If it was Hitler, Liberals win at once; otherwise the role stays secret'],
     ],
   },
 
   example: '{=president} Ana nominates Ben; the vote passes 5–2. Ana draws {=fascist}{=fascist}{=liberal}, discards a {=fascist} and passes Ben {=fascist}{=liberal}. Ben enacts the {=fascist} and says “I got two fascists.” Ana knows he lied but can’t prove it.',
 
   setup: [
-    'Deal each player a secret role card and party card (see table).',
-    'Eyes closed: Fascists open theirs to see each other; Hitler raises a thumb (with 5–6 players Hitler also opens his eyes).',
-    'Use the fascist track for your player count (its slots show the powers). Shuffle 6 {=liberal} + 11 {=fascist} as the deck. Give a random player the {president} placard.',
+    'Deal each player 1 secret role card and 1 party card (see table).',
+    'Everyone closes their eyes. The Fascists (not Hitler) open their eyes to see each other, and Hitler raises a thumb, eyes still closed, so they learn who Hitler is. With 5–6 players, Hitler opens his eyes too, so he and the Fascist see each other. Then everyone closes their eyes, and all open them together.',
+    'Use the fascist track for your player count (its slots show the powers). Shuffle 6 {=liberal} + 11 {=fascist} face down as the policy deck. Give a random player the {president} placard.',
   ],
 
   terms: [
-    ['{=president} President', 'Nominates a Chancellor, then passes 2 of 3 policies. Rotates clockwise.'],
+    ['{=president} President', 'Holds the placard this round: nominates a Chancellor and passes 2 of 3 policies. The placard moves clockwise every round, whether or not the election passed.'],
     ['{=chancellor} Chancellor', 'Enacts 1 of the 2 policies the President passed.'],
-    ['Election tracker', 'After 3 failed elections in a row, the top policy is enacted with no power; term limits reset. Any enacted policy resets the tracker.'],
-    ['Term limits', 'The last elected Chancellor (and President, with 6+ players alive) can’t be nominated Chancellor.'],
-    ['Veto', 'After 5 {=fascist}, the Chancellor may propose discarding both; if the President agrees, nothing is enacted and the election tracker moves up 1. If not, the Chancellor must enact one.'],
+    ['Election tracker', 'Moves up 1 for each failed vote (and each accepted veto). When it reaches 3, reveal the top policy of the deck and enact it; ignore any power it would grant. Then reset the tracker to 0 and forget term limits for the next nomination. If fewer than 3 policies are then left in the deck, shuffle the discard pile into it. Any enacted policy also resets the tracker to 0.'],
+    ['Term limits', 'The President and Chancellor of the last **elected** government can’t be nominated Chancellor this round. When only 5 players are alive, only the last Chancellor is barred. Anyone may be President.'],
+    ['Veto', 'Once 5 {=fascist} are enacted, the Chancellor, after receiving the 2 policies, may propose to discard both. If the President agrees, both are discarded, nothing is enacted and the election tracker moves up 1. If the President refuses, the Chancellor must enact one.'],
   ],
 
   gotchas: [
-    'With 7–10 players **Hitler doesn’t know** the Fascists; with 5–6 he does.',
+    'With 7–10 players **Hitler doesn’t know** the Fascists (they know him); with 5–6 they know each other.',
     'An executed player is **out**: no talking, voting or office. Their role stays secret unless they were Hitler.',
-    'After 3 {=fascist}, electing Hitler Chancellor ends the game at once. Hitler must reveal himself only when elected then or executed; before that he may lie.',
-    'President and Chancellor may not talk or signal while choosing policies. Discards are never shown; both may lie about what they saw.',
+    'Once 3 {=fascist} are enacted, electing Hitler Chancellor ends the game at once. Hitler must reveal himself only when elected Chancellor then, or when executed; before that he may lie.',
+    'President and Chancellor may not talk or signal while choosing policies. Discarded policies are never shown; both may lie about what they saw.',
   ],
 
   tips: [

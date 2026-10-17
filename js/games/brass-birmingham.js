@@ -53,31 +53,31 @@ defineGame({
 
   turn: {
     type: 'choose',
-    intro: 'Take 2 actions (1 in the game’s first round). Each action, even a pass, discards 1 card:',
-    outro: 'Refill your hand to 8 cards (while the deck lasts). Next player',
+    intro: 'On your turn, take 2 actions (only 1 in the game’s first round). Each action discards 1 card from your hand to your discard pile. Instead of an action you may pass, which still discards 1 card.',
+    outro: 'Draw back up to 8 cards · next player in turn order',
     steps: [
-      { verb: 'Build', text: 'Place your **lowest-level** tile of an industry where your **card** allows; pay its £ cost plus any {coal} or {iron} it shows.' },
-      { verb: 'Network', text: 'Lay a {canal} (£3), or in the rail era a {rail} (£5 + {=coal}), next to your network.' },
-      { verb: 'Sell', text: 'Sell from any of your {=cotton} {=goods} {=pottery} tiles to a **connected** merchant that buys that good, using the {beer} each tile shows; each tile sold flips.' },
-      { verb: 'Develop', text: 'Pay {=iron} per tile to remove 1–2 of your lowest-level tiles from your mat.' },
-      { verb: 'Loan/Scout', text: 'Take a **£30 loan** (income drops 3 levels), or discard 3 cards for 2 wild cards.' },
+      { verb: 'Build', text: 'Discard a location card (build in that town) or an industry card (build that industry anywhere in your network). Place the **lowest-level** tile left on your mat of that industry; pay its £ cost plus the {coal} and {iron} printed on it.' },
+      { verb: 'Network', text: 'Place 1 link on a route touching your network: a {canal} (£3) in the canal era, or a {rail} (£5 + 1 {=coal}) in the rail era. In the rail era you may place a 2nd rail in the same action (see Links).' },
+      { verb: 'Sell', text: 'Choose any number of your unflipped {=cotton} {=goods} {=pottery} tiles, one at a time. Each must be **connected** to a merchant that buys that good, and you must use the {beer} shown on the tile. Each tile sold flips.' },
+      { verb: 'Develop', text: 'Remove 1 or 2 tiles from your mat without building them, each the lowest-level tile of its industry; pay 1 {=iron} per tile removed.' },
+      { verb: 'Loan/Scout', text: '**Loan**: take £30 and move your income marker down 3 income levels. **Scout**: discard 2 more cards (3 in total) and take 1 wild location and 1 wild industry card.' },
     ],
   },
 
   tension: 'Rivals use your {=coal} {=iron} {=beer} for free: that flips your tiles sooner but also funds their builds.',
 
   structure: [
-    { label: 'Setup', text: 'Deal 8 cards each; turn order is random for round 1.' },
-    { label: 'Canal era', repeat: '8–10 rounds', text: 'Each round, in turn order, everyone takes 2 actions (1 in round 1). Links are {canal}s; **one** of your tiles per town.' },
-    { label: 'End of each round', text: 'New turn order: least £ spent this round goes first (ties keep order). Everyone collects income, or pays it if negative; none after the game’s final round.' },
+    { label: 'Setup', text: 'Deal 8 cards to each player; set a random turn order for round 1.' },
+    { label: 'Canal era', repeat: '8–10 rounds', text: 'Each round, each player in turn order takes 1 turn of 2 actions (1 action in the game’s first round). Links are {canal}s; you may have at most **one** industry tile in each town.' },
+    { label: 'End of each round', text: 'New turn order: the player who spent the least £ this round goes first, then the next least, and so on (tied players keep their previous order). Then each player gains £ equal to their income, or pays it if negative; skip income after the game’s final round.' },
     { label: 'Canal-era scoring', text: 'After the round (and income) in which the last cards are played: score {=canal} links, then flipped tiles. Remove all canals and **level‑1** tiles, refill merchant {=beer}, shuffle all discard piles into a new deck and deal 8 each.' },
-    { label: 'Rail era', repeat: '8–10 rounds', text: 'Same rounds. Links are {rail}s; several of your tiles may share a town.' },
+    { label: 'Rail era', repeat: '8–10 rounds', text: 'Rounds work the same way, with 2 actions in every round. Links are {rail}s; you may have several industry tiles in one town.' },
     { label: 'Final scoring', text: 'Score {=rail} links, then flipped tiles again. Most VP wins; ties go to highest income, then most money, else shared.' },
   ],
 
   points: [
-    ['{=canal} Canal', 'At canal-era end: the **link icons** in the 2 locations it joins (from flipped tiles, anyone’s, and 2 per merchant)'],
-    ['{=rail} Rail', 'The same, at rail-era end'],
+    ['{=canal} Canal', 'At the end of the canal era, each of your canals scores 1 VP per **link icon** in the 2 locations it joins: icons on flipped tiles there (anyone’s), plus 2 for a merchant location'],
+    ['{=rail} Rail', 'The same for each of your rails, at the end of the rail era'],
     ['{=cotton} Flipped tile', 'Its printed VP at each era end; level 2+ tiles stay and score **again** in the rail era'],
     ['Merchant {=beer}', 'Some merchants give VP as their bonus when you sell with their beer'],
     ['Unpaid income', '−1 VP per £1 you still can’t pay after selling tiles'],
@@ -96,27 +96,28 @@ defineGame({
     rows: [
       ['Industries', '{coalmine} {ironworks} {brewery} {cotton} {goods} {pottery}'],
       ['Resources', '{coal} {iron} {beer} {pound}'],
-      ['{=coal} Coal', 'nearest connected {coalmine}, else the market via a connected merchant (£8 if empty)'],
-      ['{=iron} Iron', 'any {ironworks}, no link needed, else the market (£6 if empty)'],
-      ['{=beer} Beer', 'your own {brewery} anywhere, a connected rival’s, or (when selling) the merchant’s'],
-      ['{=canal} {=rail} Links', 'canal £3 · rail £5 {=coal} · double rail £15 {=coal}{=coal} {=beer}'],
+      ['{=coal} Coal', 'free from the nearest {coalmine} connected to where it is used (anyone’s); if none, buy from the market, only if that place connects to a merchant (£8 per cube if the market is empty)'],
+      ['{=iron} Iron', 'free from any {ironworks} (anyone’s), no connection needed; if none has iron, buy from the market (£6 per cube if empty)'],
+      ['{=beer} Beer', 'your own {brewery} anywhere, a rival’s connected brewery, or (when selling) the barrel beside that merchant'],
+      ['{=canal} {=rail} Links', 'canal £3 · rail £5 + {=coal} · 2 rails in one action £15 + {=coal}{=coal} + {=beer}'],
     ],
   },
 
-  example: 'You discard a **Coalbrookdale** card and build a level‑2 {ironworks} there: £7 plus {=coal} from your connected mine. It makes {=iron}{=iron}{=iron}{=iron}; 2 sell into the iron market’s empty £1 spaces (£2) and 2 stay on the tile. Maya later develops twice, using those {=iron}{=iron}, so the tile is empty and **flips**: income +3, and the tile scores VP.',
+  example: 'You discard a **Coalbrookdale** card and build a level‑2 {ironworks} there: £7 plus {=coal} from your connected mine. It gets 4 iron cubes {=iron}{=iron}{=iron}{=iron}; 2 move at once into the iron market’s 2 empty £1 spaces (you earn £2) and 2 stay on the tile. Later Maya develops 2 tiles, taking those 2 {=iron} for free, so your tile is empty and **flips**: your income rises 3, and the tile scores VP at era end.',
 
   setup: [
-    'Each player takes £17, a player mat of industry tiles, 14 link tiles, and puts their income marker on the 10 space (£0).',
-    'Fill the {=coal} market except one £1 space and the {=iron} market except both £1 spaces. Put random merchant tiles (for the player count) and a {=beer} barrel on each trade post.',
-    'Set the 8 wild cards aside face up. Remove cards for the player count, shuffle, and deal each player 8 cards plus 1 face-down discard.',
+    'Each player takes £17, a player mat of industry tiles and 14 link tiles, and puts their income marker on space 10 of the track (income £0).',
+    'Fill the {=coal} market, leaving one £1 space empty, and the {=iron} market, leaving both £1 spaces empty. Put random merchant tiles (for the player count) and a {=beer} barrel on each trade post.',
+    'Set the 8 wild cards aside face up. Remove the cards not used at your player count, shuffle the rest, and deal each player 8 cards, plus 1 more face down to start their discard pile.',
   ],
 
   terms: [
-    ['Flip', 'An industry tile turns over when sold from or emptied: income rises and it scores VP.'],
-    ['{=canal}{=rail} Link', 'A canal or rail tile; scores the link icons in the towns at both ends.'],
-    ['Network', 'Your tiles plus every location touching your links.'],
-    ['Merchant', 'Off-map buyer; selling to it needs a connection and {beer}.'],
-    ['Overbuild', 'Replace a tile with a higher level of the same industry.'],
+    ['Flip', 'Turn an industry tile over: when you sell from it ({=cotton} {=goods} {=pottery}), or when its last cube or barrel is used ({=coalmine} {=ironworks} {=brewery}). Its owner’s income rises; only flipped tiles score VP.'],
+    ['{=canal}{=rail} Link', 'A canal or rail tile; scores the link icons in the locations at both ends.'],
+    ['Connected', 'Joined by an unbroken chain of links, **anyone’s** links included.'],
+    ['Network', 'Your network: every location that has one of your industry tiles or touches one of your links.'],
+    ['Merchant', 'Buyer at the map’s edge; to sell to it, your tile must be connected to it and use {beer}.'],
+    ['Overbuild', 'As a Build action: replace a tile with a higher level of the same industry, paying the normal build cost.'],
   ],
 
   gotchas: [
@@ -139,25 +140,25 @@ defineGame({
       'Between eras: score, remove every canal and level‑1 tile (flipped or not), and reshuffle the deck. Your network restarts from the tiles left.',
     ] },
     { title: 'Flipping and income', items: [
-      'A new {=coalmine} or {=ironworks} gets the cubes printed on it; a {=brewery} gets 1 {=beer} in the canal era, 2 in the rail era. They flip when the **last** one is used. {=cotton} {=goods} {=pottery} flip when you **sell** from them.',
+      'A new {=coalmine} or {=ironworks} gets the cubes printed on it; a {=brewery} gets 1 {=beer} in the canal era, 2 in the rail era. They flip when the **last** cube or barrel on them is used. {=cotton} {=goods} {=pottery} flip when you **sell** from them.',
       'Flipping raises your income marker by the number on the tile. Income, positive or negative, is paid at the **end of each round**, except the game’s last.',
-      'If you can’t pay negative income, remove tiles for half their cost; lose 1 VP per £1 still owed.',
+      'If you can’t pay negative income, remove your industry tiles (never links) from the map, one at a time, each giving half its cost rounded down, and stop once the shortfall is covered (keep any excess); removed tiles leave the game. If you have no tiles left to remove, lose 1 VP per £1 still owed.',
     ] },
     { title: 'Coal, iron and beer', items: [
       '{=coal} **Coal**: free from the **nearest** connected coal mine, anyone’s. If none is connected, buy from the market, only if the build location connects to a merchant.',
       '{=iron} **Iron**: free from **any** ironworks, no connection needed. If none has iron, buy from the market.',
       '{=beer} **Beer** (to sell or for a double rail): your own brewery anywhere, a rival’s connected brewery, or the barrel on the merchant you sell to (which also pays its bonus).',
-      'New {=coal} and {=iron} sell at once into empty market spaces for the space’s price: iron always, coal only if the mine connects to a merchant.',
+      'When a coal mine or ironworks is built, as many of its cubes as fit move at once into empty market spaces, **most expensive** space first, and its owner earns each space’s price: iron always, coal only if the mine connects to a merchant.',
     ] },
     { title: 'Loans and scouting', items: [
       'A loan gives **£30** and moves your income marker back **3 income levels** (not 3 spaces). Loans are never repaid.',
       'No loan may push income below −10.',
-      'Scout: discard 3 cards for 1 wild location + 1 wild industry card; not allowed while you hold a wild card.',
+      'Scout: discard 3 cards in total (the action’s card plus 2 more) to take 1 wild location + 1 wild industry card; not allowed while you hold a wild card.',
     ] },
     { title: 'Building rules', items: [
-      'Each town slot shows the industries it allows; use a slot showing **only** your industry if one is free. With nothing of yours on the board, an industry card or a link may go anywhere.',
-      'Develop skips tiles for {=iron} each; tiles with a lightbulb icon can’t be developed.',
-      'Overbuild your own tile with a higher level of the same industry any time. Overbuild a rival’s {=coalmine} or {=ironworks} only when no cubes of that type remain on the board or market.',
+      'Each town slot shows the industries it allows; if that town has a free slot showing **only** your industry, you must use it. With nothing of yours on the board, an industry card or a link may go anywhere.',
+      'Develop removes tiles from your mat without building them, for 1 {=iron} each; tiles with a lightbulb icon can’t be developed.',
+      'Overbuilding is done only with a **Build** action. You may overbuild any of your own tiles with a higher level of the same industry. Overbuild a rival’s {=coalmine} or {=ironworks} only when no cubes of that type remain on the board or market.',
     ] },
     { title: 'Era scoring', items: [
       'Links first: each of your links scores the **link icons** at both ends, from flipped tiles (anyone’s) and merchants.',

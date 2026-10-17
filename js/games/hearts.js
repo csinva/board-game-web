@@ -31,39 +31,39 @@ defineGame({
     hold: { name: 'hold (no pass)', draw: A => badge(A, A.circle(12, 12, 6.5, 'none', { stroke: '#fff', sw: 2.8 }) + A.line(7.5, 16.5, 16.5, 7.5, { stroke: '#fff', sw: 2.8 })) },
   },
 
-  pitch: 'Play tricks and avoid taking hearts and the Queen of Spades; lowest score when someone hits 100 wins.',
+  pitch: 'Play cards to win or dodge rounds called tricks; avoid winning hearts and the Queen of Spades. Lowest score wins.',
 
-  goal: { big: 'Fewest points', text: 'Hearts cost **1** point each, the Queen of Spades **13**. Lowest total when someone reaches 100 wins.' },
+  goal: { big: 'Fewest points', text: 'Points are bad. You score **1** point for each heart you win and **13** for the Queen of Spades. When any player reaches 100, the lowest total wins.' },
 
   turn: {
     type: 'round',
     intro: 'Each hand goes through these phases:',
     steps: [
-      { verb: 'Deal', text: 'Deal all 52 cards: **13** each with 4 players.' },
-      { verb: 'Pass', text: 'Everyone passes **3 cards** at once: {=left} left, {=right} right, {=across} across, {=hold} no pass, repeating (4 players).' },
-      { verb: 'Play tricks', text: 'The {=c2} holder leads it. Clockwise, follow suit if you can, else play anything; the highest card of the suit led wins and leads next.' },
-      { verb: 'Score', text: 'Add 1 per {=heart} and 13 for the {=qs} in your tricks to your total.' },
+      { verb: 'Deal', text: 'Deal all 52 cards clockwise: **13** each with 4 players (see Setup for 3 or 5).' },
+      { verb: 'Pass', text: 'At the same time, each player passes **3 cards** face down to one player. With 4 players the direction changes each hand: {=left} to the left, then {=right} to the right, then {=across} across, then {=hold} no pass, then repeat. With 3 or 5 players: {=left} left, then {=right} right, then {=hold} no pass, then repeat.' },
+      { verb: 'Play tricks', text: 'A **trick** is 1 card from each player, played face up in clockwise order. The holder of the {=c2} **leads** (plays first to) the first trick with it. Each other player must **follow suit** (play a card of the suit led) if able; otherwise they may play any card. The highest card of the suit led wins all the cards in the trick, and its player leads the next trick. Play until hands are empty.' },
+      { verb: 'Score', text: 'Each player adds 1 point for each {=heart} and 13 for the {=qs} in the tricks they won to their running total.' },
     ],
   },
 
   tension: 'High cards can catch the Queen of Spades, but dumping them all leaves you unable to stop a moon shot.',
 
   structure: [
-    { label: 'Setup', text: 'Deal 13 each (4 players). Pass direction starts {=left} left.' },
-    { label: 'Hands', repeat: 'until 100', text: 'Pass 3 cards ({=left} {=right} {=across} {=hold} in rotation), play 13 tricks, add penalty points.' },
-    { label: 'Game end', text: 'Someone reaches **100** after a hand: lowest total wins.' },
+    { label: 'Setup', text: 'Deal 13 cards to each player (4 players). The first hand passes {=left} left.' },
+    { label: 'Hands', repeat: 'until 100', text: 'Pass 3 cards (direction {=left} {=right} {=across} {=hold}, changing each hand), play tricks until hands are empty, then add points.' },
+    { label: 'Game end', text: 'If any player has **100** or more points at the end of a hand, the game ends. The lowest total wins.' },
   ],
 
   points: [
-    ['{=heart} Each heart', '+1 (13 in the deck)'],
-    ['{=qs} Queen of Spades', '+13'],
-    ['{=moon} Shoot the moon', 'Take all 13 {=heart} and the {=qs}: you 0 and everyone else +26, or you −26 (your choice)'],
+    ['{=heart} Each heart', '+1 for each heart in the tricks you win (13 in the deck)'],
+    ['{=qs} Queen of Spades', '+13 if it is in a trick you win'],
+    ['{=moon} Shoot the moon', 'If you win all 13 {=heart} and the {=qs} in one hand, you score 0 for that hand and choose: every other player scores +26, or you subtract 26 from your total'],
   ],
 
   end: {
     trigger: 'someone reaches 100 points at the end of a hand',
     results: [
-      { side: 'Lowest score wins', text: 'the **fewest** points when anyone reaches 100.' },
+      { side: 'Lowest score wins', text: 'the player with the **fewest** points when anyone reaches 100.' },
     ],
   },
 
@@ -72,37 +72,38 @@ defineGame({
     rows: [
       ['Card rank', 'A K Q J 10 … 2; no trump suit'],
       ['Pass cycle (4)', '{=left} → {=right} → {=across} → {=hold}'],
-      ['Pass cycle (3)', '{=left} → {=right} → {=hold}'],
-      ['First lead', '{c2}'],
+      ['Pass cycle (3 or 5)', '{=left} → {=right} → {=hold} (some groups use other cycles; agree on one before play)'],
+      ['First lead', '{c2} (5 players: 3{=club})'],
     ],
   },
 
-  example: 'On a {=left} hand, Maya passes **A{=spade} K{=spade} 10{=heart}** to Ben. Later, Ben leads 4{=diamond}; Maya has no diamonds and dumps the {qs}. Lee’s K{=diamond} is highest, so Lee takes the trick and 13 points.',
+  example: 'On a {=left} hand, Maya passes **A{=spade} K{=spade} 10{=heart}** to Ben. Later, Ben leads 4{=diamond}; Maya has no diamonds, so she may play any card and plays the {qs}. Lee’s K{=diamond} is the highest diamond, so Lee wins the trick and its 13 points.',
 
   setup: [
-    'Standard 52-card deck. 4 players: 13 each. 3 players: remove 2{=diamond}, 17 each. 5 players: remove 2{=diamond} and 2{=club}, 10 each; the 3{=club} leads first.',
-    'First hand passes {=left} left; the direction rotates each hand.',
+    'Standard 52-card deck. 4 players: 13 each. 3 players: remove 2{=diamond}, 17 each. 5 players: remove 2{=diamond} and 2{=club}, 10 each; the holder of the 3{=club} leads the first trick.',
+    'The first hand passes {=left} left; the direction changes each hand (see Pass cycle).',
     'Keep a running score per player on paper.',
   ],
 
   terms: [
     ['Trick', 'One card from each player; the highest card of the suit led takes them all.'],
+    ['Lead', 'Play the first card of a trick. Its suit is the suit led.'],
     ['Follow suit', 'Play a card of the suit led. Required if you have one.'],
-    ['Void', 'No cards of a suit, so you may discard anything on it.'],
+    ['Void', 'Having no cards of a suit. When that suit is led, you may play any card.'],
     ['{=heart} Broken', 'Hearts are broken once a heart has been played to a trick; only then may hearts be led.'],
     ['{=moon} Moon', 'Take all 13 {=heart} and the {=qs}: +26 to everyone else, or −26 to you.'],
   ],
 
   gotchas: [
-    'You can’t **lead** a heart until hearts are broken, unless your hand is all hearts.',
-    'Standard rules allow hearts and the {=qs} on the **first trick**. Common house rule: no points on trick 1 unless you hold nothing else; another: the {=qs} also breaks hearts.',
-    'Choose your 3 pass cards **before** you see what you receive.',
+    'You may not **lead** a heart until hearts are broken (a heart has been played on an earlier trick), unless your hand is all hearts.',
+    'Standard rules allow hearts and the {=qs} on the **first trick**. Common house rules: no hearts or {=qs} on trick 1 unless you hold nothing else; playing the {=qs} also breaks hearts.',
+    'Choose and pass your 3 cards **before** you look at the 3 you receive.',
   ],
 
   tips: [
     'Pass A{=spade} and K{=spade} unless you hold several low spades to guard them: they catch the {=qs}.',
     'Pass away a short suit to make yourself **void**, so you can dump the {=qs} and hearts early.',
-    'If one player is taking every heart, win one heart trick to stop the {=moon} moon shot.',
+    'If one player is winning every heart, win one trick containing a heart to stop the {=moon} moon shot.',
   ],
 
   walk(A) {
@@ -131,7 +132,7 @@ defineGame({
       { step: 2, say: 'Later, Ben leads **4{=diamond}**. Lee plays K{=diamond}, Jo 7{=diamond}: everyone follows suit.', svg: board + mine(left) + passed + ben + lee + jo },
       { step: 2, say: 'Maya has **no diamonds**, so she may play anything. She dumps the {=qs}.', svg: board + rest + passed + ben + lee + jo + queen + A.glow(160, 119, 28) },
       { step: 2, say: 'K{=diamond} is the highest card of the suit led: **Lee** takes the trick, {=qs} included, and leads next.', svg: board + rest + passed + pile(200, 30) + A.glow(225, 55, 34) },
-      { step: 3, say: 'End of hand: Lee scores **13** for the {=qs} plus 1 per {=heart} taken. Lowest total wins.', svg: board + rest + passed + pile(200, 30) +
+      { step: 3, say: 'End of hand: Lee scores **13** for the {=qs} plus 1 for each {=heart} Lee won. Lowest total wins.', svg: board + rest + passed + pile(200, 30) +
         A.k('score', A.rect(112, 76, 96, 40, '#fbf6ec', { rx: 4, sw: 1.2 }) + A.text(146, 89, 'Lee', { size: 10, weight: 800 }) + A.text(146, 104, '+13', { size: 14, weight: 800, fill: R }) + A.use(ic.qs.draw(A), 168, 80, 32)) },
     ];
   },

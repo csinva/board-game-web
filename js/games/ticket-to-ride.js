@@ -24,34 +24,34 @@ defineGame({
 
   pitch: 'Collect sets of train cards to claim routes between cities; long routes and completed tickets score most.',
 
-  goal: { big: 'Most points', text: 'Most points from routes, completed destination tickets and the longest continuous path. Unfinished tickets **subtract** their value.' },
+  goal: { big: 'Most points', text: 'Score the most points from routes you claim, destination tickets you complete, and the longest continuous path. Each ticket you have not completed at the end **subtracts** its value.' },
 
   turn: {
     type: 'choose',
     steps: [
-      { verb: 'Draw cards', text: 'Take **2** train cards {=orange}{=green}, face-up or from the deck. A face-up {loco} counts as both.' },
-      { verb: 'Claim route', text: 'Claim **one** open route: play cards of its colour ({=blue}{=blue}{=blue}) equal to its length (gray: any **one** colour), place your {train}s on it and score it.' },
-      { verb: 'Tickets', text: 'Draw **3** {ticket}s; keep at least 1. Return the rest to the bottom of the pile.' },
+      { verb: 'Draw cards', text: 'Take **2** train cards {=orange}{=green}, one at a time, each from the 5 face-up cards (refill the gap at once) or from the top of the deck. Taking a face-up {loco} uses your whole draw.' },
+      { verb: 'Claim route', text: 'Claim **one** unclaimed route: discard one card of its colour per space ({=blue}{=blue}{=blue} for a 3-space blue route; a gray route takes cards of any **one** colour). Put one of your {train}s on each space and score it now.' },
+      { verb: 'Tickets', text: 'Draw the top **3** {ticket}s; keep at least 1, secretly. Put the rest on the bottom of the ticket pile.' },
     ],
   },
 
   tension: 'Every turn spent drawing cards is a turn a rival can take the one route you need.',
 
   structure: [
-    { label: 'Setup', text: 'Deal 4 train cards and 3 {ticket}s each; keep at least 2 tickets. Turn 5 cards face-up.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Each turn: draw cards, claim one route, or draw tickets. No rounds or phases.' },
-    { label: 'Last round', text: 'A player ends a turn with **0–2** {=train} left: everyone, including them, gets one more turn.' },
-    { label: 'Final scoring', text: 'Reveal tickets: add completed, subtract failed. Longest continuous path +10.' },
+    { label: 'Setup', text: 'Deal each player 4 train cards and 3 {ticket}s; each player keeps at least 2 of those tickets. Turn 5 train cards face up.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'On your turn, do exactly one: draw train cards, claim one route, or draw tickets. Play passes clockwise; there are no rounds or phases.' },
+    { label: 'Last round', text: 'When a player ends a turn with **0, 1 or 2** {=train} left, every player, including that player, takes one more turn.' },
+    { label: 'Final scoring', text: 'Everyone reveals their tickets: add each completed ticket’s value and subtract each incomplete one’s. The longest continuous path scores +10.' },
   ],
 
   points: [
-    ['{=train} Route', 'scored when claimed, by length (table)'],
+    ['{=train} Route', 'scored when you claim it, by its number of spaces (see table)'],
     ['{=ticket} Completed ticket', '+ its value at game end'],
-    ['{=ticket} Failed ticket', '− its value'],
-    ['Longest path', '+10 for the longest continuous line of your trains (loops allowed; each train counts once); ties all score'],
+    ['{=ticket} Incomplete ticket', '− its value at game end'],
+    ['Longest path', '+10 for the longest continuous line of your own trains. It may loop and pass through a city more than once, but no train counts twice. If tied, every tied player scores 10.'],
   ],
 
-  end: { trigger: 'a player ends a turn with 2 or fewer trains left', detail: 'Everyone, including that player, takes **one final turn**. Then reveal and score tickets. Tie: most completed tickets wins, then the longest path.' },
+  end: { trigger: 'a player ends a turn with 2 or fewer trains left', detail: 'Everyone, including that player, takes **one final turn**. Then reveal and score tickets. If tied, the player who completed the most tickets wins; if still tied, the one with the longest-path bonus wins.' },
   scoring: [
     { label: '{=train} Routes', share: 5 },
     { label: '{=ticket} Tickets', share: 4 },
@@ -70,36 +70,37 @@ defineGame({
     ],
   },
 
-  example: 'Your {=ticket} is **Denver–El Paso (4)**. You play {=orange}{=orange} on the gray 2-train Denver–Santa Fe route, place {=train}{=train} and score **2**. Santa Fe–El Paso (2 trains) will complete the ticket.',
+  example: 'Your {=ticket} is **Denver–El Paso (4)**. You discard {=orange}{=orange} to claim the gray 2-space Denver–Santa Fe route, place {=train}{=train} and score **2**. Claiming Santa Fe–El Paso (2 spaces) later would complete the ticket.',
 
   setup: [
-    'Each player takes 45 {train}s of one colour and 4 train cards.',
-    'Deal 3 {ticket}s each; keep at least 2 and return the rest to the bottom of the pile.',
-    'Put scoring markers on Start.',
-    'Turn 5 train cards face-up beside the deck.',
+    'Each player takes 45 {train}s of one colour. Shuffle the train cards and deal 4 to each player.',
+    'Shuffle the {ticket}s and deal 3 to each player. Each player secretly keeps at least 2 and returns the rest to the bottom of the ticket pile.',
+    'Each player puts their scoring marker on the start of the score track.',
+    'Turn 5 train cards face up beside the deck.',
+    'The most experienced traveller goes first; turns then pass clockwise.',
   ],
 
   terms: [
     ['{=red} Train card', 'Coloured card spent to claim routes.'],
     ['{=loco} Locomotive', 'Wild: counts as any colour.'],
-    ['{=ticket} Destination ticket', 'Secret goal: connect two cities to gain its points, or lose them.'],
-    ['Double route', 'Two parallel routes between the same cities.'],
+    ['{=ticket} Destination ticket', 'Secret card naming two cities. If your own routes connect them by game end, add its points; if not, subtract them.'],
+    ['Double route', 'Two parallel routes between the same two cities.'],
   ],
 
   gotchas: [
     'A face-up {loco} is your **whole draw**, and you can’t take one as your second card. A {loco} drawn blind from the deck counts as one card.',
-    'Gray routes take any **one** colour; coloured routes need that colour. {loco}s can fill in for any colour.',
+    'Gray routes take any **one** colour; coloured routes need that colour. A {loco} can replace a card of any colour.',
     'A claimed route need not connect to your other routes.',
-    'Never claim both tracks of a double route. With 2–3 players only **one** track can be used.',
-    'If 3 {=loco} are face-up at once, discard all 5 and deal 5 new.',
+    'No player may claim both routes of a double route. With 2–3 players, once one route of a double is claimed, the other is **closed** to everyone.',
+    'If 3 {=loco} are ever face up at the same time, discard all 5 face-up cards and turn up 5 new ones.',
     'When the deck runs out, shuffle the discards into a new deck. If there are none, you can’t draw cards.',
-    'If fewer than 3 {ticket}s remain, draw what is left.',
+    'If fewer than 3 {ticket}s remain, draw all that are left.',
   ],
 
   tips: [
     'Finish your first tickets before drawing more; an unfinished big ticket can erase your lead.',
-    'Claim bottleneck routes on your path first; draw cards for the rest.',
-    'Long routes pay more per train: one 6-route scores 15, six 1-routes score 6.',
+    'Claim first the routes on your path that have no alternative; draw cards for the rest.',
+    'Long routes pay more per train: one 6-space route scores 15, but six 1-space routes score only 6.',
   ],
 
   walk(A) {
@@ -129,7 +130,7 @@ defineGame({
     return [
       { step: 0, say: 'Your secret {=ticket}: **Denver – El Paso** (4 points). Connect them with your trains.', svg: board + display() + top + h0 + score(0) + A.glow(...P.den, 12, 'g-den') + A.glow(...P.ep, 12, 'g-ep') },
       { step: 0, say: '**Draw cards.** Take the face-up {=orange}. A new card fills its slot.', svg: board + display(1, refill) + top + h0 + A.k('d-or', tc(...hand(3), 'orange')) + score(0) },
-      { step: 0, say: 'Second card, blind from the deck: {=green}. Turn over.', svg: board + display(1, refill) + h0 + A.k('d-or', tc(...hand(3), 'orange')) + A.k('deck', tc(...hand(4), 'green')) + score(0) },
+      { step: 0, say: 'Second card, from the top of the deck: {=green}. Your turn is over.', svg: board + display(1, refill) + h0 + A.k('d-or', tc(...hand(3), 'orange')) + A.k('deck', tc(...hand(4), 'green')) + score(0) },
       { step: 1, say: '**Next turn: claim.** Gray Denver – Santa Fe takes 2 cards of any one colour: play {=orange}{=orange}.', svg: board + display(1, refill) + A.k('h-pink', tc(...hand(0), 'pink')) + A.k('h-blue', tc(...hand(1), 'blue')) + A.k('deck', tc(...hand(2), 'green')) +
         A.k('h-or', tc(mid[0] - 22, mid[1] - 14, 'orange')) + A.k('d-or', tc(mid[0] + 2, mid[1] - 14, 'orange')) + score(0) },
       { step: 1, say: 'Discard the cards and place 2 {train}s. A 2-train route scores **2 points**.', svg: board + display(1, refill) + A.k('h-pink', tc(...hand(0), 'pink')) + A.k('h-blue', tc(...hand(1), 'blue')) + A.k('deck', tc(...hand(2), 'green')) +

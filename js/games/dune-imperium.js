@@ -35,11 +35,11 @@ defineGame({
 
   turn: {
     type: 'choose',
-    intro: 'Each round, in turn order, do ONE of these per turn until everyone has revealed:',
-    outro: 'After all reveals: combat, makers, recall',
+    intro: 'Each round, starting with the first player and going clockwise, players take 1 turn at a time. On each turn, do ONE of these, until everyone has taken their reveal turn:',
+    outro: 'After all reveals: combat, then makers, then recall',
     steps: [
-      { verb: 'Agent turn', text: 'Play 1 card and send an {agent} to an open space whose icon ({=city} {=spicetrade} {=fremen}…) is on the card; pay its cost, take its reward and the card’s agent effect (a faction space also gives +1 influence there); on a combat space deploy {troop}s (up to 2 from your garrison plus any just recruited).' },
-      { verb: 'Reveal turn', text: 'Once out of agents (or earlier, by choice), **reveal** your hand: add its {sword}s to your strength and spend its {persuasion} on Imperium Row or reserve cards (the Row refills at once); you are done for the round.' },
+      { verb: 'Agent turn', text: 'Play 1 card from your hand and send 1 {agent} to a board space with no agent on it whose icon ({=city} {=spicetrade} {=fremen}…) is on that card. Pay the space’s cost, then take the space’s reward and the card’s agent effect; a faction space also gives you +1 influence with that faction. On a combat space, you may also deploy {troop}s to the conflict: up to 2 from your garrison, plus any you recruited this turn.' },
+      { verb: 'Reveal turn', text: 'When you have no agents left to place (or earlier, if you choose), **reveal** all cards left in your hand. Add their {sword}s to your strength in the conflict, and spend their {persuasion} on cards from the Imperium Row or the reserve (refill the Row at once). You take no more turns this round.' },
     ],
   },
 
@@ -47,23 +47,23 @@ defineGame({
 
   structure: [
     { label: 'Setup', text: 'Each player: starting deck, 2 {agent}s, 3 {troop}s in garrison. Conflict deck: 1 level I, 5 level II, 4 level III (10 rounds at most).' },
-    { label: 'Round start', repeat: 'each round', text: 'Reveal the top conflict card. Everyone draws **5** cards (shuffle your discard pile when your deck runs out).' },
-    { label: 'Player turns', repeat: 'each round', text: 'From the first player, clockwise: one agent turn or reveal turn each. Players who revealed are skipped until all have.' },
-    { label: 'Combat', repeat: 'each round', text: 'Players with troops in the conflict may play combat {intrigue}s in turn order until all pass in a row. Highest strength takes the 1st reward, next the 2nd (4 players: also 3rd); 0 strength gets nothing. Tie for 1st: each tied player gets the 2nd reward; tie for 2nd: each gets the 3rd; tie for 3rd: nothing. Then every troop in the conflict returns to the supply.' },
-    { label: 'Makers & recall', repeat: 'each round', text: 'Add 1 bonus {=spice} to each maker space (Imperial Basin, Hagga Basin, The Great Flat) with no agent; its next visitor takes it all. If the game is not over, take back agents, return the Mentat, and pass the first-player marker left.' },
-    { label: 'Game end', text: 'If someone has **10+** {=vp} or the conflict deck is empty: play endgame {intrigue}s; most {=vp} wins.' },
+    { label: 'Round start', repeat: 'each round', text: 'Reveal the top conflict card. Everyone draws **5** cards (when your deck runs out, shuffle your discard pile to form a new deck).' },
+    { label: 'Player turns', repeat: 'each round', text: 'Starting with the first player and going clockwise, each player takes 1 turn at a time: an agent turn or their reveal turn. Players who have revealed are skipped until everyone has revealed.' },
+    { label: 'Combat', repeat: 'each round', text: 'Starting with the first player and going clockwise, players with troops in the conflict may each play 1 combat {intrigue} at a time, until all of them pass in a row. The highest strength takes the 1st reward, the next highest the 2nd (with 4 players, the next the 3rd); 0 strength gets nothing. Tie for 1st: each tied player gets the 2nd reward; tie for 2nd: each gets the 3rd; tie for 3rd: nothing. Then every troop in the conflict returns to the supply.' },
+    { label: 'Makers & recall', repeat: 'each round', text: 'Add 1 bonus {=spice} to each maker space (Imperial Basin, Hagga Basin, The Great Flat) with no agent on it; the next player to send an agent to that space takes all the bonus spice there. If the game is not over, everyone takes back their agents, return the Mentat to its space, and pass the first-player marker to the left.' },
+    { label: 'Game end', text: 'If any player has **10 or more** {=vp}, or the conflict deck is empty, the game ends: players may play endgame {intrigue}s; most {=vp} wins.' },
   ],
 
   points: [
     ['Start', '4 players: everyone begins at 1 {=vp}; 1–3 players: 0'],
-    ['{=sword} Conflicts', 'The {=vp} shown in the reward you earn; most 1st-place rewards include {=vp} (the level III battles: 2)'],
-    ['Influence', '1 {=vp} per faction where you have **2+** influence; lost if you drop below 2'],
+    ['{=sword} Conflicts', 'The {=vp} shown in the reward you earn; most 1st-place rewards include {=vp} (level III conflicts give 2)'],
+    ['Influence', '1 {=vp} per faction where you have **at least 2** influence; you lose it if you drop below 2'],
     ['Alliance', '1 {=vp} while you hold a faction’s alliance token: the first to **4** influence there takes it'],
     ['The Spice Must Flow', '1 {=vp} each time you buy one (reserve card, 9 {=persuasion})'],
     ['Cards', '{=intrigue} and Imperium cards whose text gives {=vp}'],
   ],
 
-  end: { trigger: 'a round ends with someone at 10+ VP', detail: 'Or after the 10th conflict. Ties: most spice, then solari, water, garrisoned troops.' },
+  end: { trigger: 'a round ends with someone at 10 or more VP', detail: 'Or after the 10th conflict. Tie: the tied player with the most spice wins; if still tied, most solari, then water, then troops in their garrison.' },
   scoring: [
     { label: '{=sword} Conflicts', share: 4 },
     { label: 'Faction influence', share: 3 },
@@ -78,23 +78,24 @@ defineGame({
       ['Factions', '{emperor} {guild} {bene} {fremen}'],
       ['Strength', '{=troop} in the conflict = 2 · {=sword} = 1'],
       ['Reserve', 'Always buyable: Arrakis Liaison (2 {=persuasion}), The Spice Must Flow (9 {=persuasion}, +1 {=vp})'],
-      ['High Council', '5 {=solari}, once: +2 {=persuasion} on every later reveal'],
-      ['Extra agents', 'Swordmaster (8 {=solari}, once): 3rd {=agent} for the rest of the game, this round included · Mentat (2 {=solari}): draw 1, +1 {=agent} this round'],
+      ['High Council', 'pay 5 {=solari} for a seat (once per game): +2 {=persuasion} on each of your later reveals'],
+      ['Extra agents', 'Swordmaster (8 {=solari}, once per game): a 3rd {=agent} for the rest of the game, this round included · Mentat (2 {=solari}): draw 1 card and take the Mentat as an extra {=agent} for this round'],
     ],
   },
 
-  example: 'You play a card with a {=city} icon and send an {=agent} to **Arrakeen**: +1 {=troop} and 1 card. You deploy that troop plus 2 from your garrison: **6 strength**. Next turn your other agent goes to **Foldspace** (+1 {=guild} influence). Then you reveal 4 cards for 5 {=persuasion} and 2 {=sword}, buy an Imperium Row card, and reach **8 strength** to win the 2‑VP conflict.',
+  example: 'You play a card with a {=city} icon and send an {=agent} to **Arrakeen**: +1 {=troop} and 1 card. You deploy that troop plus 2 from your garrison: 3 troops × 2 = **6 strength**. Next turn your other agent goes to **Foldspace** (+1 {=guild} influence). Then you reveal 4 cards for 5 {=persuasion} and 2 {=sword}, buy an Imperium Row card, and reach **8 strength** (6 + 2 swords) to win the 2‑VP conflict.',
 
   setup: [
     'Each player takes a leader (with a printed ability), a 10-card starting deck, 2 {agent}s, 1 {water} and 3 {troop}s in their garrison.',
     'Set influence markers to 0 on the four faction tracks ({=emperor} {=guild} {=bene} {=fremen}); put an alliance token at the top of each. VP markers start on 1 in a 4-player game, otherwise on 0.',
     'Shuffle the Imperium and intrigue decks; deal 5 Imperium cards face up as the Row. Lay out the reserve stacks (Arrakis Liaison, The Spice Must Flow, Foldspace).',
-    'Conflict deck: shuffle each level separately; stack 1 level I card on top of 5 level II on top of all 4 level III. Return the rest unseen.',
+    'Conflict deck: shuffle each level separately. Put all 4 level III cards at the bottom, 5 level II cards on them, and 1 level I card on top. Return the unused cards to the box without looking.',
     '1–2 players: add the House Hagal rival deck and follow the rulebook’s solo / 2-player section (in 2-player the rival takes spaces and fights conflicts but never scores).',
   ],
 
   terms: [
-    ['{=agent} Agent', 'Your worker. You start with 2 per round.'],
+    ['{=agent} Agent', 'Your worker pawn. You have 2 each round (more with Swordmaster or Mentat); you place them on agent turns and take them back at recall.'],
+    ['Imperium Row', 'The 5 face-up cards anyone may buy with persuasion; a bought card is replaced from the Imperium deck at once.'],
     ['{=persuasion} Persuasion', 'Currency from revealed cards; buys cards, which go to your discard pile. Unspent persuasion is lost.'],
     ['{=troop} Garrison', 'Your troops off the board, ready to deploy to a conflict.'],
     ['Influence', 'Your position on a faction track.'],
@@ -102,11 +103,11 @@ defineGame({
   ],
 
   gotchas: [
-    'Deploy troops only on a turn your agent goes to a **combat space**; after that, only cards add more. Win or lose, troops in the conflict are **lost** after combat.',
+    'You can deploy troops only on a turn when your agent goes to a **combat space**; at other times, only card effects add troops to the conflict. Win or lose, troops in the conflict are **lost** after combat.',
     'Persuasion and swords count only from your **reveal**, and swords only if you have at least one troop in the conflict.',
-    'Alliances move: anyone who rises **above** your influence on that faction takes the alliance token and its VP. The bonus printed at 4 influence is kept.',
-    '**Sietch Tabr** needs 2+ {=fremen} influence. Swordmaster and High Council can each be taken once per game per player.',
-    'Winning a conflict with a control reward puts your marker on Arrakeen, Carthag or Imperial Basin: you gain 1 {=solari} (Imperial Basin: 1 {=spice}) whenever anyone visits it.',
+    'Alliances move: anyone who rises **above** your influence on that faction takes the alliance token and its VP. The one-time bonus printed at 4 influence stays with whoever earned it.',
+    '**Sietch Tabr** needs at least 2 {=fremen} influence. Swordmaster and High Council can each be taken once per game per player.',
+    'Winning a conflict with a control reward puts your marker on Arrakeen, Carthag or Imperial Basin: you gain 1 {=solari} (Imperial Basin: 1 {=spice}) whenever any player sends an agent there.',
   ],
 
   tips: [

@@ -17,38 +17,38 @@ defineGame({
     trick: { name: 'trick', draw: A => A.rect(2.5, 3, 12, 17, '#fff', { rx: 2, sw: 1.2, rotate: -14 }) + A.rect(6, 3.5, 12, 17, '#fff', { rx: 2, sw: 1.2 }) + A.rect(9.5, 4, 12, 17, '#fff', { rx: 2, sw: 1.2, rotate: 14 }) + A.text(15.6, 13, '♠︎', { size: 10, weight: 400, fill: '#2b2b2b' }) },
   },
 
-  pitch: 'Partners bid how many tricks they will take, then make it, with spades as trump. First team to 500 wins.',
+  pitch: 'Partners bid how many tricks they will win, then try to win at least that many; spades beat other suits. First to 500 wins.',
 
-  goal: { big: '500 points', text: 'First team to **500** wins. Take at least as many tricks as your team bid, but not many more.' },
+  goal: { big: '500 points', text: 'Play in 2 teams of 2. Each hand, your team bids how many tricks it will win; win at least that many, but each extra trick moves you toward a penalty. First team to **500** points wins.' },
 
   turn: {
     type: 'round',
     intro: 'Each hand goes through these phases:',
     steps: [
-      { verb: 'Deal', text: 'Deal all 52 cards: **13** each.' },
-      { verb: 'Bid', text: 'From dealer’s left, one round, no passing: each player bids 1–13 tricks or {=nil}. Partners’ bids **add up** to the team contract.' },
-      { verb: 'Play tricks', text: 'Dealer’s left leads any non-{=spade}. Clockwise, follow suit if you can, else play anything. Highest {=spade} wins, else highest card of the suit led.' },
-      { verb: 'Score', text: 'Made it: 10 per trick bid, +1 per extra trick ({=bag}). Missed: −10 per trick bid.' },
+      { verb: 'Deal', text: 'Deal all 52 cards clockwise: **13** each.' },
+      { verb: 'Bid', text: 'Starting with the player to the dealer’s left and going clockwise, each player makes exactly one bid: a number of tricks from 1 to 13, or {=nil} (zero). No one may pass. The two partners’ number bids are **added** to make the team’s bid.' },
+      { verb: 'Play tricks', text: 'A **trick** is 1 card from each player, played face up in clockwise order. The player to the dealer’s left **leads** (plays first to) the first trick, with any card except a {=spade}. Each other player must **follow suit** (play a card of the suit led) if able; otherwise they may play any card, including a {=spade}. Spades are **trump**: the highest {=spade} in the trick wins it; if no {=spade} was played, the highest card of the suit led wins. The trick’s winner leads the next trick.' },
+      { verb: 'Score', text: 'A team that won at least its bid scores 10 per trick bid, plus 1 per extra trick; each extra trick is also a {=bag}. A team that won fewer than its bid loses 10 per trick bid. {=nil} bids score separately (see Scoring).' },
     ],
   },
 
-  tension: 'Bid low and extra tricks pile up as bags that cost 100; bid high and you risk losing the whole bid, so each late trick is a take-or-duck choice.',
+  tension: 'Bid low and extra tricks pile up as bags that cost 100; bid high and you risk losing the whole bid, so each late trick is a choice: win it or let it go.',
 
   structure: [
-    { label: 'Hand', repeat: 'until 500', text: 'Deal 13 each → bid → play 13 tricks → score both teams and add bags. Deal passes left.' },
-    { label: 'Game end', text: 'A team reaches **500** after a hand: higher score wins.' },
+    { label: 'Hand', repeat: 'until 500', text: 'Deal 13 cards each, bid, play 13 tricks, then score both teams and add their bags. The player to the left of the dealer deals the next hand.' },
+    { label: 'Game end', text: 'When a team has **500** or more points at the end of a hand, the game ends; the higher score wins.' },
   ],
 
   points: [
-    ['Bid made', '10 × bid, +1 per {=bag}'],
-    ['Bid missed', '−10 × bid'],
-    ['{=nil} Nil made', '+100 to the nil bidder’s team'],
-    ['{=nil} Nil failed', '−100; the nil bidder’s tricks count as {=bag}'],
-    ['10 {=bag}', '−100, then remove 10 {=bag}'],
-    ['Blind nil', '±200 (see Rules people miss)'],
+    ['Bid made', 'Team won at least its bid: +10 per trick bid, +1 per extra trick ({=bag})'],
+    ['Bid missed', 'Team won fewer tricks than its bid: −10 per trick bid'],
+    ['{=nil} Nil made', 'Nil bidder won zero tricks: +100 to their team'],
+    ['{=nil} Nil failed', 'Nil bidder won 1 or more tricks: −100 to their team, and each of those tricks counts as a {=bag}'],
+    ['10 {=bag}', 'When a team’s bag count reaches 10: −100 points, and subtract 10 from its bag count'],
+    ['Blind nil', '+200 if the bidder wins zero tricks, −200 if not (see Rules people miss)'],
   ],
 
-  end: { trigger: 'a team reaches 500 points at the end of a hand', detail: 'If both teams pass 500 in the same hand, the higher score wins. A team at −500 or below loses.' },
+  end: { trigger: 'a team reaches 500 points at the end of a hand', detail: 'If both teams reach 500 in the same hand, the higher score wins. A team whose score drops to −500 or lower loses.' },
   scoring: [
     { label: 'Made bids', share: 8 },
     { label: '{=nil} Nil bonuses', share: 2 },
@@ -58,40 +58,42 @@ defineGame({
   ref: {
     title: 'Who wins the trick',
     rows: [
-      ['Card rank', 'A K Q J 10 … 2'],
-      ['Can follow suit', 'must; highest of the suit led wins'],
-      ['Can’t follow', 'play anything; any {=spade} beats the suit led'],
-      ['Several {=spade}', 'highest {=spade} wins'],
+      ['Card rank', 'A (high) K Q J 10 … 2 (low)'],
+      ['You hold the suit led', 'you must play a card of that suit'],
+      ['You don’t', 'play any card; any {=spade} beats every card of another suit'],
+      ['Trick winner', 'highest {=spade}; if no {=spade}, highest card of the suit led'],
     ],
   },
 
-  example: 'Ana bids 4 and partner Raj bids 3: the team needs **7**. They take 9: 70 + 2 {=bag} = 72. They already had 9 bags, now 11: they lose **100** and carry 1 {=bag} forward.',
+  example: 'Ana bids 4 and partner Raj bids 3: the team needs **7**. They win 9 tricks: 70 + 2 for the 2 extra tricks = 72, and 2 {=bag}. They already had 9 bags, so now 11: they lose **100** points and keep 1 {=bag}.',
 
   setup: [
-    'Partners sit across. Deal all 52 cards, 13 each.',
-    'Score pad: two columns per team, score and bags.',
-    'The deal passes left after every hand.',
+    '4 players in 2 teams; partners sit across from each other. Choose a first dealer, who deals all 52 cards, 13 each.',
+    'On paper, keep two numbers for each team: its score and its bag count.',
+    'After every hand, the player to the dealer’s left becomes the new dealer.',
   ],
 
   terms: [
     ['{=trick} Trick', 'One card from each player; highest {=spade}, else highest of the suit led, wins.'],
-    ['{=spade} Trump', 'Spades beat any card of another suit.'],
-    ['{=bag} Bag', 'A trick above your team’s bid: +1, but every 10 cost 100.'],
-    ['{=nil} Nil', 'A bid to take **zero** tricks: +100 if you do, −100 if not.'],
-    ['Broken', 'Spades are broken once one has been played on a trick.'],
+    ['Lead', 'Play the first card of a trick. Its suit is the suit led.'],
+    ['Follow suit', 'Play a card of the suit led. Required if you have one.'],
+    ['{=spade} Trump', 'Spades are trump: any spade beats any card of another suit.'],
+    ['{=bag} Bag', 'Each trick your team wins above its bid: +1 point, but every 10 bags cost 100.'],
+    ['{=nil} Nil', 'A bid to win **zero** tricks: +100 to your team if you win none, −100 if you win any.'],
+    ['Broken', 'Spades are broken once any spade has been played on a trick.'],
   ],
 
   gotchas: [
-    'You can’t **lead** {=spade} until spades are broken, unless your hand is all spades.',
-    'You may only trump when you **can’t** follow the suit led.',
+    'You may not **lead** a {=spade} until spades are broken, unless your hand is all spades.',
+    'You may play a {=spade} on a trick led in another suit only when you have **no** card of the suit led.',
     'A nil bidder’s tricks **don’t** count toward the partner’s bid; they count as {=bag}. Partner’s bid is scored on its own.',
-    '**Blind nil** is bid before looking at your cards, usually only when your team is 100+ behind. After bidding, you and partner swap 2 cards face down.',
+    '**Blind nil** is a nil bid made before you look at your cards; a common rule allows it only when your team is at least 100 points behind. After all bids, you pass 2 cards face down to your partner, then your partner passes 2 cards face down to you.',
   ],
 
   tips: [
     'Count aces and kings as tricks, plus long or high {=spade}. A queen is not a sure trick.',
     'When partner bids {=nil}, play **high** to win the tricks they would be stuck with.',
-    'Once your bid is safe, duck tricks to avoid {=bag}, and push extra tricks on opponents near 10.',
+    'Once your bid is safe, play low cards so you don’t win extra tricks ({=bag}), and force extra tricks on opponents who have nearly 10 bags.',
   ],
 
   walk(A) {
@@ -120,9 +122,9 @@ defineGame({
       { step: 0, say: 'Deal 13 each. Ana’s partner Raj sits across. She has **four {=spade}** and no {=heart}.', svg: board + hand(full) },
       { step: 1, say: 'Ana counts her likely winners and bids **4**.', svg: board + hand(full) + anaBid + A.glow(44, 150, 18) },
       { step: 1, say: 'Raj bids **3**. Partners’ bids add up: the team needs **7** tricks.', svg: board + hand(full) + anaBid + rajBid + A.glow(196, 24, 18) },
-      { step: 2, say: 'Lee leads 5{=heart}; the others follow. Ana has **no hearts**, so she trumps with 3{=spade} and wins the trick.', svg: board + hand(rest) + anaBid + rajBid + trick + A.k('h3♠', face(145, 100, '3', '♠', true)) + A.glow(160, 121, 28) },
-      { step: 2, say: 'After 13 tricks, Ana and Raj have **9**: two over their bid.', svg: board + anaBid + rajBid + pile('9') + A.glow(241, 119, 34) },
-      { step: 3, say: '70 + 2 {=bag} = **72**. Bags go from 9 to 11, so they lose **100** and keep 1.', svg: board + anaBid + rajBid + pile('9') + sheet },
+      { step: 2, say: 'Lee leads 5{=heart}; the others follow suit. Ana has **no hearts**, so she may play a spade: her 3{=spade} beats every heart and wins the trick.', svg: board + hand(rest) + anaBid + rajBid + trick + A.k('h3♠', face(145, 100, '3', '♠', true)) + A.glow(160, 121, 28) },
+      { step: 2, say: 'After 13 tricks, Ana and Raj have won **9**: two over their bid.', svg: board + anaBid + rajBid + pile('9') + A.glow(241, 119, 34) },
+      { step: 3, say: '70 for the bid + 2 for the extra tricks = **72**. Their bags go from 9 to 11, so they lose **100** points and keep 1 bag.', svg: board + anaBid + rajBid + pile('9') + sheet },
     ];
   },
 
@@ -159,9 +161,9 @@ defineGame({
     o += A.line(290, 50, 290, 62, { sw: 1.2, stroke: '#a3611f' }) + A.line(294, 50, 294, 62, { sw: 1.2, stroke: '#a3611f' });
     o += A.use(ic.bag.draw(A), 206, 95, 20);
     o += A.note(262, 63, 274, 104, '10 bags = −100', { w: 84 });
-    o += A.note(118, 114, 260, 132, 'Spades always trump', { w: 108 });
+    o += A.note(118, 114, 260, 132, 'Spades beat other suits', { w: 120 });
     o += A.note(171, 145, 260, 168, 'Team bid: 3 + 4 = 7', { w: 108 });
-    o += A.note(41, 52, 46, 18, 'Nil: take zero', { w: 84 });
+    o += A.note(41, 52, 46, 18, 'Nil: win 0 tricks', { w: 88 });
     return o;
   },
 });

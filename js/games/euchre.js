@@ -28,33 +28,33 @@ defineGame({
 
   pitch: 'Partners name trump and try to win 3 of 5 tricks with a 24-card deck. First team to 10 points wins.',
 
-  goal: { big: '10 points', text: 'First team to **10** wins. The team that names trump (the **makers**) must take at least 3 of the 5 tricks.' },
+  goal: { big: '10 points', text: 'Play in 2 teams of 2. Each hand, one team chooses the **trump** suit (the suit that beats all others); that team, the **makers**, must win at least 3 of the 5 tricks (rounds of 1 card from each player). First team to **10** points wins.' },
 
   turn: {
     type: 'round',
     intro: 'Each hand goes through these phases:',
     steps: [
-      { verb: 'Deal', text: 'Deal **5** each. Turn up the top card of the 4 left over: the {upcard}.' },
-      { verb: 'Make trump', text: 'Round 1, from dealer’s left: **order up** the {=upcard} (dealer adds it to hand and discards 1) or pass. If all 4 pass, turn it down. Round 2: name another suit or pass.' },
-      { verb: 'Go alone?', text: 'The maker may play {=alone} **alone**: partner sits out for a bigger reward.' },
-      { verb: 'Play tricks', text: 'Dealer’s left leads; if someone is alone, the player on the loner’s left leads. Clockwise, follow suit if you can. Highest trump wins, else highest card of the suit led.' },
-      { verb: 'Score', text: 'Makers with 3+ tricks score 1, 2 or 4 (table below); with fewer, defenders score 2.' },
+      { verb: 'Deal', text: 'The dealer deals **5** cards to each player. Place the 4 left-over cards face down and turn the top one face up: this is the {upcard}.' },
+      { verb: 'Make trump', text: 'Bidding round 1: starting with the player to the dealer’s left and going clockwise (dealer last), each player either passes or **orders up** the {=upcard}, making its suit trump; the dealer then adds the upcard to their hand and discards 1 card face down. If all 4 pass, turn the upcard face down. Bidding round 2: in the same order, each player either passes or names a different suit as trump. Bidding stops as soon as one player chooses trump; that player’s team are the makers.' },
+      { verb: 'Go alone?', text: 'The player who chose trump may announce {=alone} **going alone**: their partner puts their cards face down and sits out this hand, for a bigger reward (see Scoring).' },
+      { verb: 'Play tricks', text: 'In a **trick**, each player in the hand plays 1 card face up, clockwise. The player to the dealer’s left **leads** (plays first to) the first trick; if someone is going alone, the player to the loner’s left leads instead. Each other player must **follow suit** (play a card of the suit led) if able; otherwise they may play any card, including a trump. The highest trump wins the trick; if no trump was played, the highest card of the suit led wins. The winner leads the next trick. Play 5 tricks.' },
+      { verb: 'Score', text: 'If the makers won 3 or more tricks, they score 1, 2 or 4 points (see Scoring). If they won fewer than 3, they are **euchred** and the other team (the **defenders**) scores 2.' },
     ],
   },
 
   tension: 'You choose trump seeing only 5 cards: pass and the opponents may pick a suit you are weak in; call too boldly and you get euchred for 2.',
 
   structure: [
-    { label: 'Hand', repeat: 'until 10', text: 'Deal 5 each → make trump (up to 2 rounds) → play 5 tricks → score. Deal passes left.' },
-    { label: 'Game end', text: 'First team to **10** wins.' },
+    { label: 'Hand', repeat: 'until 10', text: 'Deal 5 cards each, choose trump (up to 2 bidding rounds), play 5 tricks, score. The player to the dealer’s left deals the next hand.' },
+    { label: 'Game end', text: 'The first team to reach **10** points wins.' },
   ],
 
   points: [
-    ['Makers take 3–4', '1'],
-    ['Makers take 5 (march)', '2'],
-    ['{=alone} Alone, take 5', '4'],
-    ['{=alone} Alone, take 3–4', '1'],
-    ['Makers take 0–2 (euchred)', 'defenders get 2'],
+    ['Makers win 3 or 4 tricks', '1 point to the makers'],
+    ['Makers win all 5 (a march)', '2 points to the makers'],
+    ['{=alone} Loner wins all 5', '4 points to the loner’s team'],
+    ['{=alone} Loner wins 3 or 4', '1 point to the loner’s team'],
+    ['Makers win 0–2 (euchred)', '2 points to the defenders'],
   ],
 
   end: { trigger: 'a team reaches 10 points' },
@@ -66,39 +66,41 @@ defineGame({
   ],
 
   ref: {
-    title: 'Card order (hearts trump)',
+    title: 'Card order, high to low (if hearts are trump)',
     rows: [
       ['{=heart} trump', '{=right} {=left} A K Q 10 9'],
-      ['{=diamond} (same colour)', 'A K Q 10 9 (its J is the {=left})'],
+      ['{=diamond} (same colour)', 'A K Q 10 9 (its J becomes the {=left}, a heart)'],
       ['{=spade} {=club}', 'A K Q J 10 9'],
     ],
   },
 
-  example: 'Sam deals and turns up **9{=heart}**. Kim holds J{=heart} J{=diamond} A{=heart}, so she orders it up; Sam takes the 9{=heart} and discards a club. With {=heart} trump, Kim’s jacks are the top two cards. Her team takes 4 tricks: **1 point**.',
+  example: 'Sam deals and turns up **9{=heart}**. Kim holds J{=heart} J{=diamond} A{=heart}, so she orders it up; Sam adds the 9{=heart} to his hand and discards a club. With {=heart} trump, Kim’s jacks are the top two cards. Her team wins 4 tricks: **1 point**.',
 
   setup: [
-    'Use only 9, 10, J, Q, K, A of each suit: 24 cards. Partners sit across.',
-    'Deal 5 each in packets of 3 and 2. Put the last 4 face down and turn the top one up.',
-    'Each team keeps score with a spare 6 and 4, sliding one over the other to show pips.',
+    'Use only 9, 10, J, Q, K, A of each suit: 24 cards. 4 players in 2 teams; partners sit across from each other.',
+    'Choose a first dealer. The dealer deals 5 cards to each player in packets of 3 and 2. Put the last 4 cards face down and turn the top one face up.',
+    'Each team keeps score with a spare 6 and 4 card, placing one over the other so that the number of suit symbols showing equals the team’s score.',
   ],
 
   terms: [
     ['Trump', 'The suit that beats all others this hand.'],
-    ['{=right} Right bower', 'Jack of trump: the highest card.'],
-    ['{=left} Left bower', 'Other jack of the same colour: second highest, and it counts as trump.'],
+    ['Makers / defenders', 'The team that chose trump / the other team.'],
+    ['{=right} Right bower', 'The jack of the trump suit: the highest card. (“Bower” means one of the two top jacks.)'],
+    ['{=left} Left bower', 'The other jack of the same colour as trump: the second-highest card. It counts as a trump, not as its printed suit.'],
     ['Order up', 'Tell the dealer to pick up the {=upcard}, making its suit trump.'],
-    ['Euchred', 'Makers took fewer than 3 tricks; defenders score 2.'],
+    ['Euchred', 'Makers won fewer than 3 tricks; defenders score 2.'],
+    ['{=alone} Going alone', 'The player who chose trump plays without their partner; the loner’s team scores 4 for winning all 5 tricks.'],
   ],
 
   gotchas: [
-    'The {=left} left bower **changes suit**: with {=heart} trump, J{=diamond} is a heart. It must follow a heart lead and can’t follow diamonds.',
+    'The {=left} left bower **changes suit**: with {=heart} trump, J{=diamond} is a heart. When hearts are led it counts as a heart you hold; when diamonds are led it does not count as a diamond.',
     'In round 2 you **can’t** name the suit that was turned down.',
-    'If all 4 pass twice, the hand is thrown in and the deal passes left. Common variant, “stick the dealer”: in round 2 the dealer can’t pass and must name a suit.',
+    'If all 4 players pass in both bidding rounds, the cards are collected and the player to the dealer’s left deals a new hand. Common variant, “stick the dealer”: if the other 3 pass in round 2, the dealer may not pass and must name a suit.',
   ],
 
   tips: [
     'Both bowers plus an ace is a strong call; 3 trumps and an off-suit ace usually make 3 tricks.',
-    'As maker, lead trump early to pull the opponents’ trumps.',
+    'As maker, lead trump early to force the opponents to play their trumps.',
     'Ordering up for an **opponent** dealer hands them a trump: you need a stronger hand than when partner deals.',
   ],
 
@@ -129,7 +131,7 @@ defineGame({
       { step: 1, say: 'Kim speaks first. With {=heart} trump, J{=heart} and J{=diamond} become the top two cards ({=right} {=left}), so she **orders it up**.', svg: board + mine('', true) + kitty + up + bowers },
       { step: 1, say: 'Sam takes 9{=heart} into his hand and discards one face down. **Hearts** are trump.', svg: board + mine() + kitty + discard + A.k('up', face(274, 110, '9', '♥')) },
       { step: 2, say: 'Kim could go {=alone} **alone** for 4 points, but keeps partner Pat in.', svg: board + mine() + kitty + discard + A.k('up', face(274, 110, '9', '♥')) + alone + A.glow(153, 25, 24) },
-      { step: 3, say: 'Kim leads J{=heart}, the {right}. Everyone must follow with hearts; nothing beats it.', svg: board + mine('J♥') + kitty + discard + played + A.glow(160, 121, 28) },
+      { step: 3, say: 'Kim leads J{=heart}, the {right}. Everyone who has a heart must play one; nothing beats the right bower.', svg: board + mine('J♥') + kitty + discard + played + A.glow(160, 121, 28) },
       { step: 4, say: 'Kim and Pat take **4** of 5 tricks: **1 point**. All 5 would score 2.', svg: board + A.k('hJ♦', face(96, 150, 'J', '♦')) + kitty + discard + tricks + A.glow(244, 155, 28) },
     ];
   },
@@ -167,7 +169,7 @@ defineGame({
     o += A.note(166, 74, 250, 36, 'Order up this card?', { w: 112 });
     o += A.note(122, 176, 66, 130, 'Right bower: J of trump', { w: 128 });
     o += A.note(151, 176, 248, 136, 'Left bower: same-colour J', { w: 136 });
-    o += A.note(26, 170, 56, 190, '6 + 4 keep score', { w: 100 });
+    o += A.note(26, 170, 56, 190, '6 and 4 cards keep score', { w: 132 });
     return o;
   },
 });

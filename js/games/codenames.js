@@ -32,9 +32,9 @@ defineGame({
     type: 'round',
     intro: 'Teams alternate. On your team’s turn:',
     steps: [
-      { verb: 'Clue', text: 'Your spymaster says **one word and one number**, e.g. “Ocean: 2”. No gestures or other hints.' },
-      { verb: 'Guess', text: 'Operatives discuss and touch one word. The spymaster covers it: {red}, {blue}, {bystander} or {assassin}.' },
-      { verb: 'Continue', text: 'Your agent: guess again, up to **number + 1** guesses; you may stop after any correct guess. Anything else ends the turn.' },
+      { verb: 'Clue', text: 'Your spymaster says **one word and one number**, e.g. “Ocean: 2” (the number is how many of your words the clue is about). No gestures or other hints.' },
+      { verb: 'Guess', text: 'Your operatives discuss, then one of them touches one word. Your spymaster covers that word with the card the key shows for it: {red}, {blue}, {bystander} or {assassin}.' },
+      { verb: 'Continue', text: 'If it is your team’s agent, you may guess again or stop; you may make at most **number + 1** guesses this turn. A bystander or an enemy agent ends your turn at once; the assassin loses the game.' },
     ],
     outro: 'Other team’s turn',
   },
@@ -42,17 +42,17 @@ defineGame({
   tension: 'A clue linking more words gets you ahead faster, but each stretch makes a wrong card, or the assassin, likelier.',
 
   structure: [
-    { label: 'Setup', text: '25 word cards in a 5×5 grid. Both spymasters see one secret {=key}.' },
-    { label: 'Turns', repeat: 'teams alternate', text: 'Clue, then guesses until a miss, a stop, or number + 1 guesses.' },
-    { label: 'Game end', text: 'A team’s last agent is covered: that team wins. The {=assassin} is touched: that team loses.' },
+    { label: 'Setup', text: '25 word cards in a 5×5 grid. Both spymasters look at the same secret {=key}; operatives never see it.' },
+    { label: 'Turns', repeat: 'teams alternate', text: 'One clue, then guesses until the team touches a non-team card, chooses to stop, or has made number + 1 guesses.' },
+    { label: 'Game end', text: 'When a team’s last agent is covered, that team wins. If a team touches the {=assassin}, that team loses at once.' },
   ],
 
   end: {
-    trigger: 'One team has all its agents covered, or someone touches the assassin',
-    detail: 'An enemy agent you touch counts for them, so a team can win on the other team’s turn.',
+    trigger: 'one team has all its agents covered, or someone touches the assassin',
+    detail: 'If you touch an enemy agent, it is covered for the enemy team, so a team can win on the other team’s turn.',
     results: [
       { side: 'Win', text: 'when all your agents are covered.' },
-      { side: 'Lose instantly', text: 'if your operatives touch the {=assassin}.' },
+      { side: 'Lose at once', text: 'if your operatives touch the {=assassin}.' },
     ],
   },
 
@@ -60,32 +60,32 @@ defineGame({
     title: 'The 25 cards (key card)',
     rows: [
       ['{=red} {=blue} Agents', '9 for the starting team (the key card’s border colour), 8 for the other'],
-      ['{bystander}', '7: touching one ends your turn'],
-      ['{assassin}', '1: touching it loses the game'],
-      ['Enemy agent', 'covered for the other team; ends your turn'],
+      ['{bystander}', '7 cards: touching one ends your turn'],
+      ['{assassin}', '1 card: touching it loses the game for your team'],
+      ['Enemy agent', 'touching one covers it for the other team and ends your turn'],
     ],
   },
 
   example: 'Red’s spymaster Zoe says “**Ocean: 2**”, meaning SHARK and PORT. Her team touches SHARK: {=red}, so they continue. Then they touch BEACH: {=bystander}, so the turn ends with PORT still hidden.',
 
   setup: [
-    'Split into two teams; each picks a **spymaster**. Spymasters sit together on one side.',
-    'Lay out 25 word cards in a 5×5 grid.',
-    'Put a random {key} in the stand; its border colour shows which team starts and has 9 agents.',
-    '2–3 players: one team guesses and starts; on each enemy turn its spymaster covers 1 enemy agent of their choice. Lose if all enemy agents are covered first.',
+    'Split into two teams (red and blue); each team picks one **spymaster**. Both spymasters sit together on one side of the table.',
+    'Lay out 25 random word cards face up in a 5×5 grid.',
+    'Put a random {key} in the stand, facing the spymasters only. Its border colour shows which team starts and has 9 agents.',
+    '2–3 players (co-op): play as one team (1 spymaster, the rest operatives) against a simulated enemy team; your team starts. Each time the enemy team would take a turn, your spymaster instead covers **1** enemy agent of their choice. You lose if you touch the assassin or all enemy agents are covered; if you win, your score is the number of enemy agent cards left in their stack. 3 players may instead compete: 2 spymasters share 1 operative who guesses for both teams.',
   ],
 
   terms: [
-    ['Spymaster', 'Sees the key card; gives clues, never guesses.'],
-    ['Operatives', 'Everyone else; they guess from the clue.'],
-    ['{=key} Key card', 'Secret map of which grid spot is red, blue, bystander or assassin.'],
+    ['Spymaster', 'One per team. Sees the key card; gives clues, never guesses.'],
+    ['Operatives', 'Everyone on a team except its spymaster; they guess from their spymaster’s clue.'],
+    ['{=key} Key card', 'Secret map, seen only by the spymasters, of which grid spot is red, blue, bystander or assassin.'],
     ['{=bystander} Bystander', 'Neutral card; touching it ends your turn.'],
   ],
 
   gotchas: [
-    'The clue must be about **meaning** and can’t be any word visible on the table (or part of one). An illegal clue ends the turn, and the other spymaster covers one of their agents.',
-    'You must make **at least one** guess. The “+1” lets you catch a word from an earlier clue.',
-    'Clue numbers **0** and **unlimited** are legal: operatives may then guess with no limit.',
+    'The clue must be about **meaning** and can’t be any word visible on the table (or part of one). An illegal clue ends that team’s turn at once, and the other team’s spymaster covers one of their own team’s agents.',
+    'Each turn, your team must make **at least one** guess. The “+1” lets you catch a word from an earlier clue.',
+    'Clue numbers **0** and **unlimited** are legal: operatives may then make as many guesses as they like (still at least one).',
   ],
 
   tips: [

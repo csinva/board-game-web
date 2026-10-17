@@ -30,34 +30,34 @@ defineGame({
 
   turn: {
     type: 'choose',
-    intro: 'Use ONE of your 5 action cards; its slot (1–5) is its strength. (Or instead: move any card to slot 1 and take 1 X-token, unless you already hold 5.)',
-    outro: 'Used card moves to slot 1; the cards that were left of it shift right',
+    intro: 'On your turn, use exactly ONE of your 5 action cards; the slot it sits in (1–5) is its strength. Instead, you may move any 1 action card to slot 1 and take 1 X-token; you can’t do this if you already hold 5. After either, the card you used or moved goes to slot 1, and each card that was to its left moves 1 slot right.',
+    outro: 'Used card → slot 1 · next player clockwise',
     steps: [
-      { verb: 'Animals', text: 'Pay an animal’s {money} cost and place it in an **empty {=enclosure} enclosure** at least its size; gain its {appeal}. The card’s table says how many animals per strength.' },
-      { verb: 'Cards', text: 'Advance the break **2**, then draw from the deck (more at higher strength; the table may make you discard 1). At strength 5, instead take any 1 display card (**snap**).' },
-      { verb: 'Build', text: 'Build **one** {enclosure}, {kiosk}, pavilion or petting zoo of size ≤ strength; pay 2 {=money} per space.' },
-      { verb: 'Association', text: 'Place a worker on **one** task of value ≤ strength: **2** +2 {reputation}, **3** partner zoo, **4** university, **5** support a **conservation project** for {=conservation}.' },
-      { verb: 'Sponsors', text: 'Play one sponsor card of level ≤ strength, **or** advance the break that many spaces and take that much {=money}.' },
+      { verb: 'Animals', text: 'Play animals from your hand; the Animals card shows how many at this strength. For each, pay its {money} cost and place it in an **empty {=enclosure} standard enclosure** at least as large as its size, meeting any other requirements on the card; gain its {appeal}.' },
+      { verb: 'Cards', text: 'Move the break token **2** spaces. Then draw from the deck as many cards as the Cards card shows for this strength (at some strengths you then discard 1). At strength 5 you may instead take any 1 face-up card from the display (**snap**).' },
+      { verb: 'Build', text: 'Build **1** {enclosure}, {kiosk}, pavilion or petting zoo that covers at most as many spaces as the strength; pay 2 {=money} per space covered.' },
+      { verb: 'Association', text: 'Place 1 worker on **1** task whose value is at most the strength: value **2** = gain 2 {reputation}, **3** = take a partner zoo, **4** = take a university, **5** = support a **conservation project** for {=conservation}.' },
+      { verb: 'Sponsors', text: 'Play 1 sponsor card from your hand whose level is at most the strength, **or** move the break token as many spaces as the strength and take that much {=money}.' },
     ],
   },
 
   tension: 'Each turn: use a strong card now and reset it to strength 1, or a weak one so your strong cards keep climbing.',
 
   structure: [
-    { label: 'Setup', text: 'Zoo maps, action cards, 25 {=money}, keep 4 of 8 cards, 2 final-scoring cards (details below).' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Each turn: one action card, or take an {=xtoken}. No rounds.' },
-    { label: 'Break', repeat: 'when the break token reaches the end', text: 'After the turn that triggers it, that player takes an {=xtoken} (max 5). Then everyone: discard to **3** cards; remove multiplier, venom and constriction tokens; take back association workers (refill partner zoos and universities); discard display folders 1–2 and refill; take income: {=money} by appeal, kiosks, and income icons. Reset the break token.' },
+    { label: 'Setup', text: 'Each player gets a zoo map, 5 action cards and 25 {=money}, keeps 4 of 8 drawn cards, and gets 2 final-scoring cards (see Setup).' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Players take turns clockwise. Each turn: use 1 action card, or take the X-token action. There are no rounds.' },
+    { label: 'Break', repeat: 'when the break token reaches the end', text: 'Finish the turn in which the break token reached the last space; that player takes 1 {=xtoken} (if they hold fewer than 5). Then, in order: everyone discards down to **3** cards in hand; remove all multiplier, venom and constriction tokens; everyone takes back their association workers (and refill the partner zoos and universities); discard the cards in display folders 1 and 2 and refill the display; everyone takes income: {=money} for their appeal, kiosks and income icons. Move the break token back to its start space.' },
     { label: 'Tracks cross', text: 'When a player’s {=appeal} and {=conservation} markers share a scoring area or pass each other (checked at the end of a turn or in a break), the end is triggered.' },
-    { label: 'Final scoring', text: 'Add final-scoring cards and end-of-game card effects. Score = appeal minus the target number of your conservation space; highest wins.' },
+    { label: 'Final scoring', text: 'Add final-scoring cards and end-of-game card effects. Score = your appeal minus the lowest appeal value in the scoring area where your conservation marker is; highest wins.' },
   ],
 
   points: [
-    ['{=appeal} Appeal', 'Printed on animals (+ some sponsors); pavilions 1 each; reputation past 15 gives 1 per step; covering your whole map +7.'],
+    ['{=appeal} Appeal', 'Printed on animals (and some sponsors); 1 per pavilion; each reputation step you would gain past 15 gives 1 appeal instead; covering your whole map +7.'],
     ['{=conservation} Conservation (CP)', 'Supporting projects, donations, some animals, sponsors and bonuses.'],
     ['CP value', 'The 1st–10th CP are worth 2 points each, every later CP 3 (the scoring areas on the board).'],
-    ['Final-scoring card', '1–4 CP for its condition. You hold 2; when anyone first reaches 10 CP (or at game end if no one did), everyone discards 1.'],
+    ['Final-scoring card', '1–4 CP for its condition. You hold 2. The first time any player reaches 10 CP, every player discards 1 of theirs; if no one reaches 10, everyone discards 1 at game end.'],
     ['End-of-game effects', 'Some sponsors give appeal or CP at game end.'],
-    ['Final score', 'Your appeal minus the lowest appeal value in your conservation marker’s scoring area; can be negative. Tie: most conservation projects supported, then shared.'],
+    ['Final score', 'Your appeal minus the lowest appeal value in your conservation marker’s scoring area; can be negative. Tie: the tied player who supported the most conservation projects wins; if still tied, they share the win.'],
   ],
 
   end: { trigger: 'one player’s appeal and conservation markers meet in one scoring area or pass each other', detail: 'If this happens at the end of your turn, every other player takes one more turn; if during a break, everyone (you too) takes one more turn. Then final scoring.' },
@@ -71,38 +71,39 @@ defineGame({
     title: 'Tokens and scoring',
     rows: [
       ['Tokens', '{money} {appeal} {conservation} {reputation} {xtoken}'],
-      ['{=enclosure} Build', '2 {=money} per space; size ≤ strength'],
+      ['{=enclosure} Build', '2 {=money} per space; size at most the strength'],
       ['{=conservation} 1st–10th CP', '{=vp}{=vp} each'],
       ['{=conservation} Every CP after 10', '{=vp}{=vp}{=vp} each'],
       ['{=reputation} Association', '**2** +2 reputation · **3** partner zoo · **4** university · **5** project'],
-      ['{=xtoken} X-token', '+1 strength each, any number per action; hold up to 5'],
+      ['{=xtoken} X-token', 'when using an action card, spend any number: +1 strength each; you can hold at most 5'],
     ],
   },
 
   example: 'Build is in slot **4**. You build a size‑4 enclosure for 8 money, ready for the big cat in your hand. Build drops to slot 1 and the cards that were left of it shift right, so next turn Animals is stronger: pay the cat’s cost and gain its **{appeal}**.',
 
   setup: [
-    'Put the break token on the start space for your player count. Place 4 random bonus tiles, the 6-card display, and the association board with 1 partner zoo per continent, 1 university of each kind and 3 base conservation projects (4 with 4 players).',
+    'Put the break token on the start space for your player count. Place 4 random bonus tiles, 6 face-up cards in display folders 1–6, and the association board with 1 partner zoo per continent, 1 university of each kind and 3 base conservation projects (4 with 4 players).',
     '2 players: cover the left level of the left project, the middle of the middle and the right of the right, plus the left column of donation spaces, with 6 tokens of an unused colour; these are blocked.',
-    'Each player: zoo map (Map A in a first game, with its printed 3-space enclosure), 5 action cards side I (Animals in slot 1, the rest random), 25 {=money}, 7 player tokens on the map’s left edge, 1 active worker (3 more lying below).',
-    'Draw 8 cards and keep 4; draw 2 final-scoring cards and keep both secret.',
-    'Conservation and reputation markers on their first spaces; {=appeal} appeal at 0, 1, 2, 3 in turn order.',
+    'Each player: zoo map (Map A in a first game, with its printed 3-space enclosure), 5 action cards side I (Animals in slot 1, the rest random), 25 {=money}, 7 player tokens on the map’s left edge, 1 active association worker (the other 3 lie below it, inactive until you activate them).',
+    'Each player draws 8 cards, keeps 4 and discards 4; then draws 2 final-scoring cards and keeps both secret.',
+    'Each player puts their conservation and reputation markers on the first space of those tracks, and their {=appeal} appeal marker on 0, 1, 2 or 3 by turn order (first player 0).',
   ],
 
   terms: [
     ['{=appeal} Appeal', 'Sets your break income; moves toward the conservation marker.'],
     ['{=conservation} Conservation (CP)', 'Points from projects; moves toward appeal from the other end.'],
     ['Strength', 'An action card’s slot number (1–5), +1 per X-token spent; higher is stronger.'],
-    ['Upgrade', 'Flip an action card to side II: from 2 CP, the reputation track, or your 2nd partner zoo or 2nd university.'],
-    ['{=reputation} Reputation', 'Your reach into the display: folders up to your marker. Max 9 until Cards is upgraded.'],
+    ['Break', 'Shared timer. Some actions move the break token; when it reaches the last space, a break (cleanup and income) follows that turn.'],
+    ['Upgrade', 'Flip 1 action card of your choice to side II. You earn upgrades by reaching 2 CP, from some reputation spaces, and by taking your 2nd partner zoo and your 2nd university.'],
+    ['{=reputation} Reputation', 'Sets your reach into the display: when an action lets you take display cards, you may take them from folders up to your reputation range. It can’t pass 9 until Cards is upgraded.'],
   ],
 
   gotchas: [
-    'Using a card resets it to **slot 1**; only the cards left of it shift right.',
+    'Using a card moves it to **slot 1**; only the cards that were left of it shift 1 slot right. Cards right of it stay put.',
     'Animals need an **empty** enclosure **at least their size**, sometimes next to {water} or {rock}; one animal per standard enclosure.',
     'Each conservation project level goes to only **one** player, and you may support each project only **once**.',
-    'Every Cards action advances the break **2**; at the break, hand limit is **3**.',
-    'Association: placing on a task where you already have a worker costs **2** workers; other colours don’t count.',
+    'Every Cards action moves the break token **2** spaces; at each break, everyone discards down to **3** cards.',
+    'Association: placing on a task where you already have 1 worker takes **2** workers; other players’ workers there don’t count.',
   ],
 
   tips: [
@@ -115,10 +116,10 @@ defineGame({
     { title: 'Upgraded action cards', items: [
       'Each action card has a basic side (I) and an upgraded side (II). Upgrades come from 2 CP (or take a worker instead), the reputation track, and your 2nd partner zoo and 2nd university. You can’t upgrade all five.',
       '**Animals II**: may also play animals from the display within reputation range (pay the folder number extra); at strength 5+, gain 1 reputation first.',
-      '**Build II**: several **different** buildings, total size ≤ strength; adds the reptile house and large bird aviary (size 5) and lets you build on spaces marked II.',
-      '**Association II**: several **different** tasks, total value ≤ strength; a project card may come from the display (pay the folder number); plus 1 **donation**: pay the lowest visible amount for 1 CP. 3rd and 4th partner zoos need this side.',
-      '**Cards II**: draw from the display within reputation range and/or the deck; snap from strength 3; reputation can pass 9.',
-      '**Sponsors II**: several sponsors with total level ≤ strength + 1, also from the display (pay the folder number); the break option pays double money.',
+      '**Build II**: several **different** buildings, total size at most the strength; adds the reptile house and large bird aviary (size 5) and lets you build on spaces marked II.',
+      '**Association II**: several **different** tasks, total value at most the strength; a project card may come from the display (pay the folder number); you may also make 1 **donation**: pay the lowest uncovered amount on the donation track for 1 CP. 3rd and 4th partner zoos need this side.',
+      '**Cards II**: draw from the display within reputation range and/or the deck; snap is allowed from strength 3; reputation can pass 9.',
+      '**Sponsors II**: several sponsors with total level at most the strength + 1, also from the display (pay the folder number); the break option pays double money.',
     ] },
     { title: 'Card types', items: [
       '**Animals**: cost, enclosure size and requirements (water or rock nearby, petting zoo, reputation). They give appeal plus continent and category icons.',
@@ -128,20 +129,20 @@ defineGame({
     ] },
     { title: 'Enclosures and buildings', items: [
       'Standard enclosures (size 1–5) hold one animal and flip when filled. Build ahead: each animal needs an empty one. Special enclosures (petting zoo, reptile house, large bird aviary; one each) hold several animals of their type.',
-      '{kiosk}s: at least 2 empty spaces between any two. At each break, each kiosk earns 1 money per adjacent pavilion, special enclosure, unique building or **occupied** standard enclosure. Pavilions give 1 appeal when built.',
+      '{kiosk}s: each kiosk must be at least 3 spaces from every other kiosk, so at least 2 spaces (empty or built on) lie between any 2 kiosks. At each break, each kiosk earns 1 money per adjacent pavilion, special enclosure, unique building or **occupied** standard enclosure. Pavilions give 1 appeal when built.',
       'Pay 2 money per space. Buildings can’t cover {=water} water or {=rock} rock. Your first building must cover a border space; each later one must touch one you have. Covering a bonus space gives its reward once.',
     ] },
     { title: 'Association tasks', items: [
-      'You need an active worker. Place 1 on a task of value ≤ strength: **2** +2 reputation, **3** partner zoo (−3 money per matching continent icon on animals; max 4), **4** university (research icons, reputation; one raises hand limit to 5), **5** support a conservation project.',
+      'You need an active worker. Place 1 on a task whose value is at most the strength: **2** +2 reputation, **3** partner zoo (−3 money per matching continent icon on animals; max 4), **4** university (research icons, reputation; one raises hand limit to 5), **5** support a conservation project.',
       'If 1 of your workers is already on that task, place 2; with 3 of yours there, it is closed until the break. Workers return at each break.',
-      'Supporting a project: play a project card from hand (or support one in play), then cover one unclaimed level whose condition you meet (usually a count of icons on your cards, partner zoos and universities) with a token from your map’s left edge. Gain its CP and the uncovered bonus.',
+      'Supporting a project: play a project card from hand (or support one in play), then cover one unclaimed level whose condition you meet (usually a count of icons on your cards, partner zoos and universities) with a token from your map’s left edge. Gain that level’s CP and the bonus printed on your map under the token you took.',
     ] },
     { title: 'What advances the break', items: [
       'Every Cards action (2), the Sponsors money option (strength) and some card effects. The X-token action does not. The player who moves it onto the last space takes 1 {xtoken}.',
     ] },
     { title: 'Conservation track bonuses', items: [
-      '**2 CP**: upgrade an action card or activate a worker. **5 / 8 CP**: 5 money or a bonus tile there. **10 CP**: the first time anyone reaches it, all players discard 1 final-scoring card.',
-      'Reputation counts to 15; further reputation gives 1 appeal per step.',
+      '**2 CP**: upgrade an action card or activate a worker. **5 CP** and **8 CP**: 5 money, or a bonus tile placed there. **10 CP**: the first time anyone reaches it, all players discard 1 final-scoring card.',
+      'Reputation counts to 15; each step you would gain past 15 gives 1 appeal instead.',
     ] },
   ],
 

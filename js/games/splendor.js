@@ -25,34 +25,34 @@ defineGame({
 
   pitch: 'Take gem tokens to buy cards whose gems discount later buys; first to 15 points ends the game, most points wins.',
 
-  goal: { big: '15 prestige', text: 'Reach **15 prestige points** from cards and nobles. Then finish the round; highest total wins.' },
+  goal: { big: '15 prestige', text: 'Reach **15 prestige points** from cards and nobles. The round is then finished, and the highest total wins.' },
 
   turn: {
     type: 'choose',
     steps: [
-      { verb: 'Take 3', text: 'Take **3 different** gems, e.g. {=red}{=green}{=blue}.' },
-      { verb: 'Take 2', text: 'Take **2 of one colour** ({=red}{=red}), only if that pile has 4 or more.' },
-      { verb: 'Reserve', text: 'Take a face-up card (or a deck’s top card, unseen by others) into your hand, plus 1 {gold} if any are left. Max 3 reserved.' },
-      { verb: 'Buy', text: 'Buy a face-up or reserved {dev}: pay its cost minus your card **bonuses**, {=gold} as any gem; spent tokens go back to the bank. Refill the gap from that level’s deck.' },
+      { verb: 'Take 3', text: 'Take 1 gem token each of **3 different** colours from the bank, e.g. {=red}{=green}{=blue}. Never {=gold}.' },
+      { verb: 'Take 2', text: 'Take **2 tokens of one colour** ({=red}{=red}), only if that pile has at least 4 tokens before you take. Never {=gold}.' },
+      { verb: 'Reserve', text: 'Take 1 face-up card, or the top card of any level’s deck without showing it, into your hand. If you took a face-up card, refill its gap from that level’s deck. Also take 1 {gold} if any are left. You can’t reserve if you already hold 3 reserved cards.' },
+      { verb: 'Buy', text: 'Buy 1 face-up {dev} or 1 of your reserved cards: pay its cost minus your **bonuses**; each {=gold} pays for 1 gem of any colour. Paid tokens go back to the bank. Place the card face up in front of you, and refill a face-up gap from that level’s deck.' },
     ],
-    outro: 'Then a noble visits if you meet its requirement. Next player.',
+    outro: 'Then: a noble may visit · cut tokens to 10 · next player clockwise',
   },
 
   tension: 'Cheap no-point cards build the discounts that make big cards affordable, but every building turn is a turn not scoring, and rivals can take the card you were saving for.',
 
   structure: [
-    { label: 'Setup', text: '4 face-up cards per level; nobles = players + 1; tokens by player count (table).' },
-    { label: 'Turns', repeat: 'clockwise', text: 'One action: take 3, take 2, reserve or buy. Then a {=noble} may visit; return tokens over 10.' },
-    { label: 'Last round', text: 'Someone reaches **15**: finish the round so everyone has had equal turns.' },
-    { label: 'Game end', text: 'Most prestige wins. Tie: fewest development cards.' },
+    { label: 'Setup', text: 'Lay out 4 face-up cards per level; reveal 1 more {=noble} than there are players; set out tokens for the player count (see table).' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Each turn, exactly 1 action: take 3, take 2, reserve or buy. Then a {=noble} may visit, and you return tokens above 10.' },
+    { label: 'Last round', text: 'When a player reaches **15** or more points, finish the current round, so everyone has had the same number of turns.' },
+    { label: 'Game end', text: 'Most prestige wins. Tie: the tied player with the fewest development cards wins.' },
   ],
 
   points: [
     ['{=dev} Development card', 'points printed on it: level 1 = 0–1, level 2 = 1–3, level 3 = 3–5'],
-    ['{=noble} Noble', '3 points; visits when your card bonuses meet its requirement'],
+    ['{=noble} Noble', '3 points each; a noble visits you when your card bonuses meet its requirement'],
   ],
 
-  end: { trigger: 'a player reaches 15 prestige', detail: 'Finish the round so everyone has had the same number of turns. Tie: fewest development cards.' },
+  end: { trigger: 'a player reaches 15 or more prestige', detail: 'Finish the round so everyone has had the same number of turns. Tie: the tied player with the fewest development cards wins.' },
   scoring: [
     { label: 'Level 2–3 cards', share: 6 },
     { label: '{=noble} Nobles', share: 3 },
@@ -70,26 +70,26 @@ defineGame({
     ],
   },
 
-  example: 'A level 2 red card costs {=white} {=blue}{=blue}{=blue}{=blue} {=green}{=green} and is worth **2 points**. Your bonuses cover 1 white, 3 blue and 1 green, so you pay only {=blue}{=green}. Its red bonus completes a noble’s requirement: she visits for **+3**.',
+  example: 'A level 2 red card costs {=white} {=blue}{=blue}{=blue}{=blue} {=green}{=green} and is worth **2 points**. Your cards give bonuses of 3 white, 3 blue and 1 green, which cover 1 white, 3 blue and 1 green of the cost, so you pay only {=blue}{=green}. Its red bonus completes a noble’s requirement: she visits for **+3**.',
 
   setup: [
-    'Shuffle each level’s deck; lay out 4 face-up cards per level.',
-    'Reveal nobles equal to players + 1.',
+    'Shuffle each level’s deck separately; lay out 4 face-up cards from each level.',
+    'Reveal noble tiles: 1 more than the number of players.',
     'Set out gem tokens for your player count (table), plus all 5 {gold}.',
     'Youngest player goes first; play passes clockwise.',
   ],
 
   terms: [
-    ['Bonus', 'Gem on a card you own: a permanent 1-gem discount of that colour.'],
-    ['{=noble} Noble', 'Visits automatically when your bonuses meet its requirement.'],
-    ['Reserve', 'Take a card into your hand to buy later, plus a gold.'],
+    ['Bonus', 'The gem printed on a card you own: a permanent discount of 1 gem of that colour on every purchase.'],
+    ['{=noble} Noble', 'Visits automatically at the end of your turn when your bonuses meet its requirement; at most 1 per turn.'],
+    ['Reserve', 'Take a card into your hand to buy later, plus 1 gold if any are left.'],
     ['{=gold} Gold', 'Wild token; spends as any gem.'],
   ],
 
   gotchas: [
-    '**Take 2** needs 4+ tokens in that pile before you take.',
+    '**Take 2** needs at least 4 tokens in that pile before you take.',
     'Hold at most **10 tokens**, {=gold} included; return extras of your choice at the end of your turn.',
-    'Nobles count **card bonuses only**, never tokens. A noble can’t be refused; one per turn, and if you qualify for several, choose.',
+    'Nobles count **card bonuses only**, never tokens. You can’t refuse a noble. At most 1 noble visits you per turn; if you qualify for several, you choose which.',
     '{=gold} comes only from reserving. Reserved cards stay in your hand until bought; you can’t discard them.',
   ],
 

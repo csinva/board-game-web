@@ -31,74 +31,75 @@ defineGame({
 
   pitch: 'Attack rival planets with ships, allies and a hidden card; every alien breaks one rule. First to 5 foreign colonies wins.',
 
-  goal: { big: '5 colonies', text: 'Have ships on **5 planets outside your home system**. Allies land with the winner, so several players often win **together**.' },
+  goal: { big: '5 colonies', text: 'Have at least 1 ship on each of **5 planets outside your home system**. Allies of a winning attacker land with it, so several players often win **together**.' },
 
   turn: {
     type: 'sequence',
     intro: 'Your turn is an encounter with one other player:',
     steps: [
-      { verb: 'Destiny', text: 'Take 1 {=ship} back from the warp, then draw a {destiny}: attack the system of that colour (wild: anyone; your own colour: a foreign colony in your system, or redraw).' },
-      { verb: 'Launch', text: 'Aim the {=gate} **hyperspace gate** at one of that player’s planets and put **1–4** {=ship} in it.' },
-      { verb: 'Ally', text: 'Invite allies, then the defender does. Each invited player may send **1–4** {=ship} to one side.' },
-      { verb: 'Reveal', text: 'You and the defender each play an **encounter card** ({=atk} or {=nego}) face down, then flip. Total = card + ships on your side.' },
-      { verb: 'Resolve', text: 'Higher total wins; ties go to the defender. The losing side’s ships, allies included, go to the {=warp}. A winning offense and its allies land; a winning defense’s allies earn **rewards**. Won or made a deal? Take **one more encounter**.' },
+      { verb: 'Destiny', text: 'Take 1 of your {=ship} back from the warp and put it on any of your colonies (home or foreign). Then draw the top {destiny}. You must attack the player of that colour in their home system. Wild: attack any player you choose. Your own colour: attack another player’s colony in your home system, or draw again.' },
+      { verb: 'Launch', text: 'Point the {=gate} **hyperspace gate** at one planet in that player’s home system and put **1–4** of your {=ship} into it, taken from any of your colonies (home or foreign).' },
+      { verb: 'Ally', text: 'You invite any players to ally with you; then the defender invites any players. Then, starting with the player to your left and going clockwise, each invited player either declines or joins one side that invited them and sends **1–4** {=ship} from their colonies, before the next player decides.' },
+      { verb: 'Reveal', text: 'You and the defender each play 1 **encounter card** ({=atk}, {=nego} or {=morph}) face down, then flip both at once. With an attack card, your total is its number plus every ship on your side, allies’ included.' },
+      { verb: 'Resolve', text: 'The higher total wins; on a tie the defender wins. Every ship on the losing side, allies’ included, goes to the {=warp}. If the offense wins, it and its allies land their ships on the planet. If the defense wins, its allies earn **rewards**. If you won or made a deal, you may have **1 more encounter** (at most 2 per turn).' },
     ],
   },
 
   tension: 'You need allies’ ships to win, but each ally who lands with you also gains a colony, moving a rival closer to winning.',
 
   structure: [
-    { label: 'Setup', text: 'Each player: 5 home planets with 4 {=ship} each, 1 alien power, 8 cards.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Each turn is 1 encounter; win it (or make a deal) for a 2nd.' },
-    { label: 'Game end', text: 'Someone has 5 foreign {=colony}; everyone reaching 5 in that encounter wins.' },
+    { label: 'Setup', text: 'Each player gets 5 home planets with 4 {=ship} on each, 1 alien power and 8 cards.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Each turn is 1 encounter; if you win it or make a deal, you may have a 2nd.' },
+    { label: 'Game end', text: 'A player has 5 foreign {=colony}; every player who reached 5 in that encounter wins.' },
   ],
 
   end: {
     trigger: 'someone has 5 foreign colonies',
-    detail: 'Check after each encounter.',
+    detail: 'Check colony counts after each encounter.',
     results: [
-      { side: 'Shared win', text: 'everyone who reaches 5 in the same encounter wins together.' },
+      { side: 'Shared win', text: 'every player who reaches 5 foreign colonies in the same encounter wins together.' },
     ],
   },
 
   ref: {
     title: 'Card types',
     rows: [
-      ['{=atk} Attack 00–40', 'Add the number to your ships. Higher total wins.'],
-      ['{=nego} Negotiate', 'Loses to an attack, but takes 1 card from the winner per ship lost. Two negotiates = make a deal.'],
-      ['{=morph} Morph', 'Copies the opponent’s card.'],
-      ['{=reinf} Reinforcement', 'After reveal, main players or allies add +2, +3 or +5 to either side.'],
-      ['{=artifact} Artifact', 'One-off effect, e.g. cancel a power.'],
-      ['{=flare} Flare', 'Bonus tied to one alien; stronger if it’s yours.'],
+      ['{=atk} Attack 00–40', 'Your total is this number plus your side’s ships. Higher total wins.'],
+      ['{=nego} Negotiate', 'Loses to an attack card, but you then take 1 card from the winner per ship you lost. If both main players play one, they try to make a deal.'],
+      ['{=morph} Morph', 'Becomes a copy of the card your opponent played.'],
+      ['{=reinf} Reinforcement', 'After the encounter cards are flipped, a main player or ally may play it to add 2, 3 or 5 (as printed) to either side’s total.'],
+      ['{=artifact} Artifact', 'One-time effect, e.g. cancel an alien power.'],
+      ['{=flare} Flare', 'Linked to one alien. Any other player may use its Wild effect; the player with that alien uses its stronger Super effect.'],
     ],
   },
 
-  example: 'Maya draws a **green** {=destiny} and aims the gate at Ben’s ice planet with 3 {=ship}. She invites Raj, who adds 2. Maya flips **Attack 12**: 12 + 3 + 2 = **17**. Ben has 4 ships there and flips Attack 10: **14**. Maya and Raj land and gain 1 {=colony} each; Ben’s 4 ships go to the {=warp}.',
+  example: 'Maya draws a **green** {=destiny}, Ben’s colour, and aims the gate at Ben’s ice planet with 3 {=ship}. She invites Raj, who adds 2. Maya flips **Attack 12**: 12 + 3 + 2 = **17**. Ben has 4 ships there and flips Attack 10: **14**. Maya and Raj land and gain 1 {=colony} each; Ben’s 4 ships go to the {=warp}.',
 
   setup: [
     'Each player takes 5 planets in their colour with 4 {=ship} on each (20 ships).',
-    'Deal 2 flares each; take those 2 aliens, keep 1. Shuffle the flares into the cosmic deck (10 in total) and deal 8 cards each.',
-    'Remove unused colours from the destiny deck and shuffle it. Draw until a player colour appears: that player goes first.',
+    'Deal 2 flare cards to each player. Each player takes the 2 aliens named on them, secretly keeps 1 and returns the other. Shuffle all dealt flares (both per player) into the cosmic deck; with fewer than 5 players, add random unused flares until the deck holds 10. Then deal 8 cards to each player.',
+    'Remove the cards of unused colours from the destiny deck and shuffle it. Draw destiny cards until one shows a player’s colour: that player goes first, then play goes clockwise.',
   ],
 
   terms: [
-    ['{=colony} Colony', 'Your ships on a planet. Colonies outside your home system count toward the 5.'],
-    ['{=warp} Warp', 'Where lost ships go. Take 1 back at the start of each of your turns.'],
+    ['Offense / defense', 'The player whose turn it is (the offense) and the player they attack (the defense) are the **main players**; each side also includes its allies.'],
+    ['{=colony} Colony', '1 or more of your ships on a planet. Colonies outside your home system (foreign colonies) count toward the 5.'],
+    ['{=warp} Warp', 'Where lost ships go. At the start of each of your turns, take 1 of your ships back from it onto any of your colonies.'],
     ['{=gate} Hyperspace gate', 'The cone holding the attacking ships, pointed at the target planet.'],
-    ['Defender reward', 'When the defense wins, each defensive **ally** gets 1 card or 1 ship back from the warp per ship it sent.'],
+    ['Defender reward', 'When the defense wins, each defensive **ally**, for each ship it sent, takes either 1 card from the deck or 1 of its ships back from the warp.'],
   ],
 
   gotchas: [
-    'A {=nego} **negotiate** loses to an attack card, but its player takes **compensation**: 1 random card from the winner per ship lost.',
-    'If both play negotiate, allies go home and you have one minute to deal (trade cards and/or let each other place a colony where you have one); if you fail, **both lose 3 ships** to the warp.',
-    'You draw cards **only** when you need an encounter card and have none (start of your turn, or as defense): show and discard your hand, draw 8. Run out later as offense and your turn ends.',
-    'With fewer than **3 colonies** in your home system you lose your alien power until you regain 3.',
+    'A {=nego} **negotiate** loses to an attack card, but its player takes **compensation**: 1 random card from the winner’s hand for each of their own ships that went to the warp.',
+    'If both main players play negotiate, all allies’ ships return to their colonies and the two of you have 1 minute to make a deal: trade cards, and/or let each other place 1 ship on a planet where the other has a colony. If you don’t agree in time, **each of you loses 3 ships** to the warp.',
+    'You draw new cards **only** when you have no encounter cards at the start of your turn, or when you must defend and have none: show your hand, discard it and draw 8. If you run out of encounter cards as offense at any other point, your turn ends.',
+    'If you have colonies on fewer than **3** of your home planets, your alien power stops working until you have 3 again.',
   ],
 
   tips: [
     'Read every alien power aloud at the start; most surprises come from a forgotten power.',
-    'Defensive allies earn rewards without landing: defending is cheap card draw.',
-    'Watch colony counts. Never ally with anyone at 4 colonies.',
+    'Allying with the defender earns rewards without risking a landing: it is cheap card draw.',
+    'Watch colony counts. Never help a player with 4 foreign colonies win an attack.',
   ],
 
   walk(A) {
@@ -126,18 +127,18 @@ defineGame({
     const atk = (x, n, key) => A.k(key, A.card(x, 122, 34, 48, C.red, { title: 'ATTACK', label: n, size: 15 }));
     const total = (x, s) => A.text(x, 182, s, { size: 9, weight: 800, fill: '#fff' });
     return [
-      { step: 0, say: 'Maya takes 1 {=ship} back from the warp and draws a {=destiny} **destiny card**: green. She must attack Ben.',
+      { step: 0, say: 'Maya takes 1 {=ship} back from the warp and draws a {=destiny} **destiny card**: green, Ben’s colour. She must attack Ben.',
         svg: sp + destiny + ships('m', homeM, MAYA) + ships('r', homeR, RAJ) + ships('b', benOn, BEN) + A.glow(154, 21, 22, 'g-dest') },
       { step: 1, say: 'She aims the **hyperspace gate** at Ben’s ice planet and puts **3** {=ship} in it.',
         svg: sp + destiny + gate + ships('m', gateM, MAYA) + ships('r', homeR, RAJ) + ships('b', benOn, BEN) },
-      { step: 2, say: 'Maya invites allies; Raj sends **2 ships**. Ben invites allies too; nobody joins.',
+      { step: 2, say: 'Maya invites Raj, who sends **2 ships**. Ben invites allies too; nobody joins him.',
         svg: sp + destiny + gate + ships('m', gateM, MAYA) + ships('r', gateR, RAJ) + ships('b', benOn, BEN) },
       { step: 3, say: 'Maya and Ben each pick an **encounter card** and lay it face down.',
         svg: sp + destiny + gate + ships('m', gateM, MAYA) + ships('r', gateR, RAJ) + ships('b', benOn, BEN) + back(118, 'cm') + back(176, 'cb') + A.text(166, 146, 'vs', { size: 10, fill: '#fff' }) },
       { step: 3, say: 'Flip: Maya **12 + 3 + 2 = 17**; Ben **10 + 4 = 14**.',
         svg: sp + destiny + gate + ships('m', gateM, MAYA) + ships('r', gateR, RAJ) + ships('b', benOn, BEN) + atk(118, 12, 'cm') + atk(176, 10, 'cb') + A.text(166, 146, 'vs', { size: 10, fill: '#fff' }) +
           total(135, '= 17') + total(193, '= 14') + A.glow(135, 182, 14, 'g-17') },
-      { step: 4, say: 'Offense wins. Ben’s 4 ships go to the {=warp}; Maya and Raj land and gain a {=colony} each. Maya may have a 2nd encounter.',
+      { step: 4, say: 'Offense wins. Ben’s 4 ships go to the {=warp}; Maya and Raj land and gain 1 {=colony} each. Maya may now have a 2nd encounter.',
         svg: sp + ships('m', landM, MAYA) + ships('r', landR, RAJ) + ships('b', benWarp, BEN) + A.glow(...PB, 32, 'g-pl') },
     ];
   },

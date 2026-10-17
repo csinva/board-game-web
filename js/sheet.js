@@ -32,10 +32,10 @@
 
   function turnDiagram(t) {
     const type = t.type || 'sequence';
-    const intro = t.intro || { sequence: 'On your turn, in order:', choose: 'On your turn, do <b>one</b> of:', simultaneous: 'Everyone plays <b>at the same time</b>:', round: 'Each round:' }[type];
+    const intro = t.intro ? md(t.intro) : { sequence: 'On your turn, in order:', choose: 'On your turn, do <b>one</b> of:', simultaneous: 'Everyone plays <b>at the same time</b>:', round: 'Each round:' }[type];
     const outro = t.outro || { sequence: 'Next player', choose: 'Next player', simultaneous: 'Next round', round: 'Next round' }[type];
     const steps = t.steps.map((s, i) => `<li data-step="${i}"><span class="verb">${type === 'choose' ? String.fromCharCode(65 + i) : i + 1}. ${md(s.verb)}</span><span class="what">${md(s.text)}</span></li>`).join('');
-    return `<p class="turn-intro">${intro}</p><ol class="turn turn-${type}">${steps}</ol><div class="turn-loop"><span>↻ ${esc(outro)}</span></div>`;
+    return `<p class="turn-intro">${intro}</p><ol class="turn turn-${type}">${steps}</ol><div class="turn-loop"><span>↻ ${md(outro)}</span></div>`;
   }
 
   function endPanel(g) {

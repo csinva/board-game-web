@@ -27,35 +27,35 @@ defineGame({
 
   pitch: 'Cooperative trick-taking: get each task card won by the right player, with almost no talk about your hand.',
 
-  goal: { big: 'Finish all tasks', text: 'Each mission deals out **task cards**. You win when each task card is taken in a trick by the player who holds that task, in any required order.' },
+  goal: { big: 'Finish all tasks', text: 'Each mission hands out **task cards**; each names one playing card. You win the mission when, for every task card, its owner wins the trick containing the named card, in the order any task tokens require.' },
 
   turn: {
     type: 'round',
-    intro: 'Play one trick at a time. The commander (holder of rocket 4) leads the first:',
+    intro: 'Play one trick at a time. The commander (the player holding rocket 4) leads the first trick:',
     outro: 'The trick winner leads the next trick.',
     steps: [
-      { verb: 'Signal?', text: 'Before the trick (never during one), anyone may place one card face up with their **one** {comm} for the mission (see below). That card stays in their hand and is played later as normal.' },
-      { verb: 'Lead', text: 'The leader plays any card face up, rockets included. Its colour is the suit for this trick.' },
-      { verb: 'Follow', text: 'Clockwise, each player plays 1 card and **must follow suit** if able; if not, anything, including a {=rocket}.' },
-      { verb: 'Win trick', text: 'Highest {=rocket} wins; if none, the highest card of the led colour. Check whether a task card was taken.' },
+      { verb: 'Signal?', text: 'Before the trick starts (never during one), any player who has not yet used their {comm} this mission may place 1 card from their hand face up in front of them and put the token on it (top, middle or bottom; see the table). That card still counts as part of their hand and is played later as normal.' },
+      { verb: 'Lead', text: 'The leader plays any 1 card face up, a {=rocket} included. Its colour (or rockets) is the **led suit** for this trick.' },
+      { verb: 'Follow', text: 'Going clockwise, each other player plays 1 card. You **must play the led suit** if you have it; if you have none, play any card, a {=rocket} included.' },
+      { verb: 'Win trick', text: 'If any {=rocket} was played, the highest rocket wins; otherwise the highest card of the led suit wins. The winner takes all the cards. If one of them is named on a task card, check that its owner won it.' },
     ],
   },
 
   tension: 'You know which card a teammate must win, but not what anyone holds, so every card you play is a bet on their hands.',
 
   structure: [
-    { label: 'Mission setup', text: 'Deal all 40 cards. Reveal the mission’s {task}s; players pick them one at a time, commander first. Place any {order}s; {=comm} green side up. Optional **distress signal**: everyone passes 1 non-rocket card to the same-side neighbour.' },
-    { label: 'Tricks', repeat: 'until tasks are done', text: 'Signal? → lead → follow suit → highest {=rocket}, else highest of the led colour, wins. The winner leads next.' },
-    { label: 'Mission end', text: 'Success the moment every task is done, even with cards left. Fail the moment a task is taken by the wrong player or out of order.' },
-    { label: 'Next mission', repeat: '50 missions', text: 'On success, write the attempts in the logbook (+1 if you used the distress signal) and go on; on failure, redeal, re-pick tasks and retry.' },
+    { label: 'Mission setup', text: 'Deal all 40 cards. Reveal the mission’s {task}s; starting with the commander and going clockwise, each player takes 1 until all are taken. Place any {order}s the mission lists; everyone puts their {=comm} green side up. Optional **distress signal**, after all tasks are taken and before anyone communicates or trick 1 starts: the team picks left or right, and everyone passes 1 non-rocket card to that neighbour.' },
+    { label: 'Tricks', repeat: 'until tasks are done', text: 'Signal? → lead → follow suit → the highest {=rocket} wins, or if none, the highest card of the led suit. The winner leads the next trick.' },
+    { label: 'Mission end', text: 'Success the moment every task is done, even if players still hold cards. Failure the moment a task’s card is won by the wrong player, or a task is done out of order.' },
+    { label: 'Next mission', repeat: '50 missions', text: 'On success, write in the logbook how many attempts it took (add 1 if you used the distress signal) and go on to the next mission. On failure, reshuffle, deal again, hand out the tasks again and retry.' },
   ],
 
   end: {
     trigger: 'every task is done, or a task fails',
     detail: 'Play missions in logbook order; retry a failed one as often as needed.',
     results: [
-      { side: 'Mission success', text: 'when every task card has been won by its owner, in the order its tokens demand.' },
-      { side: 'Mission failed', text: 'the moment a task card is won by the **wrong player**, or a task is done out of order.' },
+      { side: 'Mission success', text: 'when, for every task card, its owner has won the named card, in the order the task tokens require.' },
+      { side: 'Mission failed', text: 'the moment a task’s named card is won by the **wrong player**, or a task is done out of order.' },
     ],
   },
 
@@ -63,38 +63,38 @@ defineGame({
     title: 'Deck and communication',
     rows: [
       ['Deck', '{=pink}{=blue}{=green}{=yellow} 1–9, {=rocket} 1–4 (trumps)'],
-      ['{=sigtop} Top', 'my **highest** card of that colour'],
-      ['{=sigmid} Middle', 'my **only** card of that colour'],
-      ['{=sigbot} Bottom', 'my **lowest** card of that colour'],
-      ['When', 'before a trick, once per mission; only if one of the 3 is true'],
-      ['Not allowed', 'showing a {=rocket}, or spoken hints'],
+      ['{=sigtop} Top', 'this is my **highest** card of that colour'],
+      ['{=sigmid} Middle', 'this is my **only** card of that colour'],
+      ['{=sigbot} Bottom', 'this is my **lowest** card of that colour'],
+      ['When', 'before a trick, at most once per player per mission; only if the token’s statement is true'],
+      ['Not allowed', 'signalling with a {=rocket}, or any spoken hint about your hand'],
     ],
   },
 
-  example: 'Ana holds the task **7{=pink}**. Before the trick, Cleo shows her 7{=pink} with the token in the middle: her **only** pink. Ben leads 3{=pink}; Cleo must follow with the 7, and Ana plays 9{=pink} to win her task. Dev has no pink; a {=rocket} would steal the 7 and fail the mission, so he discards 2{=green}.',
+  example: 'Ana holds the task card **7{=pink}**. Before the trick, Cleo places her 7{=pink} face up with the token in the middle: it is her **only** pink. Ben leads 3{=pink}; Cleo must follow with the 7, and Ana plays 9{=pink} to win the trick and her task. Dev has no pink; if he played a {=rocket}, Dev would win the 7 and the mission would fail, so he discards 2{=green}.',
 
   setup: [
     'Shuffle the 40 cards ({=pink}{=blue}{=green}{=yellow} 1–9, {=rocket} 1–4) and deal all; with 3 players one person gets an extra card. 2 players: use the rulebook’s JARVIS variant.',
-    'Open the logbook to the next mission, apply its special rules, and reveal that many {task}s; the commander (rocket 4) picks first, then clockwise.',
-    'Add any {order}s the mission lists; everyone takes a {comm}, green side up.',
+    'Open the logbook to the next mission and apply its special rules. Reveal as many {task}s as it lists; the commander (the player holding rocket 4) takes 1 first, then the others take 1 each going clockwise, around again until all are taken.',
+    'Put any {order}s the mission lists on the task cards; everyone takes a {comm} and places it green side up.',
   ],
 
   terms: [
-    ['Trick', 'One card from each player; the winner takes all.'],
-    ['{=task} Task card', 'Names one card you must win in a trick.'],
+    ['Trick', 'One card from each player, played clockwise; the winner takes all of them.'],
+    ['{=task} Task card', 'Names one playing card. The player who took the task card must win the trick containing that card.'],
     ['{=rocket} Rocket', 'Black trump suit, 1–4. Any rocket beats any coloured card.'],
     ['Commander', 'Holder of rocket 4. Picks the first task and leads trick 1.'],
-    ['{=order} Task tokens', '1–5: done in that order among the tasks; >, >>, >>>, >>>>: in arrow order; Ω: last of all.'],
+    ['{=order} Task tokens', '1–5: counted among **all** tasks: the task marked 1 must be the 1st task done, 2 the 2nd, and so on. >, >>, >>>, >>>>: only their order among each other counts (> before >>, and so on); other tasks may be done before, between or after them. Ω: that task must be the last task done.'],
   ],
 
   gotchas: [
-    'You **must follow suit** if you can; a rocket is legal only when you’re out of the led colour (or rockets were led).',
-    'Communicating is **once per mission**, only between tricks, and must be true when given; the shown card stays out and is played later as normal.',
-    'Winning a task card that **isn’t yours** fails the mission at once.',
+    'You **must follow suit** if you can; you may play a rocket only when you have no card of the led suit (or rockets were led).',
+    'Each player may communicate **once per mission**, only before a trick starts (trick 1 included, once all tasks are taken), never during a trick, and the statement must be true when given; the shown card stays face up in front of you until you play it.',
+    'Winning a trick that contains **another player’s** task card fails the mission at once.',
   ],
 
   tips: [
-    'Long colours are power: lead one repeatedly to draw out others’ cards.',
+    'A colour you hold many cards of is strong: lead it repeatedly to draw out others’ cards.',
     'Low cards matter as much as high: a 1 loses a trick on purpose.',
     'Signal **early**: a trick-1 signal shapes every later play.',
   ],
@@ -124,11 +124,11 @@ defineGame({
     const dev = (t) => A.k('dev2', t ? face(...T.dev, col.g, 2) : A.card(212, 172, 16, 22, col.back, { label: '✦', size: 7 }));
     const won = (k, f, n, i) => A.k(k, face(238 + i * 4, 62 + i * 3, f, n));
     return [
-      { step: 0, say: 'Ana’s task: win the trick holding **7{=pink}**. Nobody may say what they hold.',
+      { step: 0, say: 'Ana’s task: she must win the trick that contains **7{=pink}**. Nobody may say what they hold.',
         svg: board + task() + ben() + ana() + dev() + A.glow(264, 160, 17) },
       { step: 0, say: 'Before the trick, Cleo signals: 7{=pink} face up, {=comm} in the **middle** = “my **only** pink”.',
         svg: board + task() + ben() + ana() + dev() + cleoShown + A.glow(185, 23, 22) },
-      { step: 1, say: 'Ben **leads 3{=pink}**. Everyone must follow pink.',
+      { step: 1, say: 'Ben **leads 3{=pink}**. Everyone who has a pink card must play pink.',
         svg: board + task() + ben(1) + ana() + dev() + cleoShown },
       { step: 2, say: 'Cleo **must follow** with her only pink, the 7. Ana plays **9{=pink}**, highest so far.',
         svg: board + task() + ben(1) + cleoPlayed + ana(1) + dev() + A.glow(190, 103, 22) },
@@ -169,7 +169,7 @@ defineGame({
     o += A.use(ic.rocket.draw(A), 92.5, 118.6, 33);
     o += A.note(45, 96, 64, 22, 'Task: Ana wins pink 7');
     o += A.note(267, 96, 262, 154, 'Signal: highest blue');
-    o += A.note(176, 72, 214, 22, 'Must follow led colour');
+    o += A.note(176, 72, 214, 22, 'Must follow the led suit');
     o += A.note(98, 134, 48, 150, 'Rockets trump');
     return o;
   },

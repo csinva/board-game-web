@@ -26,34 +26,34 @@ defineGame({
 
   pitch: 'Roll for resources, trade for what you lack, and build roads, settlements and cities to reach 10 points.',
 
-  goal: { big: '10 points', text: 'First to **10 victory points** on their own turn wins. Settlement 1, city 2, plus bonus cards.' },
+  goal: { big: '10 points', text: 'The first player to have **10 victory points** (VP) during their own turn wins. Each settlement is worth 1 VP and each city 2 VP; bonus cards and VP cards add more.' },
 
   turn: {
     type: 'sequence',
     steps: [
-      { verb: 'Roll', text: 'Roll 2 dice. Each hex with that number pays its resource to **every** adjacent building, any owner: 1 per {=settlement}, 2 per {=city}.' },
-      { verb: 'Trade', text: 'Trade cards with any player (only trades involving you), or with the bank at 4:1 (3:1 or 2:1 at your harbors).' },
-      { verb: 'Build', text: 'Buy any number of {road}s, {settlement}s, {city} upgrades and {devcard}s (costs below).' },
+      { verb: 'Roll', text: 'Roll 2 dice. Every hex showing that number pays its resource to **every** building on its corners, whoever owns it: 1 card per {=settlement}, 2 per {=city}. The hex under the {robber} pays nothing.' },
+      { verb: 'Trade', text: 'You may trade resource cards with other players (every trade must include you), or with the bank: 4 cards of one resource for 1 of your choice, or 3:1 or 2:1 if you have a building on a harbor.' },
+      { verb: 'Build', text: 'Pay the costs below to build any number of {road}s, {settlement}s and {city} upgrades and to buy {devcard}s, in any order.' },
     ],
   },
 
   tension: 'Dice give you resources you can’t use, so you must trade, and every trade helps a rival.',
 
   structure: [
-    { label: 'Setup', text: 'Each player places 2 {settlement}s and 2 {road}s (snake order) and takes starting resources.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Each turn: roll (everyone may collect), trade, build. No rounds or phases.' },
-    { label: 'Game end', text: 'The moment a player has **10 VP** on their own turn, they win.' },
+    { label: 'Setup', text: 'Each player places a {settlement} and a {road} touching it, twice: first going clockwise, then counter-clockwise (so the last player places twice in a row). Your second {settlement} gives your starting resources.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'You roll; every player with a building on a corner of a hex showing that number collects. Then you trade, then build. Play passes clockwise; there are no rounds or phases.' },
+    { label: 'Game end', text: 'The moment a player has **10 VP** during their own turn, they win.' },
   ],
 
   points: [
     ['{=settlement} Settlement', '1 VP'],
-    ['{=city} City', '2 VP (upgrade of a settlement)'],
-    ['Longest Road', '2 VP to the first with a continuous road of **5+** segments; lost if someone builds longer'],
-    ['Largest Army', '2 VP to the first who has played **3+** knights; lost if someone plays more'],
-    ['{=devcard} VP card', '1 VP each; keep hidden until you win'],
+    ['{=city} City', '2 VP (it replaces one of your settlements)'],
+    ['Longest Road', '2 VP card to the first player with an unbroken line of **5 or more** of their own roads (branches don’t add). If another player builds a longer line, the card moves to them.'],
+    ['Largest Army', '2 VP card to the first player to have played **3** knights. If another player has played more knights than the holder, the card moves to them.'],
+    ['{=devcard} VP card', '1 VP each; keep it face down until you reveal it to win'],
   ],
 
-  end: { trigger: 'Someone reaches 10 VP on their turn', detail: 'It ends immediately; no final round.' },
+  end: { trigger: 'a player has 10 VP during their own turn', detail: 'That player wins at once; there is no final round.' },
   scoring: [
     { label: '{=settlement} Settlements', share: 2 },
     { label: '{=city} Cities', share: 4 },
@@ -65,37 +65,38 @@ defineGame({
     title: 'Build costs',
     rows: [
       ['Resources', '{wood} {brick} {wheat} {sheep} {ore}'],
-      ['{=road} Road', '{=wood} {=brick} (must connect to your road or building)'],
-      ['{=settlement} Settlement', '{=wood} {=brick} {=wheat} {=sheep}'],
-      ['{=city} City', '{=ore}{=ore}{=ore} {=wheat}{=wheat} (replaces a settlement)'],
-      ['{=devcard} Dev card', '{=ore} {=wheat} {=sheep}: knight (move the {robber}, steal 1), progress (2 free roads / take 2 resources / claim all of one resource) or 1 VP'],
+      ['{=road} Road', '{=wood} {=brick} (on an edge touching your own road, settlement or city)'],
+      ['{=settlement} Settlement', '{=wood} {=brick} {=wheat} {=sheep} (on an empty corner touching your own road)'],
+      ['{=city} City', '{=ore}{=ore}{=ore} {=wheat}{=wheat} (replaces one of your settlements; the settlement returns to your supply)'],
+      ['{=devcard} Dev card', '{=ore} {=wheat} {=sheep}. Each card is a knight (move the {robber} and steal 1 card), a progress card (build 2 roads free / take any 2 resource cards from the bank / name a resource and every other player gives you all their cards of it) or 1 VP'],
     ],
   },
 
-  example: 'You roll {=d3}{=d5} = **8**. Your {settlement} touches the 8 ore hex: you take 1 {ore}; Maya’s {city} there takes 2. You trade Maya a {sheep} for a {brick}, then pay {=wood} {=brick} for a {road}.',
+  example: 'You roll {=d3}{=d5} = **8**. Your {settlement} is on a corner of the 8 ore hex, so you take 1 {ore}; Maya’s {city} on the same hex takes 2. You trade Maya a {sheep} for a {brick}, then pay {=wood} {=brick} for a {road}.',
 
   setup: [
     'Lay out 19 terrain hexes and a number token on each except the desert; the {robber} starts on the desert.',
     'Each player takes 5 {settlement}s, 4 {city} pieces and 15 {road}s; you can’t build more than these.',
-    'Highest roll places a {settlement} + {road} first, then clockwise; then a second pair in reverse order.',
-    'Take 1 resource from each hex touching your second {settlement}. The highest roller takes the first turn.',
+    'Everyone rolls 2 dice; the highest roller places first. Going clockwise, each player places 1 {settlement} on an empty corner and 1 {road} on an edge touching that {settlement}.',
+    'Then going counter-clockwise (so the last player places twice in a row), each player places a second {settlement} and a {road} touching it. Every {settlement} must be at least 2 edges from every other building (the distance rule). Your two {settlement}s don’t need to connect.',
+    'Each player takes 1 resource card for each hex touching their second {settlement} (none from the desert). The highest roller takes the first turn.',
   ],
 
   terms: [
     ['{=vp} VP', 'Victory point. 10 wins.'],
-    ['{=robber} Robber', 'Moved on a 7. Its hex pays nothing; the mover steals 1 card from an adjacent player.'],
-    ['Harbor', 'Coastal corner; a building there improves bank trades to 3:1 or 2:1.'],
+    ['{=robber} Robber', 'Starts on the desert. Whoever rolls a 7 or plays a knight must move it to a different hex, then takes 1 random card from a player of their choice with a building on that hex. The hex under the robber pays nothing.'],
+    ['Harbor', 'A pair of coastal corners marked 3:1 or with a resource. A building on one lets you trade with the bank at 3:1 (any resource) or 2:1 (only the resource shown).'],
     ['Pips', 'Dots on a number token: more dots, rolled more often.'],
   ],
 
   gotchas: [
-    'On a **7** nobody collects. Players with 8+ cards discard half (round down); the roller moves the {robber} and steals 1 card.',
-    '{settlement}s must be **two edges apart** from any other, and (after setup) on your own {road}.',
-    'Play at most **one** {devcard} per turn (a knight may be played before rolling), and not on the turn you buy it. VP cards are exempt: reveal them whenever they win you the game.',
+    'On a **7**, nobody collects. First, every player with **8 or more** resource cards discards half of them (round down). Then the roller must move the {robber} to a different hex and steals 1 random card from a player with a building there.',
+    'A {settlement} must be at least **two edges** from every other settlement or city, yours or anyone’s (the distance rule). After setup it must also touch one of your own {road}s.',
+    'You may play at most **one** {devcard} per turn, and not one you bought this turn. A knight may be played before you roll. VP cards are exempt: reveal them as soon as they bring you to 10 VP.',
   ],
 
   tips: [
-    'Settle on varied numbers; **6 and 8** roll most.',
+    'Build your settlements on hexes with different numbers; **6 and 8** are rolled most often.',
     '{wood} + {brick} matter early ({road}s, {settlement}s); {ore} + {wheat} matter late ({city} upgrades).',
     'Don’t trade with the leader.',
   ],
@@ -121,17 +122,17 @@ defineGame({
       A.k('maya-brick', card(...maya(0), C.brick, 'brick'));
     return [
       { step: 0, say: 'Roll: **3 + 5 = 8**.', svg: board + start + dice(3, 5, 150, 150) },
-      { step: 0, say: 'Every **8** hex pays every adjacent building: your {settlement} gets 1 {ore}, Maya’s {city} gets 2.', svg: board + start + dice(3, 5, 150, 150) + A.glow(oreX, oreY, 26, 'glow-ore') +
+      { step: 0, say: 'Every **8** hex pays each building on its corners: your {settlement} gets 1 {ore}, Maya’s {city} gets 2.', svg: board + start + dice(3, 5, 150, 150) + A.glow(oreX, oreY, 26, 'glow-ore') +
         A.k('you-ore', card(...atOre, C.ore, 'ore')) + A.k('maya-ore1', card(atOre[0] - 6, atOre[1] + 4, C.ore, 'ore')) + A.k('maya-ore2', card(atOre[0] + 6, atOre[1] + 4, C.ore, 'ore')) },
       { step: 0, say: 'The cards go to each hand.', svg: board + start + dice(3, 5, 150, 150) +
         A.k('you-ore', card(...you(2), C.ore, 'ore')) + A.k('maya-ore1', card(...maya(1), C.ore, 'ore')) + A.k('maya-ore2', card(...maya(2), C.ore, 'ore')) },
       { step: 1, say: '**Trade.** You need a {brick} for a road. Maya accepts your {sheep} for it.', svg: board + dice(3, 5, 150, 150) +
         A.k('you-wood', card(...you(1), C.forest, 'wood')) + A.k('you-ore', card(...you(2), C.ore, 'ore')) + A.k('maya-ore1', card(...maya(1), C.ore, 'ore')) + A.k('maya-ore2', card(...maya(2), C.ore, 'ore')) +
         A.k('you-sheep', card(...maya(3), C.sheep, 'sheep')) + A.k('maya-brick', card(...you(0), C.brick, 'brick')) },
-      { step: 2, say: '**Build.** Pay {=wood} {=brick} to the bank; place a {road} on an edge touching your network.', svg: board + dice(3, 5, 150, 150) +
+      { step: 2, say: '**Build.** Pay {=wood} {=brick} to the bank; place a {road} on an edge touching your own road or building.', svg: board + dice(3, 5, 150, 150) +
         A.k('you-ore', card(...you(2), C.ore, 'ore')) + A.k('maya-ore1', card(...maya(1), C.ore, 'ore')) + A.k('maya-ore2', card(...maya(2), C.ore, 'ore')) +
         A.k('you-sheep', card(...maya(3), C.sheep, 'sheep')) + road + A.glow(ox, oy - 1.5 * s, 14, 'glow-road') },
-      { step: 2, say: 'Turn over. The dice pass left to Maya.', svg: board + dice(3, 5, 214, 64) +
+      { step: 2, say: 'Your turn is over. The dice pass clockwise to Maya.', svg: board + dice(3, 5, 214, 64) +
         A.k('you-ore', card(...you(2), C.ore, 'ore')) + A.k('maya-ore1', card(...maya(1), C.ore, 'ore')) + A.k('maya-ore2', card(...maya(2), C.ore, 'ore')) +
         A.k('you-sheep', card(...maya(3), C.sheep, 'sheep')) + road },
     ];

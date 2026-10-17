@@ -29,39 +29,39 @@ defineGame({
 
   pitch: 'Partners race to empty their hands, beating each play with a higher combination of the same kind. First to 1,000 wins.',
 
-  goal: { big: '1,000 points', text: 'First team to **1,000** wins. Points come from cards in tricks you win, from going out 1st and 2nd, and from **Tichu** bets.' },
+  goal: { big: '1,000 points', text: 'Play in 2 teams of 2. **Going out** means playing your last card. Points come from point cards in the tricks (piles of played cards) your team wins, from both partners going out 1st and 2nd, and from **Tichu** bets that you will go out first. First team to **1,000** wins.' },
 
   turn: {
     type: 'round',
     intro: 'Each hand goes through these phases:',
     steps: [
-      { verb: 'Deal 8', text: 'After your first 8 cards you may call **Grand Tichu**. Then take 6 more, for 14.' },
-      { verb: 'Pass', text: 'Pass 1 card face down to **each** other player (3 out, 3 in).' },
-      { verb: 'Climb', text: 'The {=mahjong} holder leads any combination. Play goes **right** (counter-clockwise): play the **same kind and length**, but higher, or pass. Passing doesn’t stop you playing later in the trick.' },
-      { verb: 'Take trick', text: 'When the other 3 pass in a row, the last player to play takes the cards and leads anything (if already out, the next player in turn leads).' },
-      { verb: 'Score', text: 'The hand ends when one player still has cards. Count card points and settle {=tichu} bets.' },
+      { verb: 'Deal 8', text: 'Deal 8 cards to each player. After looking at only these 8, any player may call **Grand Tichu** (a bet of 200 that they go out first). Then deal 6 more to each player, for 14.' },
+      { verb: 'Pass', text: 'At the same time, each player passes 1 card face down to **each** of the other 3 players (3 cards out, 3 cards in).' },
+      { verb: 'Climb', text: 'The holder of the {=mahjong} **leads** (plays first) any **combination**: a single card, a pair, a triple, a full house, a run of 5+ cards, or a run of pairs (see Key terms). Play goes to the **right** (counter-clockwise). On your turn, either play a combination of the **same kind and the same number of cards**, but higher, or pass. Passing does not stop you from playing later in the same trick.' },
+      { verb: 'Take trick', text: 'When every other player still holding cards passes in a row, the last player to play wins the **trick**: they take all cards played since the lead, face down, and lead any combination to start the next trick. If they have already gone out, the next player in turn who still has cards leads.' },
+      { verb: 'Score', text: 'The hand ends when only one player still has cards. Count card points and add or subtract {=tichu} bets (see How the game flows).' },
     ],
   },
 
   tension: 'Strong cards either win point-rich tricks or get you out first, rarely both, and a Tichu call bets 100 that you go out first.',
 
   structure: [
-    { label: 'Deal & pass', repeat: 'each hand', text: 'Deal 8 each: Grand Tichu calls. Deal 6 more each; pass 1 card to each other player.' },
-    { label: 'Play', repeat: 'each hand', text: 'The {=mahjong} leads; climb and take tricks until only 1 player has cards.' },
-    { label: 'End of hand', text: 'Last player gives their hand to the opponents and their tricks to the 1st player out. Count cards; settle {=tichu} bets.' },
-    { label: 'Game end', text: 'A team has **1,000+** after a hand: higher score wins.' },
+    { label: 'Deal & pass', repeat: 'each hand', text: 'Deal 8 cards each; players may call Grand Tichu. Deal 6 more each; each player passes 1 card to each other player.' },
+    { label: 'Play', repeat: 'each hand', text: 'The holder of the {=mahjong} leads. Play tricks until only 1 player has cards left.' },
+    { label: 'End of hand', text: 'The last player with cards gives the cards left in their hand to the opposing team, and the tricks they won to the player who went out first. Each team counts the card points in its tricks, then adds or subtracts {=tichu} bets.' },
+    { label: 'Game end', text: 'When a team has **1,000** or more points at the end of a hand, the game ends; the higher score wins.' },
   ],
 
   points: [
-    ['Card points', '5s = 5; 10s and Ks = 10'],
-    ['{=dragon} Dragon', '+25 to whoever ends up with it'],
-    ['{=phoenix} Phoenix', '−25 to whoever ends up with it'],
-    ['{=tichu} Tichu', '±100 to the caller’s team (out first or not)'],
-    ['Grand Tichu', '±200'],
-    ['Double victory', 'Partners out 1st and 2nd: 200; no cards counted'],
+    ['Card points', 'In the tricks your team won: each 5 = 5 points; each 10 and K = 10'],
+    ['{=dragon} Dragon', '+25 to the team whose tricks hold it at the end of the hand'],
+    ['{=phoenix} Phoenix', '−25 to the team whose tricks hold it at the end of the hand'],
+    ['{=tichu} Tichu', '+100 to the caller’s team if the caller goes out first; −100 if not'],
+    ['Grand Tichu', '+200 if the caller goes out first; −200 if not'],
+    ['Double victory', 'Partners go out 1st and 2nd: their team scores 200, and no card points are counted for either team'],
   ],
 
-  end: { trigger: 'a team has 1,000 or more points at the end of a hand', detail: 'If both teams pass 1,000, the higher score wins.' },
+  end: { trigger: 'a team has 1,000 or more points at the end of a hand', detail: 'If both teams reach 1,000 in the same hand, the higher score wins.' },
   scoring: [
     { label: 'Card points', share: 5 },
     { label: '{=tichu} Tichu calls', share: 3 },
@@ -71,35 +71,36 @@ defineGame({
   ref: {
     title: 'Special cards',
     rows: [
-      ['{=mahjong} Mah Jong (1)', 'Leads the first trick; may **wish** for a rank'],
-      ['{=dog} Dog', 'Lead it alone to pass the lead to your partner (if out: the player on partner’s right)'],
-      ['{=phoenix} Phoenix', 'Wild in combinations, not bombs; as a single, ½ above the last card (1½ if led). −25'],
-      ['{=dragon} Dragon', 'Highest single. +25, but you give the trick to an opponent of your choice'],
-      ['{=bomb} Bomb', '4 of a kind or a 5+ straight flush; beats anything, any time'],
+      ['{=mahjong} Mah Jong (1)', 'Its holder leads the first trick. Whoever plays it may **wish** for a rank (see Rules people miss)'],
+      ['{=dog} Dog', 'Can only be led, by itself. Your partner then leads the next trick (if your partner is out, the player to your partner’s right leads)'],
+      ['{=phoenix} Phoenix', 'In a combination (not a bomb) it stands in for any normal card. Played as a single card, it ranks ½ above the card it is played on (1½ if led). Worth −25'],
+      ['{=dragon} Dragon', 'The highest single card; it can only be played as a single. Worth +25, but if it wins the trick, you give that trick to an opponent of your choice'],
+      ['{=bomb} Bomb', '4 cards of one rank, or a run of 5+ cards all in one suit. Beats any non-bomb; may be played at any time, even out of turn'],
       ['Rank, low → high', '{=mahjong} 2 3 … 10 J Q K A, then {=dragon}'],
     ],
   },
 
-  example: 'Ana calls {=tichu} **Tichu** before her first card. Lee leads the run 4-5-6-7-8; Ana, on his right, plays 6-7-8-9-10. Ben, Lee’s partner, drops a {=bomb} of four 3s; everyone passes, and Ben takes the trick, including Ana’s 10.',
+  example: 'Ana calls {=tichu} **Tichu** before her first card. Lee leads the run 4-5-6-7-8; Ana, on his right, plays 6-7-8-9-10. Ben, Lee’s partner, plays a {=bomb} of four 3s; the other 3 players pass, and Ben wins the trick, including Ana’s 10.',
 
   setup: [
     '56 cards: 2 to Ace in 4 suits ({=jade}{=sword}{=pagoda}{=star}) plus {=mahjong}{=dog}{=phoenix}{=dragon}.',
-    'Partners sit across. Deal 8 each, allow Grand Tichu calls, then deal 6 more each.',
+    '4 players in 2 teams; partners sit across from each other. Deal 8 cards each, allow Grand Tichu calls, then deal 6 more each.',
     'Each player passes 1 card to each of the other 3.',
   ],
 
   terms: [
-    ['Combination', 'Single, pair, triple, full house, run of 5+, or run of pairs (e.g. 33-44).'],
+    ['Combination', 'A single card, a pair, a triple, a full house (a triple plus a pair), a run of 5+ consecutive ranks in any suits, or a run of 2+ consecutive pairs (e.g. 33-44).'],
+    ['Trick', 'All cards played from a lead until everyone else passes; the last player to play wins it.'],
     ['{=bomb} Bomb', 'Four of a kind or a straight flush of 5+. Beats any non-bomb.'],
-    ['{=tichu} Tichu', 'A bet that you go out first: +100 if you do, −100 if not.'],
+    ['{=tichu} Tichu', 'A bet that you go out first, called any time before you play your first card: +100 if you do, −100 if not.'],
     ['Grand Tichu', 'The same bet made after seeing only 8 cards: ±200.'],
-    ['Double victory', 'Partners go out 1st and 2nd: 200 points, no cards counted.'],
+    ['Double victory', 'Partners go out 1st and 2nd: the hand ends at once; 200 points, no cards counted.'],
   ],
 
   gotchas: [
     'A {=bomb} may be played **any time**, even out of turn. Bombs rank by card count, then rank: any straight flush beats any four of a kind.',
     'The {=dog} can only be **led**, never played on a trick, and can’t be bombed. The {=dragon} plays only as a single, and the {=phoenix} can’t beat it.',
-    'While a {=mahjong} **wish** is open, the next player who holds that rank and can legally play it on their turn must (even in a {=bomb}). Wishes are for ranks 2–A only.',
+    'While a {=mahjong} **wish** is open, the next player who holds the wished rank and can legally play it on their turn must play it (even in a {=bomb}). The wish stays open until a card of that rank is played. Wishes are for ranks 2–A only.',
   ],
 
   tips: [
@@ -142,7 +143,7 @@ defineGame({
       { step: 2, say: 'With a run and the {dragon}, Ana calls {=tichu} **Tichu**: +100 if she goes out first, −100 if not.', svg: board + row(handAfter) + call + A.glow(41, 127, 32) },
       { step: 2, say: 'Lee leads a 5-card run, **4-5-6-7-8**. Play goes right: Ana is next.', svg: board + row(handAfter) + call + leeRun },
       { step: 2, say: 'Ana plays **6-7-8-9-10**: same kind, same length, higher.', svg: board + row(['Kj', 'DR']) + call + leeRun + anaRun + A.glow(161, 89, 50) },
-      { step: 2, say: 'Ben drops a {bomb}: four 3s. A bomb may be played any time and beats any normal combination.', svg: board + row(['Kj', 'DR']) + call + leeRun + anaRun + bomb + A.glow(246, 127, 44) },
+      { step: 2, say: 'Ben plays a {bomb}: four 3s. A bomb may be played any time and beats any non-bomb combination.', svg: board + row(['Kj', 'DR']) + call + leeRun + anaRun + bomb + A.glow(246, 127, 44) },
       { step: 3, say: 'The next 3 players pass, so Ben takes the trick, including Ana’s **10** (10 points), and leads next.', svg: board + row(['Kj', 'DR']) + call + pileAt(240, 120) + A.glow(260, 145, 32) },
     ];
   },

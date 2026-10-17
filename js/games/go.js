@@ -29,15 +29,14 @@ defineGame({
 
   pitch: 'Take turns placing stones to surround empty points and capture enemy stones; most territory plus captures wins.',
 
-  goal: { big: 'Most territory', text: 'Score more than your opponent: empty points you surround plus enemy stones you capture.' },
+  goal: { big: 'Most territory', text: 'Have the higher score. Your score is the empty points (line crossings) surrounded only by your stones, plus the enemy stones you captured (Japanese rules; see Scoring).' },
 
   turn: {
     type: 'choose',
-    intro: 'Black plays first. On your turn, do one:',
+    intro: 'Black plays first, then players alternate. On your turn, do one of:',
     steps: [
-      { verb: 'Place', text: 'Put **one stone** on any empty intersection. Stones never move.' },
-      { verb: 'Capture', text: 'Remove any enemy group your stone left with **no liberties** {=liberty}; keep the stones as prisoners.' },
-      { verb: 'Or pass', text: 'Pass instead. Two passes in a row end the game.' },
+      { verb: 'Place', text: 'Put **1 stone** of your colour on any empty point (where 2 lines cross), unless the suicide or ko rule forbids it. Then remove every enemy group your stone left with **no liberties** {=liberty}; keep those stones as your prisoners. Stones never move once placed.' },
+      { verb: 'Pass', text: 'Place nothing. When both players pass, one right after the other, the game ends.' },
     ],
   },
 
@@ -46,19 +45,19 @@ defineGame({
   structure: [
     { label: 'Setup', text: 'Empty board (9×9 to learn). {=black} Black plays first.' },
     { label: 'Moves', repeat: 'alternating', text: 'Place a stone or pass. Captured stones go in the captor’s lid.' },
-    { label: 'Game end', text: 'Both players pass in a row. Agree which stones are dead and remove them as prisoners.' },
-    { label: 'Counting', text: 'Japanese rules: territory + prisoners; White adds 6.5 komi. Higher score wins.' },
+    { label: 'Game end', text: 'Both players pass, one right after the other. Together they agree which stones are dead; each dead stone is removed and becomes a prisoner of the opposing player.' },
+    { label: 'Counting', text: 'Japanese rules: each player scores territory + prisoners; White also adds 6.5 (komi). The higher score wins.' },
   ],
 
   points: [
-    ['{=terr-b} Territory', '1 per empty point surrounded only by your stones'],
-    ['{=prisoner} Prisoners', '1 per enemy stone captured, including dead stones removed at the end'],
+    ['{=terr-b} Territory', '1 for each empty point surrounded only by your stones'],
+    ['{=prisoner} Prisoners', '1 for each enemy stone you captured, including dead enemy stones removed at the end'],
     ['Komi', '+6.5 to White for moving second (the .5 prevents ties)'],
     ['Chinese rules', 'Instead count your stones on the board + your territory; prisoners don’t score; komi 7.5. The winner is almost always the same'],
   ],
 
   end: {
-    trigger: 'both players pass in a row, or one resigns',
+    trigger: 'both players pass, one right after the other, or one player resigns',
   },
 
   scoring: [
@@ -69,15 +68,15 @@ defineGame({
   ref: {
     title: 'Core rules',
     rows: [
-      ['{=liberty} Liberty', 'an empty point next to a stone (not diagonal)'],
-      ['{=black}{=black} Group', 'stones joined along lines share liberties'],
-      ['{=prisoner} Capture', 'fill a group’s last liberty; remove it'],
-      ['Suicide', 'illegal, unless the move captures'],
-      ['Ko', 'no instant retake of a single stone'],
+      ['{=liberty} Liberty', 'an empty point directly next to a stone along a line (diagonals don’t count)'],
+      ['{=black}{=black} Group', 'same-colour stones joined along lines; they share liberties and are captured together'],
+      ['{=prisoner} Capture', 'place a stone on an enemy group’s last liberty; remove the whole group'],
+      ['Suicide', 'placing a stone that leaves your own group with no liberties: illegal, unless the move captures'],
+      ['Ko', 'you may not immediately retake a single stone if that would repeat the previous board'],
     ],
   },
 
-  example: 'On 9×9, Ben’s two {=white} stones inside Ana’s area have one {=liberty} left (atari). Ana plays {=black} on that point and removes both: **2 prisoners**, and their points become her territory. Ben plays elsewhere, closing his top-right border.',
+  example: 'On 9×9, Ben’s two {=white} stones inside Ana’s area have one {=liberty} left (atari). Ana plays {=black} on that point and removes both: **2 prisoners**, and the 2 points they stood on become her territory. Ben plays elsewhere, closing his top-right border.',
 
   setup: [
     'Learn on a **9×9** board (15–20 minutes), then move to 13×13 and 19×19.',
@@ -88,13 +87,14 @@ defineGame({
   terms: [
     ['Atari', 'A group with 1 liberty left; it can be captured next move.'],
     ['{=eye} Eye', 'An empty point enclosed by one group. A group with **two** eyes can never be captured.'],
-    ['Dead stones', 'Stones that can’t escape capture. At the end they are removed as prisoners without playing it out.'],
+    ['Point', 'A place where 2 lines cross. Stones go on points, not inside the squares.'],
+    ['Dead stones', 'Stones that can’t avoid being captured. At the end, both players agree which stones are dead; those are removed and given to the opponent as prisoners, without playing out the capture.'],
     ['Seki', 'Rival groups sharing liberties that neither can fill without being captured. Both live; under Japanese rules their shared empty points score for no one.'],
   ],
 
   gotchas: [
-    '**Ko**: after a single stone is captured, the opponent may not recapture at once if that repeats the board; they must play elsewhere first.',
-    'A stone with no liberties is illegal **unless** it captures, which gives it liberties.',
+    '**Ko**: if a move captures exactly 1 stone, the opponent may not immediately recapture if that would return the board to how it was before; they must play elsewhere first and may recapture on a later turn.',
+    'You may not place a stone where it (with its group) would have no liberties, **unless** that move captures enemy stones, which gives it liberties.',
     'Diagonal stones are **not** connected and don’t share liberties.',
   ],
 
@@ -129,9 +129,9 @@ defineGame({
     return [
       { step: 0, say: 'Ben’s two {=white} stones inside Ana’s area have **one liberty** {=liberty} left: atari.', svg: base + onBoard + libs + A.glow(lx, ly, 12, 'g-b') },
       { step: 0, say: 'Ana places a {=black} on that **last liberty**.', svg: base + onBoard + A.k('b-new', stone(1, 7, true)) + A.glow(lx, ly, 13, 'g-b') },
-      { step: 1, say: 'The white pair has no liberties, so it is **captured**: Ana puts both in her lid as **2 prisoners**.', svg: base + inLid + A.k('b-new', stone(1, 7, true)) + A.glow(262, 66, 20, 'g-lid') },
+      { step: 0, say: 'The white pair has no liberties, so it is **captured**: Ana puts both in her lid as **2 prisoners**.', svg: base + inLid + A.k('b-new', stone(1, 7, true)) + A.glow(262, 66, 20, 'g-lid') },
       { step: 0, say: 'Ben plays elsewhere, sealing the border of his top-right territory.', svg: base + inLid + A.k('b-new', stone(1, 7, true)) + A.k('w-new', stone(5, 3, false)) + A.glow(...P(5, 3), 13, 'g-w2') },
-      { step: 2, say: 'When neither side can gain, both **pass**. Score = surrounded empty points ({=terr-b} {=terr-w}) + prisoners.', svg: base + inLid + A.k('b-new', stone(1, 7, true)) + A.k('w-new', stone(5, 3, false)) +
+      { step: 1, say: 'When neither side can gain, both **pass**. Score = surrounded empty points ({=terr-b} {=terr-w}) + prisoners.', svg: base + inLid + A.k('b-new', stone(1, 7, true)) + A.k('w-new', stone(5, 3, false)) +
         [[0, 4], [1, 4], [2, 4], [0, 5], [1, 6], [2, 6], [0, 7], [0, 8], [1, 8], [2, 8], [3, 7], [3, 8], [4, 7], [4, 8], [5, 7], [5, 8]].map(([i, j]) => { const [x, y] = P(i, j); return A.rect(x - 3, y - 3, 6, 6, '#1e1e1e', { sw: 0, rx: 0 }); }).join('') +
         [[4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [6, 3], [7, 3], [8, 3], [7, 4], [8, 4], [7, 5], [8, 5]].map(([i, j]) => { const [x, y] = P(i, j); return A.rect(x - 3, y - 3, 6, 6, '#fbfbf7', { sw: 0.8, rx: 0, stroke: '#7a7468' }); }).join('') },
     ];

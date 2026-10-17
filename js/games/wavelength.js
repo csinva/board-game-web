@@ -32,34 +32,34 @@ defineGame({
 
   turn: {
     type: 'round',
-    intro: 'Each round, the active team does this:',
+    intro: 'Each round, one team is active:',
     steps: [
-      { verb: 'Spin', text: 'The team’s {psychic} draws a {spectrum} (e.g. Cold ↔ Hot), spins the {target} and peeks at it alone.' },
-      { verb: 'Clue', text: 'The Psychic closes the screen and says **one clue** that sits at the target’s spot on that spectrum (“coffee”).' },
-      { verb: 'Dial', text: 'The team debates and turns the {dial} to where they think the target is.' },
-      { verb: 'Left/right', text: 'The **other team** calls whether the target’s centre is left or right of the dial.' },
-      { verb: 'Reveal', text: 'Open the screen and score (see Scoring).' },
+      { verb: 'Spin', text: 'The active team’s {psychic} draws 1 {spectrum} (e.g. Cold ↔ Hot), spins the {target} with the screen closed, then opens the screen so that only they see where it is.' },
+      { verb: 'Clue', text: 'The Psychic closes the screen and says **one clue**: something that belongs at the target’s spot on that card’s scale (“coffee” for a spot fairly far toward Hot).' },
+      { verb: 'Dial', text: 'The Psychic’s teammates discuss and turn the {dial} to where they think the target’s centre is.' },
+      { verb: 'Left/right', text: 'The **other team** then calls whether the target’s centre is to the left or the right of the dial.' },
+      { verb: 'Reveal', text: 'The Psychic opens the screen; both teams score (see Scoring).' },
     ],
-    outro: 'Teams alternate; pick a new Psychic',
+    outro: 'Other team’s turn, with a new Psychic',
   },
 
   tension: 'The best clue is the one your team will read the way you do, and that depends on who is listening.',
 
   structure: [
-    { label: 'Setup', text: 'Two teams sit on opposite sides. The team going second starts with **1 point**.' },
-    { label: 'Rounds', repeat: 'teams alternate', text: 'Spin, clue, dial, left/right call, reveal and score. A new Psychic each turn.' },
-    { label: 'Game end', text: 'A team reaches **10**: highest score wins. Tied: each team takes one more turn until it breaks.' },
+    { label: 'Setup', text: 'Two teams sit on opposite sides of the device. The team that takes the second turn starts with **1 point**.' },
+    { label: 'Rounds', repeat: 'teams alternate', text: 'Spin, clue, dial, left/right call, reveal and score. Each turn, the active team picks a new Psychic.' },
+    { label: 'Game end', text: 'When a team reaches **10**, the team with the higher score wins. If tied, each team takes one more turn; repeat until the tie breaks.' },
   ],
 
   points: [
-    ['{=band4} Centre band', '4 to the Psychic’s team; the other team’s call can’t score'],
-    ['{=band3} Next band out', '3'],
-    ['{=band2} Outer band', '2 (dial on a line between bands: take the higher)'],
-    ['Miss', '0'],
-    ['Left/right call', '+1 to the other team if right'],
+    ['{=band4} Centre band', 'dial in this band: 4 to the Psychic’s team, and the other team’s left/right call scores nothing'],
+    ['{=band3} Next band out', 'dial in either of these bands: 3 to the Psychic’s team'],
+    ['{=band2} Outer band', 'dial in either of these bands: 2 to the Psychic’s team. A dial on the line between two bands scores the higher one'],
+    ['Miss', 'dial outside the target: 0'],
+    ['Left/right call', '+1 to the other team if its call was correct (not on a centre-band hit)'],
   ],
 
-  end: { trigger: 'a team reaches 10 points', detail: 'Highest score wins. If tied, each team takes a sudden-death turn (left/right calls count); repeat until the tie breaks.' },
+  end: { trigger: 'a team reaches 10 points', detail: 'The team with the higher score wins. If tied, each team takes one more turn (left/right calls still score); repeat until the tie breaks.' },
   scoring: [
     { label: '{=band4} Bullseyes', share: 4 },
     { label: '{=band3} {=band2} Near misses', share: 4 },
@@ -72,18 +72,18 @@ defineGame({
     'Split into two teams and sit on opposite sides of the device.',
     'The team that goes second starts with **1 point**.',
     'Give the first team’s {psychic} the {spectrum}s and the device, screen closed.',
-    '2–3 players: play co-op as one team with 7 {spectrum}s and no left/right call; a bullseye scores 3 and adds 1 card. Aim for the highest total.',
+    '2–3 players: everyone plays together as one team through 7 {spectrum}s, with no left/right call. A bullseye scores 3 and adds 1 more card to play. Try for the highest total score.',
   ],
 
   terms: [
-    ['{=psychic} Psychic', 'The clue-giver this round. Sees the target, says one clue, then stays quiet.'],
+    ['{=psychic} Psychic', 'The active team’s clue-giver this round. Sees the target, says one clue, then stays quiet until the reveal.'],
     ['{=spectrum} Spectrum', 'Two-ended card that sets the scale (Overrated ↔ Underrated).'],
-    ['{=target} Target', 'The hidden 2-3-4-3-2 wedge; its spot is random each round.'],
-    ['{=band4} Bullseye', 'Dial in the centre 4 band.'],
+    ['{=target} Target', 'The hidden scoring wedge: 5 side-by-side bands worth 2, 3, 4, 3, 2 points. The spin puts it at a random spot each round.'],
+    ['{=band4} Bullseye', 'The dial ends in the centre 4-point band.'],
   ],
 
   gotchas: [
-    'The Psychic gives **only one clue** and can’t react to the debate.',
+    'The Psychic gives **only one clue** and must not react to the team’s debate.',
     'Catch-up: if a team scores a {=band4} bullseye and is **still behind**, it takes another turn at once with a new Psychic.',
     'The clue must be about the spectrum’s subject, not a number or position (“about 70%”).',
   ],

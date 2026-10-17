@@ -44,23 +44,23 @@
 
     pitch: 'Play a card matching the top card’s colour, number or symbol; first to empty your hand scores the cards others hold.',
 
-    goal: { big: '500 points', text: 'Go out first in a round to score the cards left in everyone else’s hands. First to **500** wins.' },
+    goal: { big: '500 points', text: 'Be the first to play all your cards in a round (**go out**); you then score points for the cards left in everyone else’s hands. First to **500** points wins.' },
 
     turn: {
       type: 'choose',
       intro: 'On your turn, do one:',
-      outro: 'Down to 1 card? Say “UNO”. Next player',
+      outro: 'Say “UNO” as you play your second-to-last card. Next player',
       steps: [
-        { verb: 'Match', text: 'Play a card matching the top card’s **colour**, **number** or **symbol**: {=b7} goes on any blue card or any 7.' },
-        { verb: 'Play wild', text: '{=wild} goes on anything; name the next colour. {=wild4} too, but only if you hold **no card of the current colour**.' },
-        { verb: 'Draw', text: 'Draw 1 (allowed even if you could play). You may play the drawn card if it matches, but no other card; then your turn ends.' },
+        { verb: 'Match', text: 'Play 1 card onto the discard pile that matches its top card’s **colour**, **number** or **symbol** (after a wild, match the named colour): {=b7} goes on any blue card or any 7.' },
+        { verb: 'Play wild', text: '{=wild} may be played on any card; then name the colour the next player must match. {=wild4} works the same way, but you may play it only if you hold **no card of the current colour**.' },
+        { verb: 'Draw', text: 'Take the top card of the draw pile (allowed even if you could play). If that card can be played, you may play it at once; you may not play any other card. Your turn then ends.' },
       ],
     },
 
     tension: 'Save action cards and wilds to defend yourself late, or play them now to slow the player about to go out.',
 
     structure: [
-      { label: 'Deal', text: '7 cards each. Flip the top card of the draw pile to start the discard pile.' },
+      { label: 'Deal', text: '7 cards each. Turn the top card of the draw pile face up to start the discard pile.' },
       { label: 'Turns', repeat: 'until someone is out', text: 'Match or draw. Action cards change who goes next.' },
       { label: 'Score the round', text: 'The player who went out scores all cards left in opponents’ hands.' },
       { label: 'Next round', repeat: 'until 500 points', text: 'Shuffle all cards and deal again. The rules don’t name the next dealer; passing the deal left is usual.' },
@@ -71,7 +71,7 @@
       ['{=skip} {=reverse} {=draw2}', '20 each'],
       ['{=wild} {=wild4}', '50 each'],
       ['Who scores', 'Only the player who went out, from every opponent’s hand'],
-      ['Going out on {=draw2} or {=wild4}', 'The next player still draws; those cards count too'],
+      ['Going out on {=draw2} or {=wild4}', 'If your last card is one of these, the next player still draws the cards, and they count toward your score'],
     ],
 
     end: {
@@ -83,7 +83,7 @@
       title: 'Action cards',
       rows: [
         ['{skip}', 'Next player loses their turn.'],
-        ['{reverse}', 'Reverse direction. With 2 players, acts as Skip.'],
+        ['{reverse}', 'Play direction reverses (clockwise becomes counter-clockwise, or back). With 2 players, acts as Skip.'],
         ['{draw2}', 'Next player draws 2 and loses their turn.'],
         ['{wild}', 'Name any colour.'],
         ['{wild4}', 'Name a colour; next player draws 4 and loses their turn. Legal only with no card of the current colour.'],
@@ -94,11 +94,12 @@
 
     setup: [
       'Each player draws a card; highest number deals. Shuffle the 108 standard cards (blank cards in newer decks are optional); deal 7 each. The rest is the draw pile.',
-      'Flip the top card. If it is {=wild4}, shuffle it back and flip again. Any other action card applies to the first player (a {=wild}: first player names the colour). Sheets since 2022 just flip again for any action or wild card.',
-      'Player left of the dealer starts, clockwise (a starting {=reverse}: dealer starts, going right).',
+      'Flip the top card. If it is {=wild4}, shuffle it back and flip again. Any other action card applies to the first player (a {=wild}: first player names the colour). Rule sheets printed since 2022 instead flip again for any action or wild card.',
+      'The player to the dealer’s left goes first, and play goes clockwise. If the first card is a {=reverse}, the dealer goes first and play goes to the dealer’s right.',
     ],
 
     terms: [
+      ['Go out', 'Play your last card. This ends the round.'],
       ['UNO', 'Say it as you play your second-to-last card.'],
       ['Challenge', 'The player hit by {=wild4} may claim it was illegal. The player who played it shows their hand to the challenger.'],
       ['Draw pile', 'Face-down cards. When empty, shuffle the discard pile (except the top card) into a new one.'],
@@ -106,8 +107,8 @@
 
     gotchas: [
       '**Stacking** a Draw Two on a Draw Two (or a Draw Four on either) is a house rule; Mattel confirmed it isn’t allowed. Officially you draw and lose your turn.',
-      '{=wild4} challenge: if it was illegal, the player who played it draws 4 instead. If legal, the challenger draws 6 and loses their turn. The named colour stands either way.',
-      'Forget to say UNO and get caught before the next player starts their turn: draw 2.',
+      '{=wild4} challenge: if it was illegal, the player who played it draws the 4 instead of the challenger. If legal, the challenger draws 6 and loses their turn. The named colour stands either way.',
+      'If you forget to say UNO and another player points it out before the next player starts their turn, you draw 2 cards.',
     ],
 
     tips: [

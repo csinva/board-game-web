@@ -30,14 +30,14 @@ defineGame({
 
   pitch: 'Place letter tiles to form crossword-style words, using premium squares to multiply scores; highest total wins.',
 
-  goal: { big: 'Highest score', text: 'Most **points** when the tiles run out. A word scores its tile values, boosted by premium squares.' },
+  goal: { big: 'Highest score', text: 'Have the most **points** when the game ends. Each word scores the values of its tiles, increased by premium squares.' },
 
   turn: {
     type: 'choose',
     steps: [
-      { verb: 'Play a word', text: 'Place tiles in **one row or column**, joined to tiles on the board. Score every new word formed, then refill to 7.' },
-      { verb: 'Exchange', text: 'Set any number of tiles aside face-down, draw as many, then return them to the bag. Score 0.' },
-      { verb: 'Pass', text: 'Score 0.' },
+      { verb: 'Play a word', text: 'Place 1 or more tiles from your rack in **one row or one column**, so that at least one touches a tile already on the board (except on the first play). Score every new word formed, then draw from the bag until you have 7 tiles.' },
+      { verb: 'Exchange', text: 'Set any number of your tiles aside face down, draw the same number from the bag, then put the set-aside tiles into the bag. Score 0. (Tournament rules allow this only while 7+ tiles are in the bag.)' },
+      { verb: 'Pass', text: 'Place nothing and score 0 this turn.' },
     ],
   },
 
@@ -45,17 +45,17 @@ defineGame({
 
   structure: [
     { label: 'Setup', text: 'All 100 tiles go in the {bag}; each player draws 7. The first word must cover the {star}.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Play a word, exchange or pass. After playing, draw back to 7 while the bag lasts.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Play a word, exchange or pass. After playing, draw from the bag until you have 7 tiles or the bag is empty.' },
     { label: 'Game end', text: 'The bag is empty and one player plays their last tile, or every player passes twice in a row.' },
-    { label: 'Final scoring', text: 'Each player subtracts their unplayed tiles. A player who went out adds everyone else’s unplayed total.' },
+    { label: 'Final scoring', text: 'Each player subtracts the total value of the tiles left on their rack. A player who used all their tiles adds the total of everyone else’s leftover tiles.' },
   ],
 
   points: [
     ['{=l-a} Letters', 'The value printed on each tile; {=blank} scores 0'],
     ['{=dl} {=tl} Letter squares', 'Double / triple that tile’s value'],
-    ['{=dw} {=tw} Word squares', 'Double / triple the whole word, after letter bonuses. Two word squares in one word multiply (×4 or ×9)'],
+    ['{=dw} {=tw} Word squares', 'Double / triple the whole word, after letter bonuses. If one word covers 2 word squares, apply both (×4 for 2 doubles, ×9 for 2 triples)'],
     ['{=star} Centre star', 'Double word for the first play'],
-    ['Every new word', 'Each word your tiles form scores in full; premiums count only under new tiles'],
+    ['Every new word', 'Each word your tiles form scores in full, including old tiles in it; premium squares count only under tiles placed this turn'],
     ['Bingo', '+50 for playing all 7 tiles in one turn'],
   ],
 
@@ -77,30 +77,30 @@ defineGame({
     ],
   },
 
-  example: '**BOARD** runs across the centre. You hold {=l-q}{=l-u}{=l-a} and place them above its D to spell **QUAD** downward: 10 + 1 + 1 + 2 = **14 points**. The D was already down, so it gets no premium. Draw 3 tiles back to 7.',
+  example: '**BOARD** runs across the centre. You hold {=l-q}{=l-u}{=l-a} and place them above its D to spell **QUAD** downward: 10 + 1 + 1 + 2 = **14 points**. The D was already down, so it gets no premium. Draw 3 tiles to bring your rack back to 7.',
 
   setup: [
-    'Put all 100 tiles in the {bag}. Each player draws 1 tile; nearest to A goes first ({=blank} beats all), then play goes clockwise. Return those tiles.',
-    'In turn order, each player draws 7 onto a {rack}, hidden from the others.',
+    'Put all 100 tiles face down in the {bag}. Each player draws 1 tile; the player whose letter is closest to A goes first (a {=blank} beats any letter), then play goes clockwise. Put those tiles back in the bag and mix.',
+    'In turn order, each player draws 7 tiles and stands them on their {rack}, facing only themselves.',
     'The first word needs 2+ letters and must cover the {star} (a double-word square).',
   ],
 
   terms: [
-    ['{=rack} Rack', 'Your 7 tiles, hidden from the others.'],
+    ['{=rack} Rack', 'The stand that holds your tiles (up to 7), facing only you.'],
     ['Bingo', 'Playing all 7 tiles in one turn: +50.'],
-    ['{=blank} Blank', 'Wild tile worth 0; the letter you name stays fixed all game.'],
-    ['Challenge', 'Dispute a play before the next turn starts; check the dictionary. Invalid: the player takes the tiles back and scores 0. Valid: the challenger loses their next turn.'],
+    ['{=blank} Blank', 'Worth 0. When you play it, say which letter it stands for; it stays that letter for the rest of the game.'],
+    ['Challenge', 'Before the next player starts their turn, any player may challenge a word just played; look it up in an agreed dictionary. If any word is invalid, the player takes back their tiles and scores 0 for that turn. If all are valid, the challenger loses their next turn.'],
   ],
 
   gotchas: [
     'Premium squares count **only on the turn** a tile is first placed on them.',
     'Every new word your tiles form scores, including side words made by touching tiles.',
-    'All tiles in a turn go in a **single line** with no gaps (board tiles may fill gaps).',
+    'All tiles you place in one turn go in a **single row or column** with no empty squares between them (tiles already on the board may fill the gaps).',
   ],
 
   tips: [
     'Learn the 2-letter words (QI, ZA, XU, JO); they let you stack parallel words.',
-    'Keep a balanced rack: save S and {=blank} blanks for big plays; dump awkward duplicates.',
+    'Keep a balanced rack: save S and {=blank} blanks for big plays; play off or exchange duplicate letters.',
     'Aim {=l-j}{=l-q}{=l-x}{=l-z} at {=tl} and {=dl}, ideally scoring 2 words at once.',
   ],
 

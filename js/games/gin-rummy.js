@@ -35,30 +35,30 @@
 
     pitch: 'Draw and discard to form sets and runs, then knock when your leftover cards total 10 or less. First to 100 wins.',
 
-    goal: { big: '100 points', text: 'Score by ending deals with less **deadwood** (unmelded card points) than your opponent. First to 100 wins.' },
+    goal: { big: '100 points', text: '2 players. Group your cards into **melds**: sets (3–4 cards of one rank) and runs (3+ cards in a row in one suit). Cards not in a meld are **deadwood** and count their points against you. When a deal ends, the player with less deadwood scores. First to 100 points wins.' },
 
     turn: {
       type: 'sequence',
       steps: [
-        { verb: 'Draw', text: 'Take the top card of the face-down {stock} or the face-up **discard pile**.' },
-        { verb: 'Discard', text: 'Put 1 card face up on the discard pile.' },
-        { verb: 'Knock', text: 'Optional, instead of a normal discard: if your **deadwood is 10 or less**, discard face down and lay out your hand. The deal ends.' },
+        { verb: 'Draw', text: 'Take 1 card: the top card of the face-down {stock} or the top card of the face-up **discard pile**.' },
+        { verb: 'Discard', text: 'Put 1 card from your hand face up on the discard pile. Your turn ends.' },
+        { verb: 'Knock', text: 'Optional, instead of a normal discard: if your deadwood after discarding totals **10 or less**, you may **knock**: discard face down, then lay your hand face up, split into melds and deadwood. The deal ends and is scored (see How the game flows).' },
       ],
     },
 
-    tension: 'Knock early with a few points of deadwood, or wait for gin and risk your opponent knocking first or undercutting you.',
+    tension: 'Knock early with a few points of deadwood, or wait for gin (0 deadwood) and risk your opponent knocking first or undercutting you.',
 
     structure: [
-      { label: 'Deal', text: '10 cards each; 1 face up starts the discard pile.' },
-      { label: 'Turns', repeat: 'until a knock', text: 'Draw 1, discard 1.' },
-      { label: 'Showdown', text: 'Knocker lays out melds; defender lays out, then lays off. Score the deal.' },
+      { label: 'Deal', text: 'The dealer deals 10 cards each; the next card goes face up to start the discard pile.' },
+      { label: 'Turns', repeat: 'until a knock', text: 'Players alternate turns, starting with the non-dealer: draw 1, discard 1.' },
+      { label: 'Showdown', text: 'The knocker lays out melds and deadwood. The other player (the **defender**) lays out their melds, then may **lay off**: add deadwood cards to the knocker’s melds (e.g. 7{=heart} onto 4{=heart} 5{=heart} 6{=heart}) so they stop counting. Score the deal.' },
       { label: 'Next deal', repeat: 'until 100 points', text: 'The winner of the deal deals next.' },
-      { label: 'Game end', text: 'First to 100 wins. Add bonuses; the margin is the difference between totals.' },
+      { label: 'Game end', text: 'The first player to reach 100 points wins. Add the bonuses (see Scoring); the winning margin is the difference between the two totals.' },
     ],
 
     end: {
       trigger: 'a player reaches 100 points',
-      detail: 'The winner adds a 100 game bonus; line and shutout bonuses are optional. Older rules (pagat): gin 20, undercut 10, line 20.',
+      detail: 'The winner adds a 100 game bonus; line and shutout bonuses are optional. Some older rules use gin 20, undercut 10, line 20.',
     },
     scoring: [
       { label: 'Knock: deadwood difference', share: 5 },
@@ -67,12 +67,12 @@
     ],
 
     points: [
-      ['Knock', 'Opponent’s deadwood minus yours (after lay-offs)'],
-      ['Gin', '25 + opponent’s deadwood. No lay-offs; gin can’t be undercut'],
-      ['Undercut', 'Defender’s deadwood ≤ knocker’s (ties too): defender scores 25 + the difference'],
-      ['Game bonus', 'First to 100: +100'],
-      ['Line bonus (optional)', 'At game end, each player +25 per deal they won'],
-      ['Shutout (optional)', 'Loser won no deal: double the winner’s deal points'],
+      ['Knock', 'Knocker with less deadwood scores the defender’s deadwood (after lay-offs) minus the knocker’s'],
+      ['Gin', 'Knock with 0 deadwood: score 25 + the opponent’s deadwood. The opponent may not lay off, and gin can’t be undercut'],
+      ['Undercut', 'If the defender’s deadwood (after lay-offs) is less than or equal to the knocker’s, the defender scores 25 + the difference'],
+      ['Game bonus', 'First player to 100: +100'],
+      ['Line bonus (optional)', 'At game end, each player scores +25 for each deal they won'],
+      ['Shutout (optional)', 'If the loser won no deals, the winner’s points from deals are doubled'],
     ],
 
     ref: {
@@ -80,7 +80,7 @@
       rows: [
         ['Set', '9{=club} 9{=diamond} 9{=spade}'],
         ['Run', '4{=heart} 5{=heart} 6{=heart} 7{=heart}'],
-        ['Not a run', 'Q{=spade} K{=spade} A{=spade} (ace is low)'],
+        ['Not a run', 'Q{=spade} K{=spade} A{=spade} (ace is always low: A 2 3 is a run)'],
         ['{=ca} Ace', '1 point'],
         ['{=c2} … {=c10}', 'face value'],
         ['{=cj} {=cq} {=ck}', '10 points each'],
@@ -90,28 +90,29 @@
     example: 'Maya discards Q{=spade}. You take it to complete three queens, discard K{=spade} face down and knock with 3 deadwood (the 3{=club}). Maya lays off her 7{=heart} on your heart run and has 15 left: you score 15 − 3 = **12**.',
 
     setup: [
-      'Cut for first deal; low card deals. Keep score on paper.',
+      'Each player takes a random card from the deck; the lower card deals first. Keep score on paper.',
       'Deal 10 cards each. Turn the next card face up as the discard pile; the rest is the {stock}.',
-      'First turn: non-dealer may take the up-card. If they refuse, dealer may. If both refuse, non-dealer draws from the {=stock}.',
+      'First turn only: the non-dealer may take the face-up card (then discards). If they decline, the dealer may take it. If both decline, the non-dealer takes the top {=stock} card and play continues normally.',
     ],
 
     terms: [
       ['Meld', 'A set (3–4 cards of one rank) or a run (3+ consecutive cards of one suit).'],
       ['Deadwood', 'Cards not in a meld. Their points count against you.'],
-      ['Knock', 'End the deal with 10 or less deadwood.'],
+      ['Knock', 'End the deal by discarding face down with 10 or less deadwood left.'],
       ['Gin', 'Knocking with 0 deadwood.'],
+      ['Defender', 'The player who did not knock.'],
       ['Lay off', 'After a knock, the defender adds deadwood cards to the knocker’s melds.'],
     ],
 
     gotchas: [
       'You may not discard the card you just took from the discard pile.',
       'Only the defender lays off, and never on a gin hand.',
-      'If the player who draws the 3rd-last card discards without knocking (2 left in the {=stock}), the deal is void: nobody scores and the same dealer deals again.',
+      'If only 2 cards remain in the {=stock} and the player who just drew discards without knocking, the deal is void: nobody scores and the same dealer deals again.',
     ],
 
     tips: [
       'Discard high cards early: a stray {=ck} costs 10, a stray 2 costs 2.',
-      'Note what your opponent takes from the discard pile and don’t feed those melds.',
+      'Note what your opponent takes from the discard pile, and don’t discard cards that fit those melds.',
       'Knock as soon as you can early in a deal; wait for gin only when your deadwood is already near 0.',
     ],
 

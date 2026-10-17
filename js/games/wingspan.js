@@ -32,12 +32,12 @@ defineGame({
 
   turn: {
     type: 'choose',
-    intro: 'Place an action cube to do ONE of these:',
+    intro: 'On your turn, place 1 action cube on your mat and do exactly ONE of these. For the last 3, the cube goes in the leftmost slot of that row with no bird in it; that slot shows how many you get.',
     steps: [
-      { verb: 'Play a bird', text: 'Pay its food (plus {=egg} in columns 2–5) and place it in the leftmost empty slot of a habitat it can live in.' },
-      { verb: 'Gain food', text: '{=forest} Take food dice from the birdfeeder (a two-food face gives one of them), then activate forest birds **right to left**.' },
-      { verb: 'Lay eggs', text: '{=grassland} Lay {egg}s on your birds (up to each bird’s egg limit), then activate grassland birds right to left.' },
-      { verb: 'Draw cards', text: '{=wetland} Draw {birdcard}s from the tray or deck (refill the tray after your turn), then activate wetland birds right to left.' },
+      { verb: 'Play a bird', text: 'Choose a bird from your hand and a habitat shown on its card. Pay its food cost plus the {=egg} egg cost of that row’s leftmost empty slot (see Egg cost), and place the bird in that slot.' },
+      { verb: 'Gain food', text: '{=forest} Take as many dice from the birdfeeder as the slot shows; gain 1 matching food token per die (a die showing 2 foods gives 1 of your choice). Then you may use the brown power of each forest bird, **right to left**.' },
+      { verb: 'Lay eggs', text: '{=grassland} Lay as many {egg}s as the slot shows, split any way among your birds, never above a bird’s egg limit. Then you may use your grassland birds’ brown powers, right to left.' },
+      { verb: 'Draw cards', text: '{=wetland} Draw as many {birdcard}s as the slot shows, each from the face-up tray or the top of the deck; refill the tray to 3 at the end of your turn. Then you may use your wetland birds’ brown powers, right to left.' },
     ],
   },
 
@@ -45,16 +45,16 @@ defineGame({
 
   structure: [
     { label: 'Setup', text: 'Deal hands (see Setup). Put 4 random goal tiles on the goal board. Random first player.' },
-    { label: 'Rounds 1–4', repeat: '4 rounds', text: 'Clockwise, 1 action per turn until all your {cube}s are placed: **8** turns in round 1, then 7, 6, 5.' },
-    { label: 'End of each round', text: 'Clear your mat; place 1 {=cube} on the goal board to score that round’s goal. Discard and refill the bird tray. Pass the first-player token left.' },
-    { label: 'Final scoring', text: 'Add up every source below. Tie: most unused food tokens.' },
+    { label: 'Rounds 1–4', repeat: '4 rounds', text: 'Starting with the first player and going clockwise, each player takes 1 turn at a time until everyone has placed all their {cube}s: **8** turns each in round 1, then 7, 6 and 5.' },
+    { label: 'End of each round', text: 'Everyone takes their cubes off their mat. Each player places 1 {=cube} on the goal board, on the space for their result in that round’s goal; it stays there. Discard the 3 birds in the tray and deal 3 new ones. Pass the first-player token to the left.' },
+    { label: 'Final scoring', text: 'Add up every source below. Tie: the tied player with the most unused food tokens wins.' },
   ],
 
   points: [
     ['{=birdcard} Birds', 'The points printed on each bird you played'],
     ['Bonus cards', 'As printed on each bonus card you hold'],
     ['Round goals', 'The points under your {=cube} on the goal board, for each round'],
-    ['{=egg} Eggs', '1 each, on your birds'],
+    ['{=egg} Eggs', '1 per egg on your birds'],
     ['Cached food', '1 per food token on a bird'],
     ['Tucked cards', '1 per card tucked under a bird'],
   ],
@@ -72,34 +72,35 @@ defineGame({
     title: 'Food, rows and egg costs',
     rows: [
       ['Food', '{invertebrate} {seed} {fish} {fruit} {rodent} {wild}'],
-      ['Rows', '{=forest} food · {=grassland} {=egg} · {=wetland} {=birdcard}; the amount grows with each bird in the row'],
-      ['Egg cost', 'column 1: none · 2–3: {=egg} · 4–5: {=egg}{=egg}, removed from any of your birds'],
-      ['Paying food', 'when playing a bird, any 2 food = 1 food of your choice; {=wild} = any 1 food'],
-      ['Bonus spaces', 'optional, once: {=forest} discard 1 {=birdcard} → +1 food · {=grassland} 1 food → +1 {=egg} · {=wetland} 1 {=egg} → +1 {=birdcard}'],
-      ['Round goals', 'Green side: 1st/2nd/3rd place by count (need at least 1); tied players split the tied places’ points, rounded down. Blue side: 1 per item, max 5.'],
+      ['Rows', '{=forest} food · {=grassland} {=egg} · {=wetland} {=birdcard}. The more birds in a row, the further right your cube goes and the more you get.'],
+      ['Egg cost', 'Slot in column 1: no eggs · columns 2–3: 1 {=egg} · columns 4–5: 2 {=egg}{=egg}. Pay by removing eggs from any of your birds.'],
+      ['Paying food', 'When paying for a bird, you may pay any 2 food tokens in place of 1 food of your choice. A {=wild} in a cost can be paid with any 1 food.'],
+      ['Bonus slots', 'If your cube’s slot shows a trade, you may make it once: {=forest} discard 1 {=birdcard} → +1 food · {=grassland} pay 1 food → +1 {=egg} · {=wetland} discard 1 {=egg} → +1 {=birdcard}'],
+      ['Round goals', 'Green side: players are ranked by how many of the goal’s items they have; 1st, 2nd and 3rd score the points shown (you need at least 1 item to score). Tied players add up the points of the places they share and split them, rounded down. Blue side: 1 point per item, up to 5.'],
     ],
   },
 
-  example: 'You play a duck (brown power: “draw 1 card”) into wetland column 2, paying {=invertebrate}{=seed} + {=egg}. Next turn you take the {=wetland} action: 2 birds in the row means you draw **2** cards, then the duck draws 1 more.',
+  example: 'You play a duck (brown power: “draw 1 card”) into wetland column 2, paying {=invertebrate}{=seed} + 1 {=egg}. Next turn you take the {=wetland} draw-cards action: the leftmost empty wetland slot is now column 3, which shows **draw 2**, so you draw 2 cards; then the duck’s power draws 1 more.',
 
   setup: [
-    'Deal each player 5 {birdcard}s, 2 bonus cards and 5 food: {=invertebrate}{=seed}{=fish}{=fruit}{=rodent}.',
-    'Keep any number of birds; discard 1 food per bird kept. Keep 1 bonus card.',
-    'Roll the 5 food dice into the birdfeeder. Deal 3 face-up birds to the tray.',
+    'Each player takes a mat and 8 {cube}s of one colour.',
+    'Deal each player 5 {birdcard}s, 2 bonus cards and 5 food tokens: 1 each of {=invertebrate}{=seed}{=fish}{=fruit}{=rodent}.',
+    'Each player keeps any number of the 5 birds and discards the rest, then discards 1 food token for each bird kept. Keep 1 of the 2 bonus cards; discard the other.',
+    'Roll the 5 food dice into the birdfeeder. Deal 3 birds face up to the tray.',
   ],
 
   terms: [
-    ['Habitat', 'One of your 3 rows: {forest}, {grassland}, {wetland}.'],
-    ['{=die} Birdfeeder', 'Dice tower. The faces showing are the food you can take.'],
-    ['Bird powers', '**Brown**: fires each time you take that row’s action. **White**: once, when played. **Pink**: once between your turns, when a rival does what it names. All powers are optional.'],
-    ['Cache / tuck', 'Food or cards stored on a bird; 1 point each.'],
+    ['Habitat', 'One of the 3 rows on your mat: {forest}, {grassland}, {wetland}.'],
+    ['{=die} Birdfeeder', 'Dice tower holding the 5 food dice. The faces showing are the food you can take.'],
+    ['Bird powers', '**Brown**: activates each time you take the action of the row the bird is in. **White**: once, when you play the bird. **Pink**: on other players’ turns, when someone does what it names (at most once between each of your turns). Using any power is optional.'],
+    ['Cache / tuck', 'Cache: put a food token on a bird. Tuck: slide a card under a bird, as the power says. Each is 1 point at game end.'],
     ['{=cube} Action cube', '8 per player, 1 per turn. Each round 1 stays on the goal board, so you have 1 fewer next round.'],
   ],
 
   gotchas: [
-    'A brown power fires only when you take **that row’s action**, not when you play the bird.',
-    'Birds in columns 2–5 cost **eggs** ({=egg}) on top of food.',
-    'If the feeder dice all show one face (even a single die), you may reroll all 5 before taking food. When the feeder empties, reroll all 5.',
+    'A brown power activates only when you take **that row’s action**, not when you play the bird.',
+    'Birds in columns 2–3 cost **1 egg** ({=egg}) and in columns 4–5 **2 eggs**, on top of their food.',
+    'Before taking food, if every die left in the feeder shows the same face (including when only 1 die is left), you may reroll all 5. If the feeder is ever empty, reroll all 5.',
   ],
 
   tips: [
@@ -151,7 +152,7 @@ defineGame({
     return [
       { step: 0, say: 'Action: **play a bird**. The duck in your hand lives only in the {wetland}.', svg: board + fixed + trayB(0) + deckTop + food + cubeHome + duckHand + A.glow(96, 177, 24) },
       { step: 0, say: 'The leftmost empty wetland slot is **column 2**: pay its food **plus 1** {=egg}.', svg: board + fixed + trayB(0) + deckTop + cubeHome + duckBoard + A.glow(slotX(1) + 16, rowY(2) + 24, 26) },
-      { step: 3, say: 'Next turn: **draw cards**. Your cube goes on the first open wetland space: **draw 2**.', svg: board + fixed + trayB(0) + deckTop + cubeRow + duckBoard + A.glow(slotX(2) + 16, rowY(2) + 24, 22) },
+      { step: 3, say: 'Next turn: **draw cards**. Your cube goes in the leftmost empty wetland slot: **draw 2**.', svg: board + fixed + trayB(0) + deckTop + cubeRow + duckBoard + A.glow(slotX(2) + 16, rowY(2) + 24, 22) },
       { step: 3, say: 'Take 2 birds from the face-up tray.', svg: board + fixed + trayB(2) + deckTop + cubeRow + duckBoard +
         A.k('t0', bird(...hand(1), '#3c8d4f', '', 28, 40)) + A.k('t1', bird(...hand(2), '#d6578a', '', 28, 40)) },
       { step: 3, say: 'Wetland birds activate **right to left**: the duck’s brown power draws 1 more.', svg: board + fixed + trayB(2) + cubeRow + duckBoard +

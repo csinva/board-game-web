@@ -32,25 +32,25 @@
 
     pitch: 'Bet on the best 5-card hand from 2 private and 5 shared cards; win chips by showing the best hand or making others fold.',
 
-    goal: { big: 'Win the chips', text: 'Win pots: hold the best 5-card hand at showdown, or bet until everyone else folds. In a tournament, take every {chip}.' },
+    goal: { big: 'Win the chips', text: 'Each hand, players bet chips into a central **pot**. Win it by holding the best 5-card hand when the remaining players reveal their cards (the **showdown**), or by betting until every other player gives up (**folds**). In a tournament, win every {chip}.' },
 
     turn: {
       type: 'round',
       intro: 'Each hand:',
       steps: [
-        { verb: 'Blinds', text: 'The two players left of the {=button} post the **small** and **big blind**. Everyone gets 2 face-down {hole}s.' },
-        { verb: 'Preflop', text: 'Starting left of the big blind: **fold**, **call** or **raise**; with no bet to match, **check** or **bet**. The big blind acts last and may raise even if all just called. The round ends when everyone still in has matched the top bet.' },
-        { verb: 'Flop', text: 'Burn 1 card face down, then deal 3 shared cards face up. Bet again, starting with the first player still in left of the {=button}.' },
-        { verb: 'Turn, river', text: 'Burn 1, deal a 4th shared card, bet. Burn 1, deal a 5th, bet.' },
-        { verb: 'Showdown', text: 'Players still in reveal, last bettor first. The **best 5 of your 7** cards wins the pot. Move the {=button} left.' },
+        { verb: 'Blinds', text: 'The {button} marks the dealer’s seat. The player to its left puts in the **small blind** and the next player to the left puts in the **big blind**: forced bets of the agreed sizes. Deal each player 2 cards face down: their {hole}s.' },
+        { verb: 'Preflop', text: 'Betting round 1 starts with the player to the left of the big blind and goes clockwise. On your turn: **fold** (drop your cards and leave the hand), **call** (put in chips to match the highest bet so far), or **raise** (match it and add more). If no one has bet this round, you may instead **check** (pass without betting) or **bet**. The big blind acts last and may raise even if everyone just called. The round ends when every player still in has had a turn and has put in the same amount.' },
+        { verb: 'Flop', text: 'The dealer discards (**burns**) the top card face down, then deals 3 shared cards face up in the middle: the **flop**. Betting round 2 starts with the first player still in to the left of the {=button}.' },
+        { verb: 'Turn, river', text: 'Burn 1 card, deal a 4th shared card (the **turn**), and hold betting round 3. Burn 1 card, deal a 5th shared card (the **river**), and hold betting round 4. Both rounds start like round 2.' },
+        { verb: 'Showdown', text: 'If 2 or more players are still in, they reveal their hole cards, starting with the last player who bet or raised (if everyone checked, the first player still in to the left of the button). Each makes the **best 5-card hand from their 7 cards** (2 hole + 5 shared); the best hand wins the pot. Move the {=button} 1 seat left.' },
       ],
     },
 
     tension: 'Each bet asks a question: fold and lose what you put in, or pay more to see whether your hand beats a player who may be bluffing.',
 
     structure: [
-      { label: 'Setup', text: 'Equal {chip} stacks; agree the blinds.' },
-      { label: 'Hand', repeat: 'every hand', text: 'Blinds, 2 {hole}s each, 4 betting rounds (preflop, flop, turn, river), showdown. If all but one fold, that player takes the pot unseen.' },
+      { label: 'Setup', text: 'Give everyone the same number of {chip}s; agree the blind sizes.' },
+      { label: 'Hand', repeat: 'every hand', text: 'Blinds, 2 {hole}s each, 4 betting rounds (preflop, flop, turn, river), showdown. If every player but one folds, at any point, that player wins the pot without showing their cards.' },
       { label: 'Move button', text: 'The {=button} and blinds move 1 seat left.' },
       { label: 'Tournament', repeat: 'on a timer', text: 'Blinds rise on a schedule (e.g. every 20 min). Players with no chips are out.' },
       { label: 'End', text: 'Last player with chips wins.' },
@@ -69,7 +69,7 @@
         ['Four of a kind', 'Q{=spade} Q{=heart} Q{=diamond} Q{=club} 3{=spade}'],
         ['Full house', 'K{=club} K{=diamond} K{=heart} 7{=spade} 7{=club}'],
         ['Flush', 'A{=spade} J{=spade} 9{=spade} 4{=spade} 2{=spade}'],
-        ['Straight', '8{=club} 7{=heart} 6{=spade} 5{=diamond} 4{=club} (A can be low)'],
+        ['Straight', '8{=club} 7{=heart} 6{=spade} 5{=diamond} 4{=club} (A can be high or low: 5 4 3 2 A)'],
         ['Three of a kind', '9{=club} 9{=heart} 9{=diamond} K{=spade} 2{=club}'],
         ['Two pair', 'J{=heart} J{=club} 4{=spade} 4{=diamond} A{=club}'],
         ['Pair', '10{=spade} 10{=heart} K{=club} 6{=diamond} 3{=spade}'],
@@ -86,21 +86,22 @@
     ],
 
     terms: [
-      ['Blinds', 'Forced bets by the 2 players left of the button. Heads-up (2 players), the button posts the small blind and acts first preflop, last after.'],
+      ['Blinds', 'Forced bets by the 2 players to the left of the button. With only 2 players, the button player puts in the small blind, acts first in betting round 1, and acts last in later rounds.'],
+      ['Pot', 'All chips bet in the current hand, in the middle of the table.'],
       ['Check', 'Pass without betting. Only allowed if nobody has bet this round.'],
       ['All-in', 'Betting all your chips. You can win from each player only as much as you put in; bets beyond that form a side pot among the others.'],
-      ['Kicker', 'The highest unpaired card; breaks ties between equal hands.'],
-      ['No-limit', 'Any bet from the big blind up to all your chips.'],
+      ['Kicker', 'A card in your 5-card hand that is not part of its pair, three or four of a kind. When two hands are otherwise equal, the higher kicker wins.'],
+      ['No-limit', 'The betting style used here: any bet or raise may be from the size of the big blind up to all your chips.'],
     ],
 
     gotchas: [
       'Your hand is the best 5 of 7 cards: use 2, 1 or 0 of your hole cards.',
       'A raise must be at least the size of the previous bet or raise in that round.',
-      'Suits never rank. Equal hands compare kickers; if still equal, split the pot.',
+      'Suits never rank. If two hands are otherwise equal, compare kickers; if still equal, the tied players split the pot.',
     ],
 
     tips: [
-      'Fold most starting hands. Pairs, two high cards and suited aces are worth playing.',
+      'Fold most starting hands. A pair, two high cards, or an ace with another card of its suit are worth playing.',
       'Act late when you can: the {=button} acts last after the flop and sees what others do first.',
       'Bet your strong hands for value; bluff rarely, and against few players.',
     ],
@@ -127,7 +128,7 @@
       const pot = (keys) => chips(keys.map((key, i) => [key, ...POT(i)]));
       const pre = [['sb1', 70, 96], ['bb1', 196, 56], ['bb2', 204, 58]];
       return [
-        { step: 0, say: 'Ben posts the small blind (1), Maya the big blind (2). Everyone gets 2 face-down cards; yours are A{=spade} K{=spade}.',
+        { step: 0, say: 'Ben puts in the small blind (1), Maya the big blind (2). Everyone gets 2 face-down cards; yours are A{=spade} K{=spade}.',
           svg: board + ben + jo + maya + mine + chips(pre) + A.glow(162, 166, 34) },
         { step: 1, say: 'Jo folds. You **raise** to 6. Ben folds. Maya **calls**: 4 more.',
           svg: board + maya + mine + chips(pre.slice(1).concat([['y1', 210, 132], ['y2', 218, 134], ['y3', 226, 130], ['m3', 212, 60], ['m4', 220, 56]])) },

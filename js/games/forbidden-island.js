@@ -32,68 +32,69 @@ defineGame({
   turn: {
     type: 'sequence',
     steps: [
-      { verb: 'Act ×3', text: 'Take up to **3 actions**: move 1 tile, shore up a {=flooded} tile, give a {tcard} to a player on your tile, or capture a treasure.' },
-      { verb: 'Draw 2', text: 'Draw 2 {tcard}s; hand limit 5. {rise} is not replaced: it raises the {level} and puts the flood discards back on top of the flood deck.' },
-      { verb: 'Flood', text: 'Draw flood cards equal to the **water level**. Each named tile flips {=tile} → {=flooded}; one already flooded **sinks**.' },
+      { verb: 'Act ×3', text: 'Take up to **3 actions**, in any mix (repeats allowed): move to an adjacent tile, shore up a {=flooded} tile (yours or an adjacent one), give 1 {tcard} to a player on your tile, or capture a treasure. **Adjacent** means up, down, left or right, never diagonal.' },
+      { verb: 'Draw 2', text: 'Draw the top 2 {tcard}s. For each {rise}: move the {level} up 1, shuffle the flood discard pile onto the top of the flood deck, and discard the {=rise}; do not draw a replacement. If you now hold more than 5 cards, discard down to 5.' },
+      { verb: 'Flood', text: 'Draw flood cards one at a time, as many as the **water level** shows. Flip each named {=tile} tile to {=flooded}. If the named tile is already {=flooded}, it **sinks**: remove the tile and its flood card from the game.' },
     ],
   },
 
   tension: 'Each action spent shoring up is one not spent reaching the treasures, and tiles sink every turn.',
 
   structure: [
-    { label: 'Setup', text: 'Lay the island, flood 6 tiles, put each pawn on its role’s start tile, deal 2 {=tcard} each.' },
-    { label: 'Turns', repeat: 'clockwise', text: 'Up to 3 actions → draw 2 {=tcard} → draw flood cards equal to the {level}.' },
-    { label: 'Waters Rise!', text: 'When drawn: {=level} +1; shuffle the flood discards and put them on top of the flood deck; discard the card.' },
-    { label: 'Sinking', text: 'A {=flooded} tile that floods again is removed with its flood card. Pawns on it swim to an adjacent tile at once.' },
-    { label: 'Game end', text: 'Win: everyone on Fools’ Landing with all 4 treasures, then play {=heli}. Lose: an uncaptured treasure’s 2 tiles sink, Fools’ Landing sinks, a pawn can’t swim off, or the water hits the skull.' },
+    { label: 'Setup', text: 'Lay out the island, flood 6 tiles, put each pawn on its role’s start tile, deal 2 {=tcard} to each player.' },
+    { label: 'Turns', repeat: 'clockwise', text: 'Up to 3 actions → draw 2 {=tcard} → draw flood cards equal to the {level}. Then the player to the left goes.' },
+    { label: 'Waters Rise!', text: 'When one is drawn: move the {=level} marker up 1; shuffle the flood discard pile and put it on top of the flood deck; discard the {=rise}.' },
+    { label: 'Sinking', text: 'A {=flooded} tile whose flood card is drawn again is removed from the game with its flood card. Every pawn on it must at once swim (move) to an adjacent tile.' },
+    { label: 'Game end', text: 'Win: everyone on Fools’ Landing with all 4 treasures, then play {=heli}. Lose: both tiles of an uncaptured treasure sink, Fools’ Landing sinks, a pawn on a sinking tile has no tile to swim to, or the water level reaches the skull.' },
   ],
 
   end: {
-    trigger: 'the team escapes with all 4 treasures, or a loss condition hits',
+    trigger: 'the team escapes with all 4 treasures, or the team meets a loss condition',
     results: [
       { side: 'Team wins', text: 'when everyone is on Fools’ Landing with all 4 treasures and someone plays {heli}.' },
-      { side: 'Team loses', text: 'if both tiles of an uncaptured treasure sink, Fools’ Landing sinks, a player can’t swim off a sinking tile, or the water reaches the **skull**.' },
+      { side: 'Team loses', text: 'at once if both tiles of an uncaptured treasure sink, Fools’ Landing sinks, a pawn on a sinking tile has no tile to swim to, or the water level reaches the **skull**.' },
     ],
   },
 
   ref: {
     title: 'Roles',
     rows: [
-      ['Pilot', 'once a turn, fly to any tile (1 action)'],
-      ['Engineer', 'shore up 2 tiles for 1 action'],
-      ['Explorer', 'moves and shores up diagonally'],
-      ['Diver', 'moves through any adjacent {=flooded} and {=sunk} tiles for 1 action'],
-      ['Navigator', 'moves another player up to 2 tiles per action'],
-      ['Messenger', 'gives {=tcard} from anywhere'],
+      ['Pilot', 'once per turn, for 1 action, flies to any tile'],
+      ['Engineer', 'shores up 2 tiles for 1 action'],
+      ['Explorer', 'may also move and shore up diagonally'],
+      ['Diver', 'for 1 action, moves through 1 or more adjacent {=flooded} tiles or {=sunk} spaces, and must end on a tile'],
+      ['Navigator', 'for 1 action, moves another player’s pawn up to 2 adjacent tiles'],
+      ['Messenger', 'may give a {=tcard} to a player on any tile (1 action per card)'],
     ],
   },
 
-  example: 'Water level is 3. Sam (Engineer) moves onto Moon Temple (1 action), shores up 2 flooded tiles beside him (1 action), and moves again. He draws an {=earth} card and {rise}: level 4. He flips 4 flood cards; Coral Palace was already {=flooded}, so it **sinks**.',
+  example: 'The water level is 3. Sam (Engineer) moves onto Moon Temple (1 action), shores up 2 adjacent flooded tiles (1 action, Engineer ability), and moves again (1 action). He draws an {=earth} card and a {rise}: the water level rises to 4. He draws 4 flood cards; Coral Palace was already {=flooded}, so it **sinks**.',
 
   setup: [
-    'Lay the 24 tiles in the island shape; place the 4 treasures {=earth}{=wind}{=fire}{=ocean} beside it.',
-    'Flood 6 tiles: draw 6 flood cards and flip those tiles to {=flooded}.',
-    'Deal roles; each pawn starts on the tile showing its icon. Deal 2 {=tcard} each (replace and reshuffle any Waters Rise!). Set the {level} at Novice (first game), Normal, Elite or Legendary.',
+    'Shuffle the 24 tiles and lay them out at random, dry side up, in the island shape; place the 4 treasures {=earth}{=wind}{=fire}{=ocean} beside it.',
+    'Shuffle the flood deck. Draw the top 6 flood cards, flip those 6 tiles to {=flooded}, and put the 6 cards face up as the flood discard pile.',
+    'Deal each player a role; their pawn starts on the tile showing that pawn’s icon. Deal 2 {=tcard} to each player; anyone dealt a Waters Rise! gets another card instead, and the Waters Rise! is shuffled back into the deck. Everyone keeps their hand **face up** on the table. Set the {level} marker at Novice (first game), Normal, Elite or Legendary.',
   ],
 
   terms: [
-    ['Shore up', 'Flip a {=flooded} tile back to {=tile}: yours or an adjacent one.'],
-    ['{=flooded} Flooded', 'Still usable (you may stand on it); the next flood sinks it.'],
+    ['Shore up', 'Flip a {=flooded} tile back to {=tile}. It must be your tile or an adjacent one.'],
+    ['{=flooded} Flooded', 'Still usable: pawns may stand on it and move through it. If its flood card is drawn again, it sinks.'],
     ['{=sunk} Sunk', 'Tile removed for good, with its flood card.'],
-    ['{=level} Water level', 'Flood cards drawn per turn. Rises with each Waters Rise!'],
-    ['Treasures', '{=earth}{=wind}{=fire}{=ocean}: 2 tiles each; capture with 4 matching {=tcard}.'],
+    ['{=level} Water level', 'How many flood cards are drawn each turn. Rises 1 step with each Waters Rise!'],
+    ['Treasures', '{=earth}{=wind}{=fire}{=ocean}: each is shown on 2 tiles. Capture it by discarding 4 matching {=tcard} while on one of those tiles.'],
   ],
 
   gotchas: [
-    'Movement and shoring up are **orthogonal only** unless you’re the Explorer.',
-    'Capturing needs **4 matching cards**, discarded while on one of **its 2** tiles (flooded is fine). {heli} and Sandbags can’t be given.',
-    '{heli} (fly any pawns on one tile to any tile) and Sandbags (shore up any tile) play **any time**, even on others’ turns, for no action. Sandbags can’t save a tile once its flood card is drawn.',
+    'You move and shore up only **up, down, left or right**, never diagonally (unless you are the Explorer).',
+    'Capturing needs **4 matching cards**, discarded while your pawn is on one of **that treasure’s 2** tiles (flooded is fine). {heli} and Sandbags cards can’t be given.',
+    '{heli} (move one or more pawns from one tile to any other tile) and Sandbags (shore up any one tile) may be played by their holder **at any time**, even on another player’s turn, without using an action. Sandbags can’t save a tile once its flood card has been drawn.',
+    'The 5-card hand limit applies **at any time**, also when you are given a card: discard down to 5 at once. You may play a {heli} or Sandbags instead of discarding it.',
   ],
 
   tips: [
     'Keep **Fools’ Landing** and 1 tile per uncaptured treasure dry: losing them loses the game.',
     'After a Waters Rise!, the just-flooded tiles come up again soon: shore those up first.',
-    'Discard cards of treasures already captured.',
+    'When over 5 cards, discard cards of treasures already captured.',
   ],
 
   walk(A) {
@@ -136,15 +137,15 @@ defineGame({
         svg: pre + flood(0, 1) + flood(1, 0) + sam(1, 2) + level(4) },
       { step: 0, say: '**Action 1: move** up onto Moon Temple, one of the 2 {=earth} tiles.',
         svg: pre + flood(0, 1) + flood(1, 0) + sam(1, 1) + level(4) + A.glow(at(1, 1)[0] + s / 2, at(1, 1)[1] + s / 2, 24) },
-      { step: 0, say: '**Action 2: shore up.** An Engineer dries **2** tiles per action: Lost Lagoon and Bronze Gate flip to {=tile}.',
+      { step: 0, say: '**Action 2: shore up.** An Engineer shores up **2** tiles for 1 action: Lost Lagoon and Bronze Gate flip to {=tile}.',
         svg: pre + sam(1, 1) + level(4) + A.glow(at(0, 1)[0] + s / 2, at(0, 1)[1] + s / 2, 22, 'g1') + A.glow(at(1, 0)[0] + s / 2, at(1, 0)[1] + s / 2, 22, 'g2') },
       { step: 0, say: '**Action 3: move** up to Bronze Gate. Coral Palace stays {=flooded}.',
         svg: pre + sam(1, 0) + level(4) + A.glow(at(2, 1)[0] + s / 2, at(2, 1)[1] + s / 2, 24, 'gc') },
-      { step: 1, say: '**Draw 2:** an {=earth} card, then {rise}: level **4**.',
+      { step: 1, say: '**Draw 2:** an {=earth} card, then a {rise}: the water level rises to **4**, and the flood discard pile goes back on top of the flood deck.',
         svg: pre + sam(1, 0) + hc(2, 'earth', 'h3') + A.k('wr', A.use(ic.rise.draw(A), 204.7, 14.2, 43.6)) + level(5) + A.glow(277, ly(5), 12) },
-      { step: 2, say: '**Flood:** draw 4 flood cards. Watchtower, Dunes and Silver Gate flip to {=flooded}…',
+      { step: 2, say: '**Flood:** the level is 4, so draw 4 flood cards. Watchtower, Dunes and Silver Gate flip to {=flooded}…',
         svg: pre + sam(1, 0) + hc(2, 'earth', 'h3') + level(5) + flood(0, 0) + flood(3, 2) + flood(2, 3) },
-      { step: 2, say: '…and the 4th is **Coral Palace**. Already flooded, it **sinks**.',
+      { step: 2, say: '…and the 4th is **Coral Palace**. It was already flooded, so it **sinks**: the tile is removed.',
         svg: board + hand + sam(1, 0) + hc(2, 'earth', 'h3') + level(5) + flood(0, 0) + flood(3, 2) + flood(2, 3) + A.glow(at(2, 1)[0] + s / 2, at(2, 1)[1] + s / 2, 24, 'gc') },
     ];
   },

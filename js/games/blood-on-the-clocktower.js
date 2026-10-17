@@ -30,10 +30,10 @@ defineGame({
     type: 'round',
     intro: 'A Storyteller runs each night and day:',
     steps: [
-      { verb: 'Night', text: 'Eyes closed. The Storyteller wakes characters in night order to use abilities; from night 2 the {demon} kills.' },
-      { verb: 'Dawn', text: 'The Storyteller announces who died, not their character. The dead stay at the table.' },
-      { verb: 'Talk', text: 'Open and private chats: share, or invent, what your character learned.' },
-      { verb: 'Nominate', text: 'Living players nominate; all vote by raising a hand. The top nominee with votes ≥ **half the living** is executed.' },
+      { verb: 'Night', text: 'All players close their eyes. The Storyteller wakes characters one at a time, in night order, to use their abilities or learn information. From night 2 on, the {demon} chooses a player to kill.' },
+      { verb: 'Dawn', text: 'Everyone opens their eyes. The Storyteller announces who died in the night, but not their character or how. Dead players stay at the table.' },
+      { verb: 'Talk', text: 'Players talk as a group and in private pairs or small groups. Anyone may tell the truth or lie about their character and what they learned.' },
+      { verb: 'Nominate', text: 'Living players nominate; everyone votes on each nominee by raising a hand. At day’s end, the nominee with the most votes is executed if those votes reach **half the living players** (rounded up) and no other nominee tied them.' },
     ],
   },
 
@@ -41,15 +41,15 @@ defineGame({
 
   structure: [
     { label: 'Setup', text: 'The Storyteller deals secret characters (see table) and sets up the {=grimoire}.' },
-    { label: 'First night', text: 'With 7+ players, {minion}s and the {demon} learn each other and the Demon gets 3 bluffs. Some {=townsfolk} get starting info. No kill.' },
-    { label: 'Day', repeat: 'until a team wins', text: 'Dawn deaths, then talk and nominations. At most **1** execution.' },
-    { label: 'Night', repeat: 'then day again', text: 'Poisoner and Monk act, the {=demon} kills, then information roles wake.' },
-    { label: 'Game end', text: 'Demon dead: good wins. Only 2 alive: evil wins.' },
+    { label: 'First night', text: 'With 7+ players, the Storyteller shows the {minion}s who the {demon} is, and shows the Demon its Minions plus 3 bluffs. Some {=townsfolk} learn starting information. The Demon does not kill tonight.' },
+    { label: 'Day', repeat: 'until a team wins', text: 'Dawn: deaths are announced. Then talk and nominations. At most **1** execution per day; executing nobody is allowed.' },
+    { label: 'Night', repeat: 'then day again', text: 'Eyes closed. The Poisoner and Monk act, the {=demon} kills, then characters that learn information wake.' },
+    { label: 'Game end', text: 'If the Demon dies, good wins. If only 2 players are alive, evil wins.' },
   ],
 
   end: {
     trigger: 'the Demon dies, or only 2 players are alive',
-    detail: 'Some characters add endings: executing the Saint makes evil win; the Mayor wins for good with 3 alive and no execution.',
+    detail: 'Some characters add endings: executing the Saint makes evil win; the Mayor wins for good if only 3 players are alive and no execution happens that day.',
     results: [
       { side: 'Good wins', text: 'if the Demon dies (and no Minion becomes the new Demon).' },
       { side: 'Evil wins', text: 'if only 2 players are alive, or if good executes the Saint.' },
@@ -64,15 +64,15 @@ defineGame({
       ['7–9 players', '5 {=townsfolk} · 0–2 {=outsider} · 1 {=minion} · 1 {=demon}'],
       ['10–12 players', '7 {=townsfolk} · 0–2 {=outsider} · 2 {=minion} · 1 {=demon}'],
       ['13–15 players', '9 {=townsfolk} · 0–2 {=outsider} · 3 {=minion} · 1 {=demon}'],
-      ['Execution', 'votes ≥ half the living (round up), and more than any other nominee that day'],
+      ['Execution', 'the nominee needs votes at least equal to half the living players (rounded up), and more votes than every other nominee that day; a tie for most means nobody is executed'],
     ],
   },
 
   example: 'On day 2 Mia (Empath) says a neighbour is evil. She nominates **Raj**; 6 of 11 living players vote, meeting the 6 needed. Raj is executed and the game goes on, so he wasn’t the Demon (he was the Poisoner). That night the Imp kills Mia.',
 
   setup: [
-    'The Storyteller picks characters for the player count (see table; each player above a bracket’s minimum adds 1 {=outsider}) and deals each a **secret token**.',
-    'First night (7+ players only): evil learn each other; the {=demon} also learns 3 good characters **not in play** to bluff as.',
+    'The Storyteller picks characters for the player count (see table: each player above a row’s lowest count adds 1 {=outsider}, so 8 players use 5 {=townsfolk}, 1 {=outsider}, 1 {=minion}, 1 {=demon}) and deals each player a **secret token**.',
+    'First night (7+ players only): the evil players learn who the other evil players are; the {=demon} also learns 3 good characters **not in play** to bluff as.',
     'Above 15 players, the extra players are Travellers (a separate set of characters).',
     'Players sit in a circle; seat order matters for many abilities.',
   ],
@@ -80,7 +80,7 @@ defineGame({
   terms: [
     ['Storyteller', 'The non-playing host: runs nights, keeps the Grimoire, chooses what drunk or poisoned players learn.'],
     ['{=grimoire} Grimoire', 'The Storyteller’s board showing every true character and status.'],
-    ['{=ghost} Ghost vote', 'Dead players keep one vote to use once for the rest of the game.'],
+    ['{=ghost} Ghost vote', 'Each dead player keeps 1 vote, which they may use on one nomination for the rest of the game.'],
     ['Drunk / poisoned', 'Your ability doesn’t work and your info may be false, but you aren’t told.'],
     ['Script', 'The set of characters in use; Trouble Brewing is the beginner one.'],
   ],
@@ -88,7 +88,7 @@ defineGame({
   gotchas: [
     'Dead players get a {shroud}. They still **talk** and win with their team, but can’t nominate and have only **one** {ghost} left.',
     'Each living player may **nominate once** per day, and each player may **be nominated once** per day. A tie for most votes means nobody dies.',
-    'If the Imp dies with 5+ players alive, the **Scarlet Woman** becomes the Imp; the Imp can also kill itself at night to make a Minion the new Imp.',
+    'If the Imp dies while 5 or more players are alive, the **Scarlet Woman** becomes the Imp. If the Imp kills itself at night, a Minion becomes the new Imp.',
   ],
 
   tips: [
@@ -99,17 +99,17 @@ defineGame({
 
   extended: [
     { title: 'Trouble Brewing: the Townsfolk', items: [
-      '**Washerwoman / Librarian / Investigator** (first night): learn that one of two players is a particular Townsfolk / Outsider / Minion.',
+      '**Washerwoman / Librarian / Investigator** (first night): you are shown 2 players and 1 character: one of those 2 players is that Townsfolk / Outsider / Minion.',
       '**Chef** (first night): how many pairs of evil players sit next to each other. **Empath** (each night): how many of your 2 living neighbours are evil.',
-      '**Fortune Teller** (each night): pick 2 players and learn if either is the Demon; one good player is a “red herring” who also reads as the Demon.',
-      '**Undertaker**: learn the character of today’s executed player. **Ravenkeeper**: if killed at night, pick a player and learn their character.',
-      '**Monk**: protect another player from the Demon each night. **Soldier**: safe from the Demon. **Slayer**: once per game, publicly pick a player; if it’s the Demon, it dies.',
-      '**Virgin**: the first time you are nominated, if the nominator is a Townsfolk, they are executed at once. **Mayor**: with 3 alive and no execution, good wins; if the Mayor would die at night, someone else might die instead.',
+      '**Fortune Teller** (each night): choose 2 players and learn yes or no: is either one the Demon? At setup the Storyteller picks one good player as a “red herring”, who also gives a yes for the whole game.',
+      '**Undertaker** (each night except the first): learn the character of the player executed today. **Ravenkeeper**: if you die at night, choose a player and learn their character.',
+      '**Monk**: each night except the first, choose another player; the Demon can’t kill them that night. **Soldier**: the Demon can’t kill you. **Slayer**: once per game, publicly choose a player; if they are the Demon, they die.',
+      '**Virgin**: the first time you are nominated, if the player who nominated you is a Townsfolk, that player is executed at once. **Mayor**: if only 3 players are alive and no execution happens that day, good wins; if the Mayor would die at night, another player might die instead.',
     ] },
     { title: 'Outsiders, Minions and the Demon', items: [
-      'Outsiders (good, with a drawback): **Butler** may only vote if their chosen master votes; **Drunk** thinks they are a Townsfolk but has no power; **Recluse** may register as evil or as a Minion/Demon; **Saint**: if executed, good loses.',
-      'Minions: **Poisoner** poisons a player each night (their ability fails, info may be false); **Spy** sees the Grimoire and may register as good; **Scarlet Woman** becomes the Imp if it dies with 5+ alive; **Baron** adds 2 Outsiders to the game.',
-      'Demon: the **Imp** kills one player each night except the first. If it kills itself, a Minion becomes the new Imp.',
+      'Outsiders (good, with a drawback): **Butler**: each night (first night included) chooses another player as master, and the next day may vote only if the master is voting too; **Drunk** is told they are a Townsfolk but has no ability; **Recluse** may register to abilities as evil, a Minion or a Demon; **Saint**: if executed, evil wins.',
+      'Minions: **Poisoner** poisons a player each night (their ability fails, their info may be false); **Spy** sees the Grimoire and may register as good; **Scarlet Woman** becomes the Imp if the Imp dies while 5 or more players are alive; **Baron**: at setup, the Storyteller replaces 2 Townsfolk with 2 Outsiders.',
+      'Demon: the **Imp** chooses one player to kill each night except the first. If it chooses itself, it dies and a Minion becomes the new Imp.',
     ] },
     { title: 'The night order', items: [
       '**First night**: with 7+ players, Minions learn each other and the Demon, and the Demon learns its Minions and 3 bluffs; then Poisoner, Washerwoman, Librarian, Investigator, Chef, Empath, Fortune Teller, Butler, Spy.',
@@ -119,13 +119,13 @@ defineGame({
     ] },
     { title: 'Nominations and voting', items: [
       'Each living player may **nominate once** per day, and each player may **be nominated once** per day.',
-      'After the nominee and nominator speak, the Storyteller’s hand moves around the circle starting next to the nominee; raise your hand when it reaches you. Votes are final once counted.',
+      'After the nominator and nominee each speak, the Storyteller’s hand moves **clockwise** around the circle, starting with the player clockwise of the nominee and ending with the nominee. Raise your hand when it reaches you to vote; a vote is final once the hand passes you.',
       'To be **about to die**, a nominee needs votes equal to at least **half the living players** (rounded up), and more than any earlier nominee that day. A tie with the leader means neither is about to die.',
       'At the end of the day the player about to die (if any) is executed: at most **one execution** per day. Executing nobody is a valid choice.',
     ] },
     { title: 'Dead players and ghost votes', items: [
       'Dead players lose their ability but stay in the game: they talk, share info, and still win or lose with their team.',
-      'They cannot nominate, and get **one ghost vote** for the rest of the game; spend it by raising your hand, then turn your token over.',
+      'They cannot nominate, and get **one ghost vote** for the rest of the game; to spend it, raise your hand on a vote, then remove your vote token; without it you can’t vote again.',
       'Ghost votes count toward the total, but the threshold is still half of the **living** players, so late game a few dead votes swing everything.',
       'Evil wins when just **2 players** are alive, so the endgame often hinges on whether to execute at all.',
     ] },
